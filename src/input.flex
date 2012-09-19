@@ -63,9 +63,11 @@ NOTWHITESPACE   [^ \t\n\r]
     // Maths: division.
     printf("Maths div:      %s\n", yytext);
 }
-("+"|"-")?{DIGIT}+ {
+{DIGIT}+"."? {
     // Numeric constant.
-    printf("Numeric constant:   %s\n", yytext);
+    int value;
+    sscanf(yytext, "%d", &value);
+    printf("Numeric constant:   %d\n", value);
 }
 (?i:"#\\"{NOTWHITESPACE}) {
     // Character constant.
