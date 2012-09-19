@@ -6,6 +6,59 @@
 char            buffer[8 * 1024];   // For storing strings, comments etc.
 unsigned int    buffer_length = 0;  // Length of the buffer.
 
+int my_powah(int base, int n)
+{
+    int result = 1;
+    for (int i = 0; i < n; i++)
+        result *= base;
+    return result;
+}
+
+int nondec2dec(char * string, int base) {
+    int result = 0;
+    size_t length = strlen(string);
+    for (size_t i = 0; i < length; i++)
+    {
+        char cur = string[length - i - 1];
+        int tmp = 0;
+        switch (cur)
+        {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            tmp = (int)cur - 0x30;
+            break;
+        case 'A':
+        case 'B':
+        case 'C':
+        case 'D':
+        case 'E':
+        case 'F':
+            tmp = (int)cur - ('A' - 0xA);
+            break;
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
+            tmp = (int)cur - ('a' - 0xA);
+            break;
+        default:
+            tmp = 0;
+        }
+        result += tmp * my_powah(base, i);
+    }
+    return result;
+}
+
 void buffer_output(char * title, char * buf, unsigned int len)
 {
     printf("%s", title);
@@ -19,7 +72,10 @@ void buffer_output(char * title, char * buf, unsigned int len)
 %option noyywrap
 %option never-interactive
 
-DIGIT           [0-9]
+DIGIT_BIN       [0-1]
+DIGIT_OCT       [0-7]
+DIGIT_DEC       [0-9]
+DIGIT_HEX       [0-9a-fA-F]
 WORDCHAR        [a-zA-Z0-9_]
 WHITESPACE      [ \t\n\r]
 NOTWHITESPACE   [^ \t\n\r]
@@ -63,11 +119,27 @@ NOTWHITESPACE   [^ \t\n\r]
     // Maths: division.
     printf("Maths div:      %s\n", yytext);
 }
-{DIGIT}+"."? {
+(?i:"#"b{DIGIT_BIN}+) {
+    // Numeric constant - binary.
+    int value = nondec2dec(yytext + 2, 2);
+    printf("Numeric constant - binary:   %d\n", value);
+}
+(?i:"#"o{DIGIT_OCT}+) {
+    // Numeric constant - octal.
+    int value = nondec2dec(yytext + 2, 8);
+    printf("Numeric constant - octal:   %d\n", value);
+}
+{DIGIT_DEC}+"."? {
     // Numeric constant.
-    int value;
-    sscanf(yytext, "%d", &value);
+    if (yytext[yyleng - 1] == '.')
+        yytext[yyleng - 1] = '\0';
+    int value = nondec2dec(yytext, 10);
     printf("Numeric constant:   %d\n", value);
+}
+(?i:"#"x{DIGIT_HEX}+) {
+    // Numeric constant - hexadecimal.
+    int value = nondec2dec(yytext + 2, 16);
+    printf("Numeric constant - hexadecimal:   %d\n", value);
 }
 (?i:"#\\"{NOTWHITESPACE}) {
     // Character constant.
@@ -85,6 +157,12 @@ NOTWHITESPACE   [^ \t\n\r]
 (?i:"defun") {
     printf("Key word defun: %s\n", yytext);
 }
+<COMMENT_ML>"|#" {
+    // Multiline comment ending.
+    buffer_output("Comment: ", buffer, buffer_length);
+    buffer_length = 0;
+    BEGIN(INITIAL);
+}
 <COMMENT_ML>[^|] {
     // Multiline comment body.
     buffer[buffer_length++] = yytext[0];
@@ -92,12 +170,6 @@ NOTWHITESPACE   [^ \t\n\r]
 <COMMENT_ML>"|" {
     // Multiline comment body.
     buffer[buffer_length++] = yytext[0];
-}
-<COMMENT_ML>"|#" {
-    // Multiline comment ending.
-    buffer_output("Comment: ", buffer, buffer_length);
-    buffer_length = 0;
-    BEGIN(INITIAL);
 }
 <STRING>[^"\""] {
     // String constant body: non-quote character.

@@ -1,4 +1,17 @@
-()#|comme 
- here#| |#
+()
+#|comment
+here#| |#
 +-*/10
 "do cats eat quotes\"?"
+"multi-
+  line string
+\"\\ constant"
++11
+-11
+- 12.
+#b101
+#B010
+#O77
+#o11
+#xFF
+#XFFFF
