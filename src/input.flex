@@ -1,11 +1,18 @@
 %{
 
-#include <stdio.h>
-#include <string.h>
 //#include "lexemtypes.h"
 // ATTENTION! LISP is case-insensitive so don't forget to use (?i: ... ) when creating rules.
 
-char buffer[8 * 1024];  // For storing strings, comments etc.
+char            buffer[8 * 1024];   // For storing strings, comments etc.
+unsigned int    buffer_length = 0;  // Length of the buffer.
+
+void buffer_output(char * title, char * buf, unsigned int len)
+{
+    printf("%s", title);
+    for (unsigned int i = 0; i < len; i++)
+        printf("%c", buf[i]);
+    printf("\n");
+}
 
 %}
 
@@ -15,7 +22,7 @@ char buffer[8 * 1024];  // For storing strings, comments etc.
 DIGIT           [0-9]
 WORDCHAR        [a-zA-Z0-9_]
 WHITESPACE      [ \t\n\r]
-NOTWHITESPACE   [ \t\n\r]
+NOTWHITESPACE   [^ \t\n\r]
 
 %x COMMENT_ML
 %x STRING
@@ -24,7 +31,7 @@ NOTWHITESPACE   [ \t\n\r]
 
 "#|" {
     // Multiline comment beginning.
-    strcpy(buffer, "");
+    buffer_length = 0;
     BEGIN(COMMENT_ML);
 }
 {WHITESPACE} {
@@ -70,38 +77,42 @@ NOTWHITESPACE   [ \t\n\r]
 }
 "\"" {
     // String constant beginning.
-    strcpy(buffer, "");
+    buffer_length = 0;
     BEGIN(STRING);
 }
 (?i:"defun") {
     printf("Key word defun: %s\n", yytext);
 }
-<COMMENT_ML>[^|]* {
-    // Multiline comment body with maximal length.
-    strcat(buffer, yytext);
-}
-<COMMENT_ML>. {
+<COMMENT_ML>[^|] {
     // Multiline comment body.
-    strcat(buffer, yytext);
+    buffer[buffer_length++] = yytext[0];
+}
+<COMMENT_ML>"|" {
+    // Multiline comment body.
+    buffer[buffer_length++] = yytext[0];
 }
 <COMMENT_ML>"|#" {
     // Multiline comment ending.
-    printf("Comment: %s\n", buffer);
-    strcpy(buffer, "");
+    buffer_output("Comment: ", buffer, buffer_length);
+    buffer_length = 0;
     BEGIN(INITIAL);
 }
 <STRING>[^"\""] {
     // String constant body: non-quote character.
-    strcat(buffer, yytext);
+    buffer[buffer_length++] = yytext[0];
 }
 <STRING>"\\\"" {
     // String constant body: escaped quote character.
-    strcat(buffer, "\"");
+    buffer[buffer_length++] = '"';
+}
+<STRING>"\\\\" {
+    // String constant body: escaped slash character.
+    buffer[buffer_length++] = '\\';
 }
 <STRING>"\"" {
     // String constant ending.
-    printf("String constant: %s\n", buffer);
-    strcpy(buffer, "");
+    buffer_output("String constant: ", buffer, buffer_length);
+    buffer_length = 0;
     BEGIN(INITIAL);
 }
 
