@@ -1,7 +1,12 @@
 %{
+
 #include <stdio.h>
+#include <string.h>
 //#include "lexemtypes.h"
 // ATTENTION! LISP is case-insensitive so don't forget to use (?i: ... ) when creating rules.
+
+char buffer[8 * 1024];  // For storing strings, comments etc.
+
 %}
 
 %option noyywrap
@@ -12,10 +17,16 @@ WORDCHAR        [a-zA-Z0-9_]
 WHITESPACE      [ \t\n\r]
 NOTWHITESPACE   [ \t\n\r]
 
+%x COMMENT_ML
 %x STRING
 
 %%
 
+"#|" {
+    // Multiline comment beginning.
+    strcpy(buffer, "");
+    BEGIN(COMMENT_ML);
+}
 {WHITESPACE} {
     // Whitespaces.
     printf("Skipping whitespace\n");
@@ -57,9 +68,41 @@ NOTWHITESPACE   [ \t\n\r]
     // Character constant - whitespace.
     printf("Character constant:   %s\n", yytext);
 }
-
+"\"" {
+    // String constant beginning.
+    strcpy(buffer, "");
+    BEGIN(STRING);
+}
 (?i:"defun") {
     printf("Key word defun: %s\n", yytext);
+}
+<COMMENT_ML>[^|]* {
+    // Multiline comment body with maximal length.
+    strcat(buffer, yytext);
+}
+<COMMENT_ML>. {
+    // Multiline comment body.
+    strcat(buffer, yytext);
+}
+<COMMENT_ML>"|#" {
+    // Multiline comment ending.
+    printf("Comment: %s\n", buffer);
+    strcpy(buffer, "");
+    BEGIN(INITIAL);
+}
+<STRING>[^"\""] {
+    // String constant body: non-quote character.
+    strcat(buffer, yytext);
+}
+<STRING>"\\\"" {
+    // String constant body: escaped quote character.
+    strcat(buffer, "\"");
+}
+<STRING>"\"" {
+    // String constant ending.
+    printf("String constant: %s\n", buffer);
+    strcpy(buffer, "");
+    BEGIN(INITIAL);
 }
 
 %%
