@@ -1,7 +1,6 @@
 %{
 
 //#include "lexemtypes.h"
-// ATTENTION! LISP is case-insensitive so don't forget to use (?i: ... ) when creating rules.
 
 char            buffer[8 * 1024];   // For storing strings, comments etc.
 unsigned int    buffer_length = 0;  // Length of the buffer.
@@ -71,6 +70,7 @@ void buffer_output(char * title, char * buf, unsigned int len)
 
 %option noyywrap
 %option never-interactive
+%option case-insensitive
 
 DIGIT_BIN       [0-1]
 DIGIT_OCT       [0-7]
@@ -162,12 +162,12 @@ ALPHA           [a-zA-Z_]
     // Operator: not.
     printf("Operator not:              %s\n", yytext);
 }
-(?i:"#b"{DIGIT_BIN}+) {
+"#b"{DIGIT_BIN}+ {
     // Numeric constant - binary.
     int value = nondec2dec(yytext + 2, 2);
     printf("Numeric constant - bin:    %d\n", value);
 }
-(?i:"#o"{DIGIT_OCT}+) {
+"#o"{DIGIT_OCT}+ {
     // Numeric constant - octal.
     int value = nondec2dec(yytext + 2, 8);
     printf("Numeric constant - oct:    %d\n", value);
@@ -179,51 +179,51 @@ ALPHA           [a-zA-Z_]
     int value = nondec2dec(yytext, 10);
     printf("Numeric constant - dec:    %d\n", value);
 }
-(?i:"#x"{DIGIT_HEX}+) {
+"#x"{DIGIT_HEX}+ {
     // Numeric constant - hexadecimal.
     int value = nondec2dec(yytext + 2, 16);
     printf("Numeric constant - hex:    %d\n", value);
 }
-(?i:"#\\"{NOTWHITESPACE}) {
+"#\\"{NOTWHITESPACE} {
     // Character constant.
     printf("Character constant:        %s\n", yytext + 2);
 }
-(?i:"#\\"("SPACE"|"TAB"|"NEWLINE"|"PAGE"|"RUBOUT"|"LINEFEED"|"RETURN"|"BACKSPACE")) {
+"#\\"("SPACE"|"TAB"|"NEWLINE"|"PAGE"|"RUBOUT"|"LINEFEED"|"RETURN"|"BACKSPACE") {
     // Character constant - whitespace.
     // TODO: convert to a real character.
     printf("Character constant:        %s\n", yytext + 2);
 }
-(?i:"loop") {
+"loop" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"for") {
+"for" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"in") {
+"in" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"do") {
+"do" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"from") {
+"from" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"to") {
+"to" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"repeat") {
+"repeat" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"while") {
+"while" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"until") {
+"until" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"progn") {
+"progn" {
     printf("Key word:                  %s\n", yytext);
 }
-(?i:"defun") {
+"defun" {
     printf("Key word:                  %s\n", yytext);
 }
 {ALPHA}({ALPHA}|{DIGIT_DEC})* {
