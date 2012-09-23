@@ -76,9 +76,9 @@ DIGIT_BIN       [0-1]
 DIGIT_OCT       [0-7]
 DIGIT_DEC       [0-9]
 DIGIT_HEX       [0-9a-fA-F]
-WORDCHAR        [a-zA-Z0-9_]
 WHITESPACE      [ \t\n\r]
 NOTWHITESPACE   [^ \t\n\r]
+ALPHA           [a-zA-Z_]
 
 %x COMMENT_ML
 %x STRING
@@ -90,6 +90,17 @@ NOTWHITESPACE   [^ \t\n\r]
     buffer_length = 0;
     BEGIN(COMMENT_ML);
 }
+"\"" {
+    // String constant beginning.
+    buffer_length = 0;
+    BEGIN(STRING);
+}
+";".* {
+    // Singleline comment.
+    strcpy(buffer, yytext + 1);
+    buffer_length = strlen(yytext + 1);
+    buffer_output("Comment:                   ", buffer, buffer_length);
+}
 {WHITESPACE} {
     // Whitespaces.
     printf("Skipping whitespace\n");
@@ -97,78 +108,135 @@ NOTWHITESPACE   [^ \t\n\r]
 }
 "(" {
     // Opening parenthesis.
-    printf("Opening paren:  %s\n", yytext);
+    printf("Opening paren:             %s\n", yytext);
 }
 ")" {
     // Closing parenthesis.
-    printf("Closing paren:  %s\n", yytext);
+    printf("Closing paren:             %s\n", yytext);
 }
 "+" {
-    // Maths: addition.
-    printf("Maths add:      %s\n", yytext);
+    // Operator: addition.
+    printf("Operator add:              %s\n", yytext);
 }
 "-" {
-    // Maths: subtraction.
-    printf("Maths sub:      %s\n", yytext);
+    // Operator: subtraction.
+    printf("Operator sub:              %s\n", yytext);
 }
 "*" {
-    // Maths: multiplication.
-    printf("Maths mult:     %s\n", yytext);
+    // Operator: multiplication.
+    printf("Operator mult:             %s\n", yytext);
 }
 "/" {
-    // Maths: division.
-    printf("Maths div:      %s\n", yytext);
+    // Operator: division.
+    printf("Operator div:              %s\n", yytext);
 }
-(?i:"#"b{DIGIT_BIN}+) {
+">" {
+    // Operator: greater.
+    printf("Operator greater:          %s\n", yytext);
+}
+">=" {
+    // Operator: greater or equal.
+    printf("Operator greater or equal: %s\n", yytext);
+}
+"<" {
+    // Operator: less.
+    printf("Operator less:             %s\n", yytext);
+}
+"<=" {
+    // Operator: less or equal.
+    printf("Operator less or equal:    %s\n", yytext);
+}
+"=" {
+    // Operator: equal.
+    printf("Operator equal:            %s\n", yytext);
+}
+"and" {
+    // Operator: and.
+    printf("Operator and:              %s\n", yytext);
+}
+"or" {
+    // Operator: or.
+    printf("Operator or:               %s\n", yytext);
+}
+"not" {
+    // Operator: not.
+    printf("Operator not:              %s\n", yytext);
+}
+(?i:"#b"{DIGIT_BIN}+) {
     // Numeric constant - binary.
     int value = nondec2dec(yytext + 2, 2);
-    printf("Numeric constant - binary:   %d\n", value);
+    printf("Numeric constant - bin:    %d\n", value);
 }
-(?i:"#"o{DIGIT_OCT}+) {
+(?i:"#o"{DIGIT_OCT}+) {
     // Numeric constant - octal.
     int value = nondec2dec(yytext + 2, 8);
-    printf("Numeric constant - octal:   %d\n", value);
+    printf("Numeric constant - oct:    %d\n", value);
 }
 {DIGIT_DEC}+"."? {
     // Numeric constant.
     if (yytext[yyleng - 1] == '.')
         yytext[yyleng - 1] = '\0';
     int value = nondec2dec(yytext, 10);
-    printf("Numeric constant:   %d\n", value);
+    printf("Numeric constant - dec:    %d\n", value);
 }
-(?i:"#"x{DIGIT_HEX}+) {
+(?i:"#x"{DIGIT_HEX}+) {
     // Numeric constant - hexadecimal.
     int value = nondec2dec(yytext + 2, 16);
-    printf("Numeric constant - hexadecimal:   %d\n", value);
+    printf("Numeric constant - hex:    %d\n", value);
 }
 (?i:"#\\"{NOTWHITESPACE}) {
     // Character constant.
-    printf("Character constant:   %s\n", yytext);
+    printf("Character constant:        %s\n", yytext + 2);
 }
 (?i:"#\\"("SPACE"|"TAB"|"NEWLINE"|"PAGE"|"RUBOUT"|"LINEFEED"|"RETURN"|"BACKSPACE")) {
     // Character constant - whitespace.
-    printf("Character constant:   %s\n", yytext);
+    // TODO: convert to a real character.
+    printf("Character constant:        %s\n", yytext + 2);
 }
-"\"" {
-    // String constant beginning.
-    buffer_length = 0;
-    BEGIN(STRING);
+(?i:"loop") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"for") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"in") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"do") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"from") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"to") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"repeat") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"while") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"until") {
+    printf("Key word:                  %s\n", yytext);
+}
+(?i:"progn") {
+    printf("Key word:                  %s\n", yytext);
 }
 (?i:"defun") {
-    printf("Key word defun: %s\n", yytext);
+    printf("Key word:                  %s\n", yytext);
+}
+{ALPHA}({ALPHA}|{DIGIT_DEC})* {
+    printf("Variable:                  %s\n", yytext);
 }
 <COMMENT_ML>"|#" {
     // Multiline comment ending.
-    buffer_output("Comment: ", buffer, buffer_length);
+    buffer_output("Comment:                   ", buffer, buffer_length);
     buffer_length = 0;
     BEGIN(INITIAL);
 }
-<COMMENT_ML>[^|] {
-    // Multiline comment body.
-    buffer[buffer_length++] = yytext[0];
-}
-<COMMENT_ML>"|" {
-    // Multiline comment body.
+<COMMENT_ML>[^"|"]|"|" {
+    // Multiline comment body: any character.
     buffer[buffer_length++] = yytext[0];
 }
 <STRING>[^"\""] {
@@ -185,7 +253,7 @@ NOTWHITESPACE   [^ \t\n\r]
 }
 <STRING>"\"" {
     // String constant ending.
-    buffer_output("String constant: ", buffer, buffer_length);
+    buffer_output("String constant:           ", buffer, buffer_length);
     buffer_length = 0;
     BEGIN(INITIAL);
 }

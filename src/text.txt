@@ -1,17 +1,9 @@
-()
-#|comment
-here#| |#
-+-*/10
-"do cats eat quotes\"?"
+#|multiline comment
+here#| |# "do cats \\eat quotes\"?" ;comment
 "multi-
   line string
 \"\\ constant"
-+11
--11
-- 12.
-#b101
-#B010
-#O77
-#o11
-#xFF
-#XFFFF
+()+-*/>=><<= = and or not
+#b101 #B010 #O77 #o11 #xFF #XFFFF #\f #\NEWLINE
+loop for in do from to repeat while until progn defun
+this_is_a_var
