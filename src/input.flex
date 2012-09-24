@@ -105,7 +105,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 {WHITESPACE} {
     // Whitespaces.
-    printf("Skipping whitespace\n");
+    //printf("Skipping whitespace\n");
     //printf("Whitespace:  %s\n", yytext);
 }
 "(" {
@@ -303,9 +303,13 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     buffer_length = 0;
     BEGIN(INITIAL);
 }
-<COMMENT_ML>[^"|"]|"|" {
+<COMMENT_ML>.|\n {
     // Multiline comment body: any character.
     buffer[buffer_length++] = yytext[0];
+}
+<COMMENT_ML><<EOF>> {
+    puts("ERROR: UNCLOSED COMMENT");
+    yyterminate();
 }
 <STRING>[^"\""] {
     // String constant body: non-quote character.
@@ -324,6 +328,10 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     buffer_output("String constant:           ", buffer, buffer_length);
     buffer_length = 0;
     BEGIN(INITIAL);
+}
+<STRING><<EOF>> {
+    puts("ERROR: UNCLOSED STRING CONSTANT");
+    yyterminate();
 }
 
 %%

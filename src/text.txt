@@ -10,3 +10,5 @@ defparameter setf let vector vector-push vector-pop elt list
 count find position remove substitute concatenate if dotimes
 defun defclass slot-value open close with_open-file format
 this_is_a_var
+"#||#"
+#|"|#
