@@ -2,9 +2,6 @@
 
 //#include "lexemtypes.h"
 
-char            buffer[8 * 1024];   // For storing strings, comments etc.
-unsigned int    buffer_length = 0;  // Length of the buffer.
-
 int my_powah(int base, int n)
 {
     int result = 1;
@@ -84,6 +81,11 @@ ALPHA           [a-zA-Z_]
 %x STRING
 
 %%
+
+%{
+char            buffer[8 * 1024];   // For storing strings, comments etc.
+unsigned int    buffer_length = 0;  // Length of the buffer.
+%}
 
 "#|" {
     // Multiline comment beginning.
