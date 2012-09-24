@@ -223,7 +223,73 @@ ALPHA           [a-zA-Z_]
 "progn" {
     printf("Key word:                  %s\n", yytext);
 }
+"defparameter" {
+    printf("Key word:                  %s\n", yytext);
+}
+"setf" {
+    printf("Key word:                  %s\n", yytext);
+}
+"let" {
+    printf("Key word:                  %s\n", yytext);
+}
+"vector" {
+    printf("Key word:                  %s\n", yytext);
+}
+"vector-push" {
+    printf("Key word:                  %s\n", yytext);
+}
+"vector-pop" {
+    printf("Key word:                  %s\n", yytext);
+}
+"elt" {
+    printf("Key word:                  %s\n", yytext);
+}
+"list" {
+    printf("Key word:                  %s\n", yytext);
+}
+"count" {
+    printf("Key word:                  %s\n", yytext);
+}
+"find" {
+    printf("Key word:                  %s\n", yytext);
+}
+"position" {
+    printf("Key word:                  %s\n", yytext);
+}
+"remove" {
+    printf("Key word:                  %s\n", yytext);
+}
+"substitute" {
+    printf("Key word:                  %s\n", yytext);
+}
+"concatenate" {
+    printf("Key word:                  %s\n", yytext);
+}
+"if" {
+    printf("Key word:                  %s\n", yytext);
+}
+"dotimes" {
+    printf("Key word:                  %s\n", yytext);
+}
 "defun" {
+    printf("Key word:                  %s\n", yytext);
+}
+"defclass" {
+    printf("Key word:                  %s\n", yytext);
+}
+"slot-value" {
+    printf("Key word:                  %s\n", yytext);
+}
+"open" {
+    printf("Key word:                  %s\n", yytext);
+}
+"close" {
+    printf("Key word:                  %s\n", yytext);
+}
+"with_open-file" {
+    printf("Key word:                  %s\n", yytext);
+}
+"format" {
     printf("Key word:                  %s\n", yytext);
 }
 {ALPHA}({ALPHA}|{DIGIT_DEC})* {
