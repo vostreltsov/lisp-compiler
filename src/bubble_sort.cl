@@ -1,11 +1,11 @@
-(setf *x* (vector 7 15 1))
 (defun BubbleSort (v)
-        "Sort elements of sequence"
+        ;Sort elements of sequence
         (dotimes (i (length v))
                 (dotimes (j (length v))
-                        (if( >(elt v i) (elt v j))
-                                (progn(setf temp (elt v j))
-                                        (setf(elt v j) (elt v i))
-                                        (setf(elt v i) temp))))))
+                        (if (> (elt v i) (elt v j))
+                                (progn (setf temp (elt v j))
+                                       (setf(elt v j) (elt v i))
+                                       (setf(elt v i) temp))))))
+(setf *x* (vector 7 15 1))
 (BubbleSort *x*)
 (print *x*)
