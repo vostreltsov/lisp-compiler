@@ -8,7 +8,8 @@ here#| |# "do cats \\eat quotes\"?" ;comment
 loop for in do from to repeat while until progn
 defparameter setf let vector vector-push vector-pop elt list
 count find position remove substitute concatenate if dotimes
-defun defclass slot-value open close with_open-file format
+defun slot-value open close with-open-file format funcall
+defclass :initform :reader :writer :accessor :initarg :allocation :type :documentation :initformaaaa
 this_is_a_var
 "#||#"
 #|"|#

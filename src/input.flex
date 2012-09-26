@@ -276,9 +276,6 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "defun" {
     printf("Key word:                  %s\n", yytext);
 }
-"defclass" {
-    printf("Key word:                  %s\n", yytext);
-}
 "slot-value" {
     printf("Key word:                  %s\n", yytext);
 }
@@ -288,10 +285,46 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "close" {
     printf("Key word:                  %s\n", yytext);
 }
-"with_open-file" {
+"with-open-file" {
     printf("Key word:                  %s\n", yytext);
 }
 "format" {
+    printf("Key word:                  %s\n", yytext);
+}
+"funcall" {
+    printf("Key word:                  %s\n", yytext);
+}
+"defclass" {
+    printf("Key word:                  %s\n", yytext);
+}
+"'" {
+    printf("Key word:                  %s\n", yytext);
+}
+":initform" {
+    printf("Key word:                  %s\n", yytext);
+}
+":reader" {
+    printf("Key word:                  %s\n", yytext);
+}
+":writer" {
+    printf("Key word:                  %s\n", yytext);
+}
+":accessor" {
+    printf("Key word:                  %s\n", yytext);
+}
+":initarg" {
+    printf("Key word:                  %s\n", yytext);
+}
+":allocation" {
+    printf("Key word:                  %s\n", yytext);
+}
+":type" {
+    printf("Key word:                  %s\n", yytext);
+}
+":documentation" {
+    printf("Key word:                  %s\n", yytext);
+}
+":".+ {
     printf("Key word:                  %s\n", yytext);
 }
 {ALPHA}({ALPHA}|{DIGIT_DEC})* {
