@@ -118,39 +118,39 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     // Closing parenthesis.
     printf("Closing paren:             %s\n", yytext);
 }
-"+"/{DELIMETER}+ {
+"+"/{DELIMETER} {
     // Operator: addition.
     printf("Operator add:              %s\n", yytext);
 }
-"-"/{DELIMETER}+ {
+"-"/{DELIMETER} {
     // Operator: subtraction.
     printf("Operator sub:              %s\n", yytext);
 }
-"*"/{DELIMETER}+ {
+"*"/{DELIMETER} {
     // Operator: multiplication.
     printf("Operator mult:             %s\n", yytext);
 }
-"/"/{DELIMETER}+ {
+"/"/{DELIMETER} {
     // Operator: division.
     printf("Operator div:              %s\n", yytext);
 }
-">"/{DELIMETER}+ {
+">"/{DELIMETER} {
     // Operator: greater.
     printf("Operator greater:          %s\n", yytext);
 }
-">="/{DELIMETER}+ {
+">="/{DELIMETER} {
     // Operator: greater or equal.
     printf("Operator greater or equal: %s\n", yytext);
 }
-"<"/{DELIMETER}+ {
+"<"/{DELIMETER} {
     // Operator: less.
     printf("Operator less:             %s\n", yytext);
 }
-"<="/{DELIMETER}+ {
+"<="/{DELIMETER} {
     // Operator: less or equal.
     printf("Operator less or equal:    %s\n", yytext);
 }
-"="/{DELIMETER}+ {
+"="/{DELIMETER} {
     // Operator: equal.
     printf("Operator equal:            %s\n", yytext);
 }
@@ -165,6 +165,14 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "not" {
     // Operator: not.
     printf("Operator not:              %s\n", yytext);
+}
+"t" {
+    // Boolean constant - true.
+    printf("Boolean constant - true:   %s\n", yytext);
+}
+"nil" {
+    // Boolean constant - false.
+    printf("Boolean constant - false:  %s\n", yytext);
 }
 "#b"{DIGIT_BIN}+ {
     // Numeric constant - binary.
@@ -302,6 +310,12 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "'" {
     printf("Key word:                  %s\n", yytext);
 }
+"print" {
+    printf("Key word:                  %s\n", yytext);
+}
+"length" {
+    printf("Key word:                  %s\n", yytext);
+}
 ":initform" {
     printf("Key word:                  %s\n", yytext);
 }
@@ -330,7 +344,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     printf("Key word:                  %s\n", yytext);
 }
 {SYMBOLID}+ {
-    printf("Variable:                  %s\n", yytext);
+    printf("Symbol:                    %s\n", yytext);
 }
 . {
     printf("UNEXPECTED CHARACTER:      %s\n", yytext);
