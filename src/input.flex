@@ -259,7 +259,10 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "list" {
     printf("Key word:                  %s\n", yytext);
 }
-"count" {
+"list-length" {
+    printf("Key word:                  %s\n", yytext);
+}
+"length" {
     printf("Key word:                  %s\n", yytext);
 }
 "find" {
@@ -311,9 +314,6 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     printf("Key word:                  %s\n", yytext);
 }
 "print" {
-    printf("Key word:                  %s\n", yytext);
-}
-"length" {
     printf("Key word:                  %s\n", yytext);
 }
 ":initform" {
