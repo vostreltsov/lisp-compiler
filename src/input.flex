@@ -77,7 +77,6 @@ DIGIT_HEX       [0-9a-fA-F]
 WHITESPACE      [ \t\n\r]
 NOTWHITESPACE   [^ \t\n\r]
 SYMBOLID        [a-zA-Z0-9+\-*/@$%^&_=<>~.]
-DELIMETER       [ \t\n\r()]
 
 %x COMMENT_ML
 %x STRING
@@ -118,39 +117,39 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     // Closing parenthesis.
     printf("Closing paren:             %s\n", yytext);
 }
-"+"/{DELIMETER} {
+"+" {
     // Operator: addition.
     printf("Operator add:              %s\n", yytext);
 }
-"-"/{DELIMETER} {
+"-" {
     // Operator: subtraction.
     printf("Operator sub:              %s\n", yytext);
 }
-"*"/{DELIMETER} {
+"*" {
     // Operator: multiplication.
     printf("Operator mult:             %s\n", yytext);
 }
-"/"/{DELIMETER} {
+"/" {
     // Operator: division.
     printf("Operator div:              %s\n", yytext);
 }
-">"/{DELIMETER} {
+">" {
     // Operator: greater.
     printf("Operator greater:          %s\n", yytext);
 }
-">="/{DELIMETER} {
+">=" {
     // Operator: greater or equal.
     printf("Operator greater or equal: %s\n", yytext);
 }
-"<"/{DELIMETER} {
+"<" {
     // Operator: less.
     printf("Operator less:             %s\n", yytext);
 }
-"<="/{DELIMETER} {
+"<=" {
     // Operator: less or equal.
     printf("Operator less or equal:    %s\n", yytext);
 }
-"="/{DELIMETER} {
+"=" {
     // Operator: equal.
     printf("Operator equal:            %s\n", yytext);
 }
@@ -349,23 +348,28 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 . {
     printf("UNEXPECTED CHARACTER:      %s\n", yytext);
 }
+<COMMENT_ML>"|" {
+    // Multiline comment body: any character.
+    buffer[buffer_length++] = yytext[0];
+}
+<COMMENT_ML>"#" {
+    // Multiline comment body: any character.
+    buffer[buffer_length++] = yytext[0];
+}
+<COMMENT_ML>[^|#]+ {
+    // Multiline comment body: any character.
+    for (int i = 0; i < yyleng; i++)
+        buffer[buffer_length++] = yytext[i];
+}
 <COMMENT_ML>"|#" {
     // Multiline comment ending.
     buffer_output("Comment:                   ", buffer, buffer_length);
     buffer_length = 0;
     BEGIN(INITIAL);
 }
-<COMMENT_ML>.|\n {
-    // Multiline comment body: any character.
-    buffer[buffer_length++] = yytext[0];
-}
 <COMMENT_ML><<EOF>> {
     puts("ERROR: UNCLOSED COMMENT");
     yyterminate();
-}
-<STRING>[^"\""] {
-    // String constant body: non-quote character.
-    buffer[buffer_length++] = yytext[0];
 }
 <STRING>"\\\"" {
     // String constant body: escaped quote character.
@@ -373,6 +377,15 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 <STRING>"\\\\" {
     // String constant body: escaped slash character.
+    buffer[buffer_length++] = '\\';
+}
+<STRING>[^"\"\\"]+ {
+    // String constant body: non-quote, non-slash characters.
+    for (int i = 0; i < yyleng; i++)
+        buffer[buffer_length++] = yytext[i];
+}
+<STRING>"\\" {
+    // String constant body: unrecognized slash character.
     buffer[buffer_length++] = '\\';
 }
 <STRING>"\"" {

@@ -1,10 +1,12 @@
-#|multiline comment
-here#| |# "do cats \\eat quotes\"?" ;comment
+#|multiline #| # |comment
+here#| still here |#
+"do cats \\eat quotes\" or recognize single \slashes?"
+;comment
 "multi-
-  line string
-\"\\ constant"
+    line string
+        \"\\ constant folowed by unrecognized \slash"
 ( ) + - * / >= > < <= = aNd or not t NiL
-#b101 #B010 #O77 #o11 #xFF #XFFFF #\f #\NEWLINE
+#b10178 #B010 #O77 #o11 #xFF #XFFFFzyx #\f #\NEWLINE
 loop for in do from to repeat while until progn
 defparameter setf let vector vector-push vector-pop elt list
 list-length length find position remove substitute concatenate if dotimes
@@ -24,3 +26,4 @@ this_is_a_var
 (setf *x* (vector 7 15 1))
 (BubbleSort *x*)
 (print *x*)
+kinda_weird_symbol_azAZ0-9+-*/@$%^&_=<>~.
