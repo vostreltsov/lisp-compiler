@@ -1,5 +1,6 @@
+#line 2 "lexer.c"
 
-#line 3 "lex.yy.c"
+#line 4 "lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -733,11 +734,10 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "input.flex"
-#line 2 "input.flex"
+#line 1 "lexer.flex"
+#line 2 "lexer.flex"
 
 #include <string.h>
-//#include "lexemtypes.h"
 
 int my_powah(int base, int n)
 {
@@ -802,7 +802,7 @@ void buffer_output(char * title, char * buf, unsigned int len)
 
 
 
-#line 806 "lex.yy.c"
+#line 806 "lexer.c"
 
 #define INITIAL 0
 #define COMMENT_ML 1
@@ -986,7 +986,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 84 "input.flex"
+#line 84 "lexer.flex"
 
 
 
@@ -994,7 +994,7 @@ char            buffer[8 * 1024];   // For storing strings, comments etc.
 unsigned int    buffer_length = 0;  // Length of the buffer.
 
 
-#line 998 "lex.yy.c"
+#line 998 "lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -1075,7 +1075,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 91 "input.flex"
+#line 91 "lexer.flex"
 {
     // Multiline comment beginning.
     buffer_length = 0;
@@ -1084,7 +1084,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 96 "input.flex"
+#line 96 "lexer.flex"
 {
     // String constant beginning.
     buffer_length = 0;
@@ -1093,7 +1093,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 101 "input.flex"
+#line 101 "lexer.flex"
 {
     // Singleline comment.
     strcpy(buffer, yytext + 1);
@@ -1104,7 +1104,7 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 107 "input.flex"
+#line 107 "lexer.flex"
 {
     // Whitespaces.
     //printf("Skipping whitespace\n");
@@ -1113,7 +1113,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 112 "input.flex"
+#line 112 "lexer.flex"
 {
     // Opening parenthesis.
     printf("Opening paren:             %s\n", yytext);
@@ -1121,7 +1121,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 116 "input.flex"
+#line 116 "lexer.flex"
 {
     // Closing parenthesis.
     printf("Closing paren:             %s\n", yytext);
@@ -1129,7 +1129,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 120 "input.flex"
+#line 120 "lexer.flex"
 {
     // Operator: addition.
     printf("Operator add:              %s\n", yytext);
@@ -1137,7 +1137,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 124 "input.flex"
+#line 124 "lexer.flex"
 {
     // Operator: subtraction.
     printf("Operator sub:              %s\n", yytext);
@@ -1145,7 +1145,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 128 "input.flex"
+#line 128 "lexer.flex"
 {
     // Operator: multiplication.
     printf("Operator mult:             %s\n", yytext);
@@ -1153,7 +1153,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 132 "input.flex"
+#line 132 "lexer.flex"
 {
     // Operator: division.
     printf("Operator div:              %s\n", yytext);
@@ -1161,7 +1161,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 136 "input.flex"
+#line 136 "lexer.flex"
 {
     // Operator: greater.
     printf("Operator greater:          %s\n", yytext);
@@ -1169,7 +1169,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 140 "input.flex"
+#line 140 "lexer.flex"
 {
     // Operator: greater or equal.
     printf("Operator greater or equal: %s\n", yytext);
@@ -1177,7 +1177,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 144 "input.flex"
+#line 144 "lexer.flex"
 {
     // Operator: less.
     printf("Operator less:             %s\n", yytext);
@@ -1185,7 +1185,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 148 "input.flex"
+#line 148 "lexer.flex"
 {
     // Operator: less or equal.
     printf("Operator less or equal:    %s\n", yytext);
@@ -1193,7 +1193,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 152 "input.flex"
+#line 152 "lexer.flex"
 {
     // Operator: equal.
     printf("Operator equal:            %s\n", yytext);
@@ -1201,7 +1201,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 156 "input.flex"
+#line 156 "lexer.flex"
 {
     // Operator: and.
     printf("Operator and:              %s\n", yytext);
@@ -1209,7 +1209,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 160 "input.flex"
+#line 160 "lexer.flex"
 {
     // Operator: or.
     printf("Operator or:               %s\n", yytext);
@@ -1217,7 +1217,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 164 "input.flex"
+#line 164 "lexer.flex"
 {
     // Operator: not.
     printf("Operator not:              %s\n", yytext);
@@ -1225,7 +1225,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 168 "input.flex"
+#line 168 "lexer.flex"
 {
     // Boolean constant - true.
     printf("Boolean constant - true:   %s\n", yytext);
@@ -1233,7 +1233,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 172 "input.flex"
+#line 172 "lexer.flex"
 {
     // Boolean constant - false.
     printf("Boolean constant - false:  %s\n", yytext);
@@ -1241,7 +1241,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 176 "input.flex"
+#line 176 "lexer.flex"
 {
     // Numeric constant - binary.
     int value = nondec2dec(yytext + 2, 2);
@@ -1250,7 +1250,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 181 "input.flex"
+#line 181 "lexer.flex"
 {
     // Numeric constant - octal.
     int value = nondec2dec(yytext + 2, 8);
@@ -1259,7 +1259,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 186 "input.flex"
+#line 186 "lexer.flex"
 {
     // Numeric constant.
     if (yytext[yyleng - 1] == '.')
@@ -1270,7 +1270,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 193 "input.flex"
+#line 193 "lexer.flex"
 {
     // Numeric constant - hexadecimal.
     int value = nondec2dec(yytext + 2, 16);
@@ -1279,7 +1279,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 198 "input.flex"
+#line 198 "lexer.flex"
 {
     // Character constant.
     printf("Character constant:        %s\n", yytext + 2);
@@ -1287,7 +1287,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 202 "input.flex"
+#line 202 "lexer.flex"
 {
     // Character constant - whitespace.
     // TODO: convert to a real character.
@@ -1296,343 +1296,343 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 207 "input.flex"
+#line 207 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 210 "input.flex"
+#line 210 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 213 "input.flex"
+#line 213 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 216 "input.flex"
+#line 216 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 219 "input.flex"
+#line 219 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 222 "input.flex"
+#line 222 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 225 "input.flex"
+#line 225 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 228 "input.flex"
+#line 228 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 231 "input.flex"
+#line 231 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 234 "input.flex"
+#line 234 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 237 "input.flex"
+#line 237 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 240 "input.flex"
+#line 240 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 243 "input.flex"
+#line 243 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 246 "input.flex"
+#line 246 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 249 "input.flex"
+#line 249 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 252 "input.flex"
+#line 252 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 255 "input.flex"
+#line 255 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 258 "input.flex"
+#line 258 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 261 "input.flex"
+#line 261 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 264 "input.flex"
+#line 264 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 267 "input.flex"
+#line 267 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 270 "input.flex"
+#line 270 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 273 "input.flex"
+#line 273 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 276 "input.flex"
+#line 276 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 279 "input.flex"
+#line 279 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 282 "input.flex"
+#line 282 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 285 "input.flex"
+#line 285 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 288 "input.flex"
+#line 288 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 291 "input.flex"
+#line 291 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 294 "input.flex"
+#line 294 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 297 "input.flex"
+#line 297 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 300 "input.flex"
+#line 300 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 303 "input.flex"
+#line 303 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 306 "input.flex"
+#line 306 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 309 "input.flex"
+#line 309 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 312 "input.flex"
+#line 312 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 315 "input.flex"
+#line 315 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 318 "input.flex"
+#line 318 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 321 "input.flex"
+#line 321 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 324 "input.flex"
+#line 324 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 327 "input.flex"
+#line 327 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 330 "input.flex"
+#line 330 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 333 "input.flex"
+#line 333 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 336 "input.flex"
+#line 336 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 339 "input.flex"
+#line 339 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 342 "input.flex"
+#line 342 "lexer.flex"
 {
     printf("Key word:                  %s\n", yytext);
 }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 345 "input.flex"
+#line 345 "lexer.flex"
 {
     printf("Symbol:                    %s\n", yytext);
 }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 348 "input.flex"
+#line 348 "lexer.flex"
 {
     printf("UNEXPECTED CHARACTER:      %s\n", yytext);
 }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 351 "input.flex"
+#line 351 "lexer.flex"
 {
     // Multiline comment body: any character.
     buffer[buffer_length++] = yytext[0];
@@ -1640,7 +1640,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 355 "input.flex"
+#line 355 "lexer.flex"
 {
     // Multiline comment body: any character.
     buffer[buffer_length++] = yytext[0];
@@ -1649,7 +1649,7 @@ YY_RULE_SETUP
 case 77:
 /* rule 77 can match eol */
 YY_RULE_SETUP
-#line 359 "input.flex"
+#line 359 "lexer.flex"
 {
     // Multiline comment body: any character.
     for (int i = 0; i < yyleng; i++)
@@ -1658,7 +1658,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 364 "input.flex"
+#line 364 "lexer.flex"
 {
     // Multiline comment ending.
     buffer_output("Comment:                   ", buffer, buffer_length);
@@ -1667,7 +1667,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(COMMENT_ML):
-#line 370 "input.flex"
+#line 370 "lexer.flex"
 {
     puts("ERROR: UNCLOSED COMMENT");
     yyterminate();
@@ -1675,7 +1675,7 @@ case YY_STATE_EOF(COMMENT_ML):
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 374 "input.flex"
+#line 374 "lexer.flex"
 {
     // String constant body: escaped quote character.
     buffer[buffer_length++] = '"';
@@ -1683,7 +1683,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 378 "input.flex"
+#line 378 "lexer.flex"
 {
     // String constant body: escaped slash character.
     buffer[buffer_length++] = '\\';
@@ -1692,7 +1692,7 @@ YY_RULE_SETUP
 case 81:
 /* rule 81 can match eol */
 YY_RULE_SETUP
-#line 382 "input.flex"
+#line 382 "lexer.flex"
 {
     // String constant body: non-quote, non-slash characters.
     for (int i = 0; i < yyleng; i++)
@@ -1701,7 +1701,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 387 "input.flex"
+#line 387 "lexer.flex"
 {
     // String constant body: unrecognized slash character.
     buffer[buffer_length++] = '\\';
@@ -1709,7 +1709,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 391 "input.flex"
+#line 391 "lexer.flex"
 {
     // String constant ending.
     buffer_output("String constant:           ", buffer, buffer_length);
@@ -1718,7 +1718,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 397 "input.flex"
+#line 397 "lexer.flex"
 {
     puts("ERROR: UNCLOSED STRING CONSTANT");
     yyterminate();
@@ -1726,10 +1726,10 @@ case YY_STATE_EOF(STRING):
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 402 "input.flex"
+#line 402 "lexer.flex"
 ECHO;
 	YY_BREAK
-#line 1733 "lex.yy.c"
+#line 1733 "lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2724,7 +2724,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 402 "input.flex"
+#line 402 "lexer.flex"
 
 
 

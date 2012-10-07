@@ -1,7 +1,6 @@
 %{
 
 #include <string.h>
-//#include "lexemtypes.h"
 
 int my_powah(int base, int n)
 {
@@ -69,6 +68,7 @@ void buffer_output(char * title, char * buf, unsigned int len)
 %option noyywrap
 %option never-interactive
 %option case-insensitive
+%option outfile="lexer.c"
 
 DIGIT_BIN       [0-1]
 DIGIT_OCT       [0-7]
