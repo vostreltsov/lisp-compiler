@@ -3,9 +3,9 @@
 
 enum var_type
 {
-    VAR_TYPE_CONST,        // Constant.
-    VAR_TYPE_LOCAL,        // Local variable.
-    VAR_TYPE_GLOBAL        // Global variable.
+    VAR_TYPE_CONST,     // Constant.
+    VAR_TYPE_LOCAL,     // Local variable.
+    VAR_TYPE_GLOBAL     // Global variable.
 };
 
 enum expr_type
@@ -14,8 +14,6 @@ enum expr_type
     EXPR_TYPE_CHAR,     // Value: character.
     EXPR_TYPE_STRING,   // Value: string.
     EXPR_TYPE_BOOL,     // Value: boolean.
-    EXPR_TYPE_T,        // Value: T (true).
-    EXPR_TYPE_NIL,      // Value: NIL (false).
 
     EXPR_TYPE_PLUS,     // Binary plus.
     EXPR_TYPE_MINUS,    // Binary minus.
@@ -42,8 +40,8 @@ enum stmt_type
 // Represents a variable.
 struct variable_struct
 {
-    enum var_type    type;  // Type of the
-    char           * name;
+    enum var_type    type;  // Type of the variable.
+    char           * name;  // Name of the variable.
 };
 
 struct expression_struct
@@ -63,16 +61,16 @@ struct statement_struct
     enum stmt_type      type;   // Type of the statement.
 };
 
-struct expression_list
+struct expression_node
 {
     expression_struct * expr;
-    expression_list   * next;
+    expression_node   * next;
 };
 
-struct statement_list
+struct statement_node
 {
     statement_struct * stmt;
-    statement_list   * next;
+    statement_node   * next;
 };
 
 // Represents a program.

@@ -16,15 +16,24 @@ struct program_struct * root;
 
     struct variable_struct   * semantic_var;
     struct expression_struct * semantic_expr;
-    struct expression_list   * semantic_expr_list;
-    struct statement_list    * semantic_stmt_list;
+    struct expression_node   * semantic_expr_node;
+    struct statement_node    * semantic_stmt_node;
     struct program_struct    * semantic_program;
 }
 
 %error-verbose
 
-%type<semantic_program> program
-%type<semantic_stmt_list> stmt_list
+
+%type   <semantic_var>        var
+%type   <semantic_expr>       expr
+%type   <semantic_expr_node>  expr_list
+%type   <semantic_stmt_node>  stmt_list
+%type   <semantic_program>    program
+
+%token  <semantic_int>        int_const
+%token  <semantic_char>       char_const
+%token  <semantic_string>     string_const
+%token  <semantic_bool>       bool_const
 
 %token LOOP
 %token FOR
@@ -71,20 +80,32 @@ struct program_struct * root;
 %token TYPE
 %token DOCUMENTATION
 
-%left '+' '-' '*' '/' UPLUS UMINUS
-%left '<' '>' LESSEQ GRTREQ
+%nonassoc '+' '-' '*' '/'
+%nonassoc '<' '>' LESSEQ GRTREQ
+%nonassoc AND OR
+%nonassoc UPLUS UMINUS NOT
+%nonassoc SETF
 
 %start program
 
 %%
 
-program : stmt_list { $$ = root = create_program($1); }
+program : stmt_list {$$ = root = create_program($1);}
         ;
 
-expr : '+' expr {}
+expr : int_const                {$$ = create_expr_int($1);}
+     | char_const               {$$ = create_expr_char($1);}
+     | string_const             {$$ = create_expr_string($1);}
+     | bool_const               {$$ = create_expr_bool($1);}
+     | '+' expr                 {}
      ;
 
-stmt_list : expr {}
+expr_list : expr                {}
+          | expr_list expr      {}
+          ;
+
+stmt_list : stmt                {}
+          | stmt_list stmt      {}
           ;
 
 %%
