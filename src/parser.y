@@ -9,105 +9,50 @@ struct program_struct * root;
 %}
 
 %union {
-    int    semantic_int;
-    char   semantic_char;
-    char * semantic_string;
-    int    semantic_bool;
-
-    struct variable_struct   * semantic_var;
-    struct expression_struct * semantic_expr;
-    struct expression_node   * semantic_expr_node;
-    struct statement_node    * semantic_stmt_node;
-    struct program_struct    * semantic_program;
+    int                     semantic_int;
+    char                    semantic_char;
+    char                  * semantic_string;
+    int                     semantic_bool;
+    char                  * semantic_id;
+    struct program_struct * semantic_program;
 }
 
 %error-verbose
 
+%token  <semantic_int>        INT
+%token  <semantic_char>       CHAR
+%token  <semantic_string>     STRING
+%token  <semantic_bool>       BOOL
+%token  <semantic_bool>       ID
 
-%type   <semantic_var>        var
-%type   <semantic_expr>       expr
-%type   <semantic_expr_node>  expr_list
-%type   <semantic_stmt_node>  stmt_list
 %type   <semantic_program>    program
-
-%token  <semantic_int>        int_const
-%token  <semantic_char>       char_const
-%token  <semantic_string>     string_const
-%token  <semantic_bool>       bool_const
-
-%token LOOP
-%token FOR
-%token IN
-%token DO
-%token FROM
-%token TO
-%token REPEAT
-%token WHILE
-%token UNTIL
-%token PROGN
-%token DEFPARAMETER
-%token SETF
-%token LET
-%token VECTOR
-%token VECTOR_PUSH
-%token VECTOR_POP
-%token ELT
-%token LIST
-%token LIST_LENGTH
-%token LENGTH
-%token FIND
-%token POSITION
-%token REMOVE
-%token SUBSTITUTE
-%token CONCATENATE
-%token IF
-%token DOTIMES
-%token DEFUN
-%token SLOT_VALUE
-%token OPEN
-%token CLOSE
-%token WITH_OPEN_FILE
-%token FORMAT
-%token FUNCALL
-%token DEFCLASS
-%token PRINT
-%token INITFORM
-%token READER
-%token WRITER
-%token ACCESSOR
-%token INITARG
-%token ALLOCATION
-%token TYPE
-%token DOCUMENTATION
-
-%nonassoc '+' '-' '*' '/'
-%nonassoc '<' '>' LESSEQ GRTREQ
-%nonassoc AND OR
-%nonassoc UPLUS UMINUS NOT
-%nonassoc SETF
 
 %start program
 
 %%
 
-program : stmt_list {$$ = root = create_program($1);}
+program : /* empty */              {}
+        | s_expr                   {}
         ;
 
-expr : int_const                {$$ = create_expr_int($1);}
-     | char_const               {$$ = create_expr_char($1);}
-     | string_const             {$$ = create_expr_string($1);}
-     | bool_const               {$$ = create_expr_bool($1);}
-     | '+' expr                 {}
+atom : INT                         {}
+     | CHAR                        {}
+     | STRING                      {}
+     | BOOL                        {}
+     | ID                          {}
      ;
 
-expr_list : expr                {}
-          | expr_list expr      {}
-          ;
+s_expr : atom                      {}
+       | list                      {}
+       ;
 
-stmt_list : stmt                {}
-          | stmt_list stmt      {}
-          ;
+s_expr_list : s_expr               {}
+            | s_expr_list s_expr   {}
+            ;
+
+list : '(' ')'                     {}
+     | '\'' s_expr                 {}
+     | '(' s_expr_list ')'         {}
+     ;
 
 %%
-
-
