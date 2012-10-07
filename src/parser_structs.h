@@ -34,20 +34,51 @@ enum expr_type
 
 };
 
+enum stmt_type
+{
+    // TODO.
+};
+
 // Represents a variable.
 struct variable_struct
 {
-    enum var_type type;
-    char * name;
+    enum var_type    type;  // Type of the
+    char           * name;
 };
 
-struct statement_list {
-    // TODO.
+struct expression_struct
+{
+    long int const_int;         // Integer constant.
+    char     const_char;        // Character constant.
+    char   * const_string;      // String constant.
+    int      const_bool;        // Boolean constant.
+
+    enum expr_type      type;   // Type of the expression.
+    expression_struct * left;   // Left operand.
+    expression_struct * right;  // Right operand.
+};
+
+struct statement_struct
+{
+    enum stmt_type      type;   // Type of the statement.
+};
+
+struct expression_list
+{
+    expression_struct * expr;
+    expression_list   * next;
+};
+
+struct statement_list
+{
+    statement_struct * stmt;
+    statement_list   * next;
 };
 
 // Represents a program.
-struct program_struct {
-    // TODO.
+struct program_struct
+{
+    statement_list * stmts;
 };
 
 #endif
