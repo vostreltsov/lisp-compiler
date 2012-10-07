@@ -10,7 +10,8 @@ int my_powah(int base, int n)
     return result;
 }
 
-int nondec2dec(char * string, int base) {
+int nondec2dec(char * string, int base)
+{
     int result = 0;
     size_t length = strlen(string);
     for (size_t i = 0; i < length; i++)
