@@ -25,34 +25,46 @@ struct program_struct * root;
 %token  <semantic_bool>       BOOL
 %token  <semantic_bool>       ID
 
+%token LOOP
+%token FOR
+%token IN
+%token FROM
+%token TO
+%token PROGN
+%token SETF
+%token IF
+
 %type   <semantic_program>    program
 
 %start program
 
 %%
 
-program : /* empty */              {}
-        | s_expr                   {}
+program : s_expr                        {}
         ;
 
-atom : INT                         {}
-     | CHAR                        {}
-     | STRING                      {}
-     | BOOL                        {}
-     | ID                          {}
-     ;
-
-s_expr : atom                      {}
-       | list                      {}
+s_expr : INT                            {}
+       | CHAR                           {}
+       | STRING                         {}
+       | BOOL                           {}
+       | ID                             {}
+       | list                           {}
        ;
 
-s_expr_list : s_expr               {}
-            | s_expr_list s_expr   {}
+s_expr_list : s_expr                    {}
+            | s_expr_list s_expr        {}
             ;
 
-list : '(' ')'                     {}
-     | '\'' s_expr                 {}
-     | '(' s_expr_list ')'         {}
+list : '(' ')'                                            {}
+     | '(' ID s_expr_list ')'                             {}
+     | '\'' s_expr                                        {}
+
+     | '(' LOOP FOR ID IN list s_expr ')'                 {}
+     | '(' LOOP FOR ID FROM s_expr TO s_expr s_expr ')'   {}
+     | '(' PROGN s_expr_list ')'                          {}
+     | '(' SETF ID s_expr ')'                             {}
+     | '(' IF s_expr s_expr ')'                           {}
+     | '(' IF s_expr s_expr s_expr ')'                    {}
      ;
 
 %%
