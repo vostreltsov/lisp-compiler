@@ -1,54 +1,57 @@
-#ifndef PARSER_STRUCTS
-#define PARSER_STRUCTS
+#ifndef PARSER_STRUCTS_H
+#define PARSER_STRUCTS_H
 
-struct atom_struct;
+struct program_struct;
 struct s_expr_struct;
 struct s_expr_list_struct;
 struct list_struct;
-struct program_struct;
 
-enum atom_type
+
+/*enum s_expr_type
 {
-    ATOM_TYPE_INT,      // Value: integer.
-    ATOM_TYPE_CHAR,     // Value: character.
-    ATOM_TYPE_STRING,   // Value: string.
-    ATOM_TYPE_BOOL,     // Value: boolean.
+    S_EXPR_TYPE_INT,      // Value: integer.
+    S_EXPR_TYPE_CHAR,     // Value: character.
+    S_EXPR_TYPE_STRING,   // Value: string.
+    S_EXPR_TYPE_BOOL,     // Value: boolean.
+    S_EXPR_TYPE_ID,       // Identifier.
+};*/
 
-    ATOM_TYPE_PLUS,     // Binary plus.
-    ATOM_TYPE_MINUS,    // Binary minus.
-    ATOM_TYPE_MULT,     // Binary multiplication.
-    ATOM_TYPE_DIV,      // Binary division.
-    ATOM_TYPE_GRTR,     // Binary greater.
-    ATOM_TYPE_GRTR_EQ,  // Binary greater or equal.
-    ATOM_TYPE_LESS,     // Binary less.
-    ATOM_TYPE_LESS_EQ,  // Binary less or equal.
-    ATOM_TYPE_EQ,       // Binary equal.
-    ATOM_TYPE_AND,      // Binary and.
-    ATOM_TYPE_OR,       // Binary or.
-    ATOM_TYPE_NOT,      // Unary not.
-
-    ATOM_TYPE_ID,       // Identifier.
-    ATOM_TYPE_SETF      // Assignment.
+enum list_type
+{
+    LIST_TYPE_PLUS,     // Binary plus.
+    LIST_TYPE_MINUS,    // Binary minus.
+    LIST_TYPE_MULT,     // Binary multiplication.
+    LIST_TYPE_DIV,      // Binary division.
+    LIST_TYPE_GRTR,     // Binary greater.
+    LIST_TYPE_GRTR_EQ,  // Binary greater or equal.
+    LIST_TYPE_LESS,     // Binary less.
+    LIST_TYPE_LESS_EQ,  // Binary less or equal.
+    LIST_TYPE_EQ,       // Binary equal.
+    LIST_TYPE_AND,      // Binary and.
+    LIST_TYPE_OR,       // Binary or.
+    LIST_TYPE_NOT,      // Unary not.
+    LIST_TYPE_SETF      // Assignment.
 
     // TODO: all the functions and keywords go here
 
 };
 
-struct atom_struct
+struct program_struct
 {
-    enum atom_type type;         // Type of the atom.
-    long int       const_int;    // Integer constant.
-    char           const_char;   // Character constant.
-    char         * const_string; // String constant.
-    int            const_bool;   // Boolean constant.
-    char         * const_id;     // Identifier.
+    struct s_expr_struct * s_expr; // Program is an s-expression.
 };
 
 struct s_expr_struct
 {
-    struct atom_struct   * atom; // S-expression may be an atom.
-    struct list_struct   * list; // S-expression may be a list.
-    struct s_expr_struct * next; // Pointer to the next s_expr_struct.
+    //enum s_expr_type       type;         // Type of the s-expression.
+    long int               const_int;    // S-expression may be an integer constant.
+    char                   const_char;   // S-expression may be a character constant.
+    char                 * const_string; // S-expression may be a string constant.
+    int                    const_bool;   // S-expression may be an boolean constant.
+    char                 * const_id;     // S-expression may be an identifier.
+    struct list_struct   * list;         // S-expression may be a list.
+
+    struct s_expr_struct * next;         // Pointer to the next s_expr_struct.
 };
 
 struct s_expr_list_struct
@@ -61,11 +64,6 @@ struct list_struct
 {
     struct s_expr_struct      * s_expr;      // List may be an (s-expression).
     struct s_expr_list_struct * s_expr_list; // List may be an (s-expression list).
-};
-
-struct program_struct
-{
-    struct s_expr_struct * s_expr; // Program is an s-expression.
 };
 
 #endif

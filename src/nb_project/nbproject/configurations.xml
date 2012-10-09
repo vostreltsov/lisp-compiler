@@ -4,11 +4,17 @@
     <logicalFolder name="SourceFiles"
                    displayName="Исходные файлы"
                    projectFiles="true">
+      <itemPath>../lexer.c</itemPath>
       <itemPath>main.c</itemPath>
+      <itemPath>../parser.tab.c</itemPath>
+      <itemPath>../parser_funcs.c</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Файлы заголовков"
                    projectFiles="true">
+      <itemPath>../parser.tab.h</itemPath>
+      <itemPath>../parser_funcs.h</itemPath>
+      <itemPath>../parser_structs.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Файлы ресурсов"

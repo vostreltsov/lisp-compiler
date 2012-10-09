@@ -6,11 +6,12 @@
 #include "parser_structs.h"
 
 struct program_struct * create_program(struct s_expr_struct * s_expr);
-struct atom_struct * create_atom_empty();
-struct atom_struct * create_atom_int(long int value);
-struct atom_struct * create_atom_char(char value);
-struct atom_struct * create_atom_string(char * value);
-struct atom_struct * create_atom_bool(int value);
+struct s_expr_struct * create_s_expr_empty();
+struct s_expr_struct * create_s_expr_int(long int value);
+struct s_expr_struct * create_s_expr_char(char value);
+struct s_expr_struct * create_s_expr_string(char * value);
+struct s_expr_struct * create_s_expr_bool(int value);
+struct s_expr_struct * create_s_expr_id(char * value);
 
 #endif
 

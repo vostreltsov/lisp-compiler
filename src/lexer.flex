@@ -108,64 +108,62 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 {WHITESPACE}+ {
     // Whitespaces.
-    //printf("Skipping whitespace\n");
-    //printf("Whitespace:  %s\n", yytext);
 }
 "(" {
     // Opening parenthesis.
-    printf("Opening paren:             %s\n", yytext);
+    return (unsigned char)'(';
 }
 ")" {
     // Closing parenthesis.
-    printf("Closing paren:             %s\n", yytext);
+    return (unsigned char)')';
 }
 "+" {
     // Operator: addition.
-    printf("Operator add:              %s\n", yytext);
+    return (unsigned char)'+';
 }
 "-" {
     // Operator: subtraction.
-    printf("Operator sub:              %s\n", yytext);
+    return (unsigned char)'-';
 }
 "*" {
     // Operator: multiplication.
-    printf("Operator mult:             %s\n", yytext);
+    return (unsigned char)'*';
 }
 "/" {
     // Operator: division.
-    printf("Operator div:              %s\n", yytext);
+    return (unsigned char)'/';
 }
 ">" {
     // Operator: greater.
-    printf("Operator greater:          %s\n", yytext);
+    return (unsigned char)'>';
 }
 ">=" {
     // Operator: greater or equal.
-    printf("Operator greater or equal: %s\n", yytext);
+    return GRTR_EQ;
 }
 "<" {
     // Operator: less.
-    printf("Operator less:             %s\n", yytext);
+    return (unsigned char)'<';
 }
 "<=" {
     // Operator: less or equal.
-    printf("Operator less or equal:    %s\n", yytext);
+    return LESS_EQ;
 }
 "=" {
     // Operator: equal.
-    printf("Operator equal:            %s\n", yytext);
+    return (unsigned char)'=';
 }
 "and" {
     // Operator: and.
-    printf("Operator and:              %s\n", yytext);
+    return AND;
 }
 "or" {
     // Operator: or.
-    printf("Operator or:               %s\n", yytext);
+    return OR;
 }
 "not" {
     // Operator: not.
-    printf("Operator not:              %s\n", yytext);
+    return NOT;
 }
 "t" {
     // Boolean constant - true.
@@ -190,7 +188,9 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     if (yytext[yyleng - 1] == '.')
         yytext[yyleng - 1] = '\0';
     int value = nondec2dec(yytext, 10);
-    printf("Numeric constant - dec:    %d\n", value);
+    yylval.semantic_int = value;
+    return INT;
+    //printf("Numeric constant - dec:    %d\n", value);
 }
 "#x"{DIGIT_HEX}+ {
     // Numeric constant - hexadecimal.

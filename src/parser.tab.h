@@ -51,14 +51,19 @@ extern int yydebug;
      STRING = 260,
      BOOL = 261,
      ID = 262,
-     LOOP = 263,
-     FOR = 264,
-     IN = 265,
-     FROM = 266,
-     TO = 267,
-     PROGN = 268,
-     SETF = 269,
-     IF = 270
+     GRTR_EQ = 263,
+     LESS_EQ = 264,
+     AND = 265,
+     OR = 266,
+     NOT = 267,
+     LOOP = 268,
+     FOR = 269,
+     IN = 270,
+     FROM = 271,
+     TO = 272,
+     PROGN = 273,
+     SETF = 274,
+     IF = 275
    };
 #endif
 
@@ -67,7 +72,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2049 of yacc.c  */
-#line 12 "parser.y"
+#line 15 "parser.y"
 
     int                     semantic_int;
     char                    semantic_char;
@@ -75,10 +80,11 @@ typedef union YYSTYPE
     int                     semantic_bool;
     char                  * semantic_id;
     struct program_struct * semantic_program;
+    struct s_expr_struct  * semantic_s_expr;
 
 
 /* Line 2049 of yacc.c  */
-#line 82 "parser.tab.h"
+#line 88 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

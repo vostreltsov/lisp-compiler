@@ -35,6 +35,9 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/_ext/1472/lexer.o \
+	${OBJECTDIR}/_ext/1472/parser_funcs.o \
+	${OBJECTDIR}/_ext/1472/parser.tab.o \
 	${OBJECTDIR}/main.o
 
 
@@ -61,6 +64,21 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/nb_project: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/nb_project ${OBJECTFILES} ${LDLIBSOPTIONS} 
+
+${OBJECTDIR}/_ext/1472/lexer.o: ../lexer.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1472
+	${RM} $@.d
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1472/lexer.o ../lexer.c
+
+${OBJECTDIR}/_ext/1472/parser_funcs.o: ../parser_funcs.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1472
+	${RM} $@.d
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1472/parser_funcs.o ../parser_funcs.c
+
+${OBJECTDIR}/_ext/1472/parser.tab.o: ../parser.tab.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/1472
+	${RM} $@.d
+	$(COMPILE.c) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1472/parser.tab.o ../parser.tab.c
 
 ${OBJECTDIR}/main.o: main.c 
 	${MKDIR} -p ${OBJECTDIR}

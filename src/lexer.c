@@ -1109,125 +1109,123 @@ YY_RULE_SETUP
 #line 109 "lexer.flex"
 {
     // Whitespaces.
-    //printf("Skipping whitespace\n");
-    //printf("Whitespace:  %s\n", yytext);
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 114 "lexer.flex"
+#line 112 "lexer.flex"
 {
     // Opening parenthesis.
-    printf("Opening paren:             %s\n", yytext);
+    return (unsigned char)'(';
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 118 "lexer.flex"
+#line 116 "lexer.flex"
 {
     // Closing parenthesis.
-    printf("Closing paren:             %s\n", yytext);
+    return (unsigned char)')';
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 122 "lexer.flex"
+#line 120 "lexer.flex"
 {
     // Operator: addition.
-    printf("Operator add:              %s\n", yytext);
+    return (unsigned char)'+';
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 126 "lexer.flex"
+#line 124 "lexer.flex"
 {
     // Operator: subtraction.
-    printf("Operator sub:              %s\n", yytext);
+    return (unsigned char)'-';
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 130 "lexer.flex"
+#line 128 "lexer.flex"
 {
     // Operator: multiplication.
-    printf("Operator mult:             %s\n", yytext);
+    return (unsigned char)'*';
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 134 "lexer.flex"
+#line 132 "lexer.flex"
 {
     // Operator: division.
-    printf("Operator div:              %s\n", yytext);
+    return (unsigned char)'/';
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 138 "lexer.flex"
+#line 136 "lexer.flex"
 {
     // Operator: greater.
-    printf("Operator greater:          %s\n", yytext);
+    return (unsigned char)'>';
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 142 "lexer.flex"
+#line 140 "lexer.flex"
 {
     // Operator: greater or equal.
-    printf("Operator greater or equal: %s\n", yytext);
+    return GRTR_EQ;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 146 "lexer.flex"
+#line 144 "lexer.flex"
 {
     // Operator: less.
-    printf("Operator less:             %s\n", yytext);
+    return (unsigned char)'<';
 }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 150 "lexer.flex"
+#line 148 "lexer.flex"
 {
     // Operator: less or equal.
-    printf("Operator less or equal:    %s\n", yytext);
+    return LESS_EQ;
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 154 "lexer.flex"
+#line 152 "lexer.flex"
 {
     // Operator: equal.
-    printf("Operator equal:            %s\n", yytext);
+    return (unsigned char)'=';
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 158 "lexer.flex"
+#line 156 "lexer.flex"
 {
     // Operator: and.
-    printf("Operator and:              %s\n", yytext);
+    return AND;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 162 "lexer.flex"
+#line 160 "lexer.flex"
 {
     // Operator: or.
-    printf("Operator or:               %s\n", yytext);
+    return OR;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 166 "lexer.flex"
+#line 164 "lexer.flex"
 {
     // Operator: not.
-    printf("Operator not:              %s\n", yytext);
+    return NOT;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 170 "lexer.flex"
+#line 168 "lexer.flex"
 {
     // Boolean constant - true.
     printf("Boolean constant - true:   %s\n", yytext);
@@ -1235,7 +1233,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 174 "lexer.flex"
+#line 172 "lexer.flex"
 {
     // Boolean constant - false.
     printf("Boolean constant - false:  %s\n", yytext);
@@ -1243,7 +1241,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 178 "lexer.flex"
+#line 176 "lexer.flex"
 {
     // Numeric constant - binary.
     int value = nondec2dec(yytext + 2, 2);
@@ -1252,7 +1250,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 183 "lexer.flex"
+#line 181 "lexer.flex"
 {
     // Numeric constant - octal.
     int value = nondec2dec(yytext + 2, 8);
@@ -1261,13 +1259,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 188 "lexer.flex"
+#line 186 "lexer.flex"
 {
     // Numeric constant.
     if (yytext[yyleng - 1] == '.')
         yytext[yyleng - 1] = '\0';
     int value = nondec2dec(yytext, 10);
-    printf("Numeric constant - dec:    %d\n", value);
+    yylval.semantic_int = value;
+    return INT;
+    //printf("Numeric constant - dec:    %d\n", value);
 }
 	YY_BREAK
 case 24:
