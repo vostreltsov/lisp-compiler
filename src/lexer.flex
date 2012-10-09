@@ -1,6 +1,7 @@
 %{
 
 #include <string.h>
+#include "parser.tab.h"
 
 int my_powah(int base, int n)
 {
@@ -401,16 +402,3 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 
 %%
-
-int main(int argc, char * argv[])
-{
-    yyin = fopen("text.txt", "r");
-    if (yyin == 0)
-        printf("error opening text.txt\n");
-    else
-    {
-        yylex();
-        fclose(yyin);
-    }
-    return 0;
-}

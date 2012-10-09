@@ -1,6 +1,7 @@
 %{
 
 #include <stdio.h>
+#include "parser.tab.h"
 #include "parser_structs.h"
 #include "parser_funcs.h"
 
@@ -68,3 +69,7 @@ list : '(' ')'                                            {}
      ;
 
 %%
+
+void yyerror(const char * msg) {
+    printf("error: %s\n", msg);
+}
