@@ -46,7 +46,7 @@ struct s_expr_struct {
     char                   character;  // S-expression may be a character constant.
     char                 * string;     // S-expression may be a string constant.
     int                    boolean;    // S-expression may be an boolean constant.
-    char                 * identifier; // S-expression may be an identifier.
+    char                 * id;         // S-expression may be an identifier.
     struct list_struct   * list;       // S-expression may be a list.
 
     int                    nodeId;     // Identifier of the node in the syntax tree.

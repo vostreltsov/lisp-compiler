@@ -31,9 +31,7 @@ struct s_expr_struct * create_s_expr_char(char value, int nodeId) {
 struct s_expr_struct * create_s_expr_string(char * value, int nodeId) {
     struct s_expr_struct * result = create_s_expr_empty(nodeId);
     result->type = S_EXPR_TYPE_STRING;
-    result->string = (char *)malloc(sizeof(char) * strlen(value));
-    strcpy(result->string, value);
-    free(value);
+    result->string = value;
     return result;
 }
 
@@ -47,9 +45,7 @@ struct s_expr_struct * create_s_expr_bool(int value, int nodeId) {
 struct s_expr_struct * create_s_expr_id(char * value, int nodeId) {
     struct s_expr_struct * result = create_s_expr_empty(nodeId);
     result->type = S_EXPR_TYPE_ID;
-    result->identifier = (char *)malloc(sizeof(char) * strlen(value));
-    strcpy(result->identifier, value);
-    free(value);
+    result->id = value;
     return result;
 }
 

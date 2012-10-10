@@ -1,6 +1,7 @@
 %{
 
 #include <string.h>
+#include <ctype.h>
 #include "parser.tab.h"
 
 int my_powah(int base, int n)
@@ -57,12 +58,11 @@ int nondec2dec(char * string, int base)
     return result;
 }
 
-void buffer_output(char * title, char * buf, unsigned int len)
-{
-    printf("%s", title);
-    for (unsigned int i = 0; i < len; i++)
-        printf("%c", buf[i]);
-    printf("\n");
+void store_function_id() {
+    yylval.semantic_id = (char *)malloc(sizeof(char) * (yyleng + 1));
+    strcpy(yylval.semantic_id, yytext);
+    for (size_t i = 0; i < yyleng; i++)
+        yylval.semantic_id[i] = tolower(yylval.semantic_id[i]);
 }
 
 %}
@@ -80,8 +80,8 @@ WHITESPACE      [ \t\n\r]
 NOTWHITESPACE   [^ \t\n\r]
 SYMBOLID        [a-zA-Z0-9+\-*/@$%^&_=<>~.]
 
-%x COMMENT_ML
-%x STRING
+%x COMMENT_ML_ST
+%x STRING_ST
 
 %%
 
@@ -92,22 +92,18 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 
 "#|" {
     // Multiline comment beginning.
-    buffer_length = 0;
-    BEGIN(COMMENT_ML);
+    BEGIN(COMMENT_ML_ST);
 }
 "\"" {
     // String constant beginning.
     buffer_length = 0;
-    BEGIN(STRING);
+    BEGIN(STRING_ST);
 }
 ";".* {
-    // Singleline comment.
-    strcpy(buffer, yytext + 1);
-    buffer_length = strlen(yytext + 1);
-    buffer_output("Comment:                   ", buffer, buffer_length);
+    // Singleline comment, do nothing.
 }
 {WHITESPACE}+ {
-    // Whitespaces.
+    // Whitespaces, do nothing.
 }
 "(" {
     // Opening parenthesis.
@@ -119,92 +115,105 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 "+" {
     // Operator: addition.
-    return (unsigned char)'+';
+    store_function_id();
+    return ID;
 }
 "-" {
     // Operator: subtraction.
-    return (unsigned char)'-';
+    store_function_id();
+    return ID;
 }
 "*" {
     // Operator: multiplication.
-    return (unsigned char)'*';
+     store_function_id();
+    return ID;
 }
 "/" {
     // Operator: division.
-    return (unsigned char)'/';
+    store_function_id();
+    return ID;
 }
 ">" {
     // Operator: greater.
-    return (unsigned char)'>';
+    store_function_id();
+    return ID;
 }
 ">=" {
     // Operator: greater or equal.
-    return GRTR_EQ;
+    store_function_id();
+    return ID;
 }
 "<" {
     // Operator: less.
-    return (unsigned char)'<';
+    store_function_id();
+    return ID;
 }
 "<=" {
     // Operator: less or equal.
-    return LESS_EQ;
+    store_function_id();
+    return ID;
 }
 "=" {
     // Operator: equal.
-    return (unsigned char)'=';
+    store_function_id();
+    return ID;
 }
 "and" {
     // Operator: and.
-    return AND;
+    store_function_id();
+    return ID;
 }
 "or" {
     // Operator: or.
-    return OR;
+    store_function_id();
+    return ID;
 }
 "not" {
     // Operator: not.
-    return NOT;
+    store_function_id();
+    return ID;
 }
 "t" {
     // Boolean constant - true.
-    printf("Boolean constant - true:   %s\n", yytext);
+    yylval.semantic_bool = 1;
+    return BOOL;
 }
 "nil" {
     // Boolean constant - false.
-    printf("Boolean constant - false:  %s\n", yytext);
+    yylval.semantic_bool = 0;
+    return BOOL;
 }
 "#b"{DIGIT_BIN}+ {
     // Numeric constant - binary.
-    int value = nondec2dec(yytext + 2, 2);
-    printf("Numeric constant - bin:    %d\n", value);
+    yylval.semantic_int = nondec2dec(yytext + 2, 2);
+    return INT;
 }
 "#o"{DIGIT_OCT}+ {
     // Numeric constant - octal.
-    int value = nondec2dec(yytext + 2, 8);
-    printf("Numeric constant - oct:    %d\n", value);
+    yylval.semantic_int = nondec2dec(yytext + 2, 8);
+    return INT;
 }
 {DIGIT_DEC}+"."? {
     // Numeric constant.
     if (yytext[yyleng - 1] == '.')
         yytext[yyleng - 1] = '\0';
-    int value = nondec2dec(yytext, 10);
-    yylval.semantic_int = value;
+    yylval.semantic_int = nondec2dec(yytext, 10);
     return INT;
-    //printf("Numeric constant - dec:    %d\n", value);
 }
 "#x"{DIGIT_HEX}+ {
     // Numeric constant - hexadecimal.
-    int value = nondec2dec(yytext + 2, 16);
-    printf("Numeric constant - hex:    %d\n", value);
+    yylval.semantic_int = nondec2dec(yytext + 2, 16);
+    return INT;
 }
 "#\\"{NOTWHITESPACE} {
     // Character constant.
-    printf("Character constant:        %s\n", yytext + 2);
+    yylval.semantic_char = yytext[2];
+    return CHAR;
 }
 "#\\"("SPACE"|"TAB"|"NEWLINE"|"PAGE"|"RUBOUT"|"LINEFEED"|"RETURN"|"BACKSPACE") {
     // Character constant - whitespace.
-    // TODO: convert to a real character.
-    printf("Character constant:        %s\n", yytext + 2);
+    yylval.semantic_char = 'q'; // TODO: convert to a real character.
+    return CHAR;
 }
 "loop" {
     printf("Key word:                  %s\n", yytext);
@@ -312,7 +321,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     printf("Key word:                  %s\n", yytext);
 }
 "'" {
-    printf("Key word:                  %s\n", yytext);
+    return (unsigned char)'\'';
 }
 "print" {
     printf("Key word:                  %s\n", yytext);
@@ -345,60 +354,56 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     printf("Key word:                  %s\n", yytext);
 }
 {SYMBOLID}+ {
-    yylval.semantic_id = (char *)malloc(sizeof(char) * yyleng);
-    strcpy(yylval.semantic_id, yytext);
+    // User-defined symbol.
+    store_function_id();
     return ID;
 }
 . {
     printf("UNEXPECTED CHARACTER:      %s\n", yytext);
 }
-<COMMENT_ML>"|" {
+<COMMENT_ML_ST>"|" {
     // Multiline comment body: any character.
-    buffer[buffer_length++] = yytext[0];
 }
-<COMMENT_ML>"#" {
+<COMMENT_ML_ST>"#" {
     // Multiline comment body: any character.
-    buffer[buffer_length++] = yytext[0];
 }
-<COMMENT_ML>[^|#]+ {
+<COMMENT_ML_ST>[^|#]+ {
     // Multiline comment body: any character.
-    for (int i = 0; i < yyleng; i++)
-        buffer[buffer_length++] = yytext[i];
 }
-<COMMENT_ML>"|#" {
+<COMMENT_ML_ST>"|#" {
     // Multiline comment ending.
-    buffer_output("Comment:                   ", buffer, buffer_length);
-    buffer_length = 0;
     BEGIN(INITIAL);
 }
-<COMMENT_ML><<EOF>> {
+<COMMENT_ML_ST><<EOF>> {
     puts("ERROR: UNCLOSED COMMENT");
     yyterminate();
 }
-<STRING>"\\\"" {
+<STRING_ST>"\\\"" {
     // String constant body: escaped quote character.
     buffer[buffer_length++] = '"';
 }
-<STRING>"\\\\" {
+<STRING_ST>"\\\\" {
     // String constant body: escaped slash character.
     buffer[buffer_length++] = '\\';
 }
-<STRING>[^"\"\\"]+ {
+<STRING_ST>[^"\"\\"]+ {
     // String constant body: non-quote, non-slash characters.
     for (int i = 0; i < yyleng; i++)
         buffer[buffer_length++] = yytext[i];
 }
-<STRING>"\\" {
+<STRING_ST>"\\" {
     // String constant body: unrecognized slash character.
     buffer[buffer_length++] = '\\';
 }
-<STRING>"\"" {
+<STRING_ST>"\"" {
     // String constant ending.
-    buffer_output("String constant:           ", buffer, buffer_length);
+    yylval.semantic_string = (char *)malloc(sizeof(char) * (buffer_length + 1));
+    strcpy(yylval.semantic_string, buffer);
     buffer_length = 0;
     BEGIN(INITIAL);
+    return STRING;
 }
-<STRING><<EOF>> {
+<STRING_ST><<EOF>> {
     puts("ERROR: UNCLOSED STRING CONSTANT");
     yyterminate();
 }

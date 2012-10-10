@@ -20,22 +20,22 @@ void dot_for_s_expr(FILE * file, char * lastNode, struct s_expr_struct * expr) {
 
     switch (expr->type) {
         case S_EXPR_TYPE_INT:
-            sprintf(tmp, "\"id%d\\n s_expr %d\"", expr->nodeId, expr->integer);
+            sprintf(tmp, "\"id%d\\ns_expr-int\\n%d\"", expr->nodeId, expr->integer);
             break;
         case S_EXPR_TYPE_CHAR:
-            sprintf(tmp, "\"id%d\\n s_expr %c\"", expr->nodeId, expr->character);
+            sprintf(tmp, "\"id%d\\ns_expr-char\\n%c\"", expr->nodeId, expr->character);
             break;
         case S_EXPR_TYPE_STRING:
-            sprintf(tmp, "\"id%d\\n s_expr %s\"", expr->nodeId, expr->string);
+            sprintf(tmp, "\"id%d\\ns_expr-string\\n%s\"", expr->nodeId, expr->string);
             break;
         case S_EXPR_TYPE_BOOL:
-            sprintf(tmp, "\"id%d\\n s_expr %s\"", expr->nodeId, expr->boolean ? "TRUE" : "FALSE");
+            sprintf(tmp, "\"id%d\\ns_expr-bool\\n%s\"", expr->nodeId, expr->boolean ? "TRUE" : "FALSE");
             break;
         case S_EXPR_TYPE_ID:
-            sprintf(tmp, "\"id%d\\n s_expr %s\"", expr->nodeId, expr->identifier);
+            sprintf(tmp, "\"id%d\\ns_expr-id\\n%s\"", expr->nodeId, expr->id);
             break;
         case S_EXPR_TYPE_LIST:
-            sprintf(tmp, "\"id%d\\n s_expr\"", expr->nodeId);
+            sprintf(tmp, "\"id%d\\ns_expr-list\"", expr->nodeId);
             dot_for_list(file, tmp, expr->list);
             break;
         default:
@@ -45,11 +45,11 @@ void dot_for_s_expr(FILE * file, char * lastNode, struct s_expr_struct * expr) {
     fprintf(file, "%s->%s;\n", lastNode, tmp);
 }
 
-void dot_for_s_expr_seq(FILE * file, char * lastNode, struct s_expr_seq_struct * expr_list) {
+void dot_for_s_expr_seq(FILE * file, char * lastNode, struct s_expr_seq_struct * expr_seq) {
     char tmp[BUFFER_SIZE];
-    sprintf(tmp, "\"id%d\\n s_expr_list\"", expr_list->nodeId);
+    sprintf(tmp, "\"id%d\\ns_expr_seq\"", expr_seq->nodeId);
     fprintf(file, "%s->%s;\n", lastNode, tmp);
-    struct s_expr_struct * expr = expr_list->first;
+    struct s_expr_struct * expr = expr_seq->first;
     while (expr != NULL) {
         dot_for_s_expr(file, tmp, expr);
         expr = expr->next;
@@ -58,7 +58,11 @@ void dot_for_s_expr_seq(FILE * file, char * lastNode, struct s_expr_seq_struct *
 
 void dot_for_list(FILE * file, char * lastNode, struct list_struct * list) {
     char tmp[BUFFER_SIZE];
-    sprintf(tmp, "\"id%d\\n list\"", list->nodeId);
+    if (list->id == NULL) {
+        sprintf(tmp, "\"id%d\\nlist\"", list->nodeId);
+    } else {
+        sprintf(tmp, "\"id%d\\nlist\\n%s\"", list->nodeId, list->id);
+    }
     fprintf(file, "%s->%s;\n", lastNode, tmp);
     if (list->s_expr != NULL) {
         dot_for_s_expr(file, tmp, list->s_expr);
