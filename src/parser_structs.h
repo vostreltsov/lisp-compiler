@@ -3,7 +3,7 @@
 
 struct program_struct;
 struct s_expr_struct;
-struct s_expr_list_struct;
+struct s_expr_seq_struct;
 struct list_struct;
 
 enum s_expr_type {
@@ -36,6 +36,7 @@ enum list_type {
 
 struct program_struct {
     struct s_expr_struct * s_expr;     // Program is an s-expression.
+
     int                    nodeId;     // Identifier of the node in the syntax tree.
 };
 
@@ -52,14 +53,20 @@ struct s_expr_struct {
     struct s_expr_struct * next;       // Pointer to the next s_expr_struct.
 };
 
-struct s_expr_list_struct {
-    struct s_expr_struct * first; // First s-expression in the list.
-    struct s_expr_struct * last;  // Last s-expression in the list.
+struct s_expr_seq_struct {
+    struct s_expr_struct * first;  // First s-expression in the list.
+    struct s_expr_struct * last;   // Last s-expression in the list.
+
+    int                    nodeId; // Identifier of the node in the syntax tree.
 };
 
 struct list_struct {
-    struct s_expr_struct      * s_expr;      // List may be an (s-expression).
-    struct s_expr_list_struct * s_expr_list; // List may be an (s-expression list).
+    char                     * id;          // List may be a function call.
+
+    struct s_expr_struct     * s_expr;      // List may be an (s-expression).
+    struct s_expr_seq_struct * s_expr_seq; // List may be an (s-expression list).
+
+    int                        nodeId;      // Identifier of the node in the syntax tree.
 };
 
 #endif

@@ -15,23 +15,23 @@ int idCounter = 0;
 %}
 
 %union {
-    int                          semantic_int;
-    char                         semantic_char;
-    char                       * semantic_string;
-    int                          semantic_bool;
-    char                       * semantic_id;
-    struct program_struct      * semantic_program;
-    struct s_expr_struct       * semantic_s_expr;
-    struct s_expr_list_struct  * semantic_s_expr_list;
-    struct list_struct         * semantic_list;
+    int                         semantic_int;
+    char                        semantic_char;
+    char                      * semantic_string;
+    int                         semantic_bool;
+    char                      * semantic_id;
+    struct program_struct     * semantic_program;
+    struct s_expr_struct      * semantic_s_expr;
+    struct s_expr_seq_struct  * semantic_s_expr_seq;
+    struct list_struct        * semantic_list;
 }
 
 %error-verbose
 
-%type   <semantic_program>      program
-%type   <semantic_s_expr>       s_expr
-%type   <semantic_s_expr_list>  s_expr_list
-%type   <semantic_list>         list
+%type   <semantic_program>     program
+%type   <semantic_s_expr>      s_expr
+%type   <semantic_s_expr_seq>  s_expr_seq
+%type   <semantic_list>        list
 
 %token  <semantic_int>          INT
 %token  <semantic_char>         CHAR
@@ -69,17 +69,17 @@ s_expr : INT                            {$$ = create_s_expr_int($1, ++idCounter)
        | list                           {$$ = create_s_expr_list($1, ++idCounter);}
        ;
 
-s_expr_list : s_expr                    {}
-            | s_expr_list s_expr        {}
-            ;
+s_expr_seq : s_expr                     {$$ = create_s_expr_seq($1, ++idCounter);}
+           | s_expr_seq s_expr          {$$ = add_to_s_expr_seq($1, $2);}
+           ;
 
-list : '(' ')'                                            {}
-     | '(' ID s_expr_list ')'                             {}
+list : '(' ')'                                            {$$ = create_list_empty(++idCounter);}
+     | '(' ID s_expr_seq ')'                              {$$ = create_list_id_s_expr_seq($2, $3, ++idCounter);}
      | '\'' s_expr                                        {}
 
      | '(' LOOP FOR ID IN list s_expr ')'                 {}
      | '(' LOOP FOR ID FROM s_expr TO s_expr s_expr ')'   {}
-     | '(' PROGN s_expr_list ')'                          {}
+     | '(' PROGN s_expr_seq ')'                           {}
      | '(' SETF ID s_expr ')'                             {}
      | '(' IF s_expr s_expr ')'                           {}
      | '(' IF s_expr s_expr s_expr ')'                    {}

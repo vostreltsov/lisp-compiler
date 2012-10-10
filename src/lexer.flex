@@ -345,7 +345,9 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     printf("Key word:                  %s\n", yytext);
 }
 {SYMBOLID}+ {
-    printf("Symbol:                    %s\n", yytext);
+    yylval.semantic_id = (char *)malloc(sizeof(char) * yyleng);
+    strcpy(yylval.semantic_id, yytext);
+    return ID;
 }
 . {
     printf("UNEXPECTED CHARACTER:      %s\n", yytext);

@@ -144,15 +144,15 @@ typedef union YYSTYPE
 /* Line 350 of yacc.c  */
 #line 17 "parser.y"
 
-    int                          semantic_int;
-    char                         semantic_char;
-    char                       * semantic_string;
-    int                          semantic_bool;
-    char                       * semantic_id;
-    struct program_struct      * semantic_program;
-    struct s_expr_struct       * semantic_s_expr;
-    struct s_expr_list_struct  * semantic_s_expr_list;
-    struct list_struct         * semantic_list;
+    int                         semantic_int;
+    char                        semantic_char;
+    char                      * semantic_string;
+    int                         semantic_bool;
+    char                      * semantic_id;
+    struct program_struct     * semantic_program;
+    struct s_expr_struct      * semantic_s_expr;
+    struct s_expr_seq_struct  * semantic_s_expr_seq;
+    struct list_struct        * semantic_list;
 
 
 /* Line 350 of yacc.c  */
@@ -493,7 +493,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "INT", "CHAR", "STRING", "BOOL", "ID",
   "GRTR_EQ", "LESS_EQ", "AND", "OR", "NOT", "LOOP", "FOR", "IN", "FROM",
   "TO", "PROGN", "SETF", "IF", "'('", "')'", "'\\''", "$accept", "program",
-  "s_expr", "s_expr_list", "list", YY_NULL
+  "s_expr", "s_expr_seq", "list", YY_NULL
 };
 #endif
 
@@ -1468,25 +1468,25 @@ yyreduce:
   case 9:
 /* Line 1787 of yacc.c  */
 #line 72 "parser.y"
-    {}
+    {(yyval.semantic_s_expr_seq) = create_s_expr_seq((yyvsp[(1) - (1)].semantic_s_expr), ++idCounter);}
     break;
 
   case 10:
 /* Line 1787 of yacc.c  */
 #line 73 "parser.y"
-    {}
+    {(yyval.semantic_s_expr_seq) = add_to_s_expr_seq((yyvsp[(1) - (2)].semantic_s_expr_seq), (yyvsp[(2) - (2)].semantic_s_expr));}
     break;
 
   case 11:
 /* Line 1787 of yacc.c  */
 #line 76 "parser.y"
-    {}
+    {(yyval.semantic_list) = create_list_empty(++idCounter);}
     break;
 
   case 12:
 /* Line 1787 of yacc.c  */
 #line 77 "parser.y"
-    {}
+    {(yyval.semantic_list) = create_list_id_s_expr_seq((yyvsp[(2) - (4)].semantic_id), (yyvsp[(3) - (4)].semantic_s_expr_seq), ++idCounter);}
     break;
 
   case 13:

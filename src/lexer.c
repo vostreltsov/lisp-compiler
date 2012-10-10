@@ -1622,19 +1622,21 @@ case 73:
 YY_RULE_SETUP
 #line 347 "lexer.flex"
 {
-    printf("Symbol:                    %s\n", yytext);
+    yylval.semantic_id = (char *)malloc(sizeof(char) * yyleng);
+    strcpy(yylval.semantic_id, yytext);
+    return ID;
 }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 350 "lexer.flex"
+#line 352 "lexer.flex"
 {
     printf("UNEXPECTED CHARACTER:      %s\n", yytext);
 }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 353 "lexer.flex"
+#line 355 "lexer.flex"
 {
     // Multiline comment body: any character.
     buffer[buffer_length++] = yytext[0];
@@ -1642,7 +1644,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 357 "lexer.flex"
+#line 359 "lexer.flex"
 {
     // Multiline comment body: any character.
     buffer[buffer_length++] = yytext[0];
@@ -1651,7 +1653,7 @@ YY_RULE_SETUP
 case 77:
 /* rule 77 can match eol */
 YY_RULE_SETUP
-#line 361 "lexer.flex"
+#line 363 "lexer.flex"
 {
     // Multiline comment body: any character.
     for (int i = 0; i < yyleng; i++)
@@ -1660,7 +1662,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 366 "lexer.flex"
+#line 368 "lexer.flex"
 {
     // Multiline comment ending.
     buffer_output("Comment:                   ", buffer, buffer_length);
@@ -1669,7 +1671,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(COMMENT_ML):
-#line 372 "lexer.flex"
+#line 374 "lexer.flex"
 {
     puts("ERROR: UNCLOSED COMMENT");
     yyterminate();
@@ -1677,7 +1679,7 @@ case YY_STATE_EOF(COMMENT_ML):
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 376 "lexer.flex"
+#line 378 "lexer.flex"
 {
     // String constant body: escaped quote character.
     buffer[buffer_length++] = '"';
@@ -1685,7 +1687,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 380 "lexer.flex"
+#line 382 "lexer.flex"
 {
     // String constant body: escaped slash character.
     buffer[buffer_length++] = '\\';
@@ -1694,7 +1696,7 @@ YY_RULE_SETUP
 case 81:
 /* rule 81 can match eol */
 YY_RULE_SETUP
-#line 384 "lexer.flex"
+#line 386 "lexer.flex"
 {
     // String constant body: non-quote, non-slash characters.
     for (int i = 0; i < yyleng; i++)
@@ -1703,7 +1705,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 389 "lexer.flex"
+#line 391 "lexer.flex"
 {
     // String constant body: unrecognized slash character.
     buffer[buffer_length++] = '\\';
@@ -1711,7 +1713,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 393 "lexer.flex"
+#line 395 "lexer.flex"
 {
     // String constant ending.
     buffer_output("String constant:           ", buffer, buffer_length);
@@ -1720,7 +1722,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 399 "lexer.flex"
+#line 401 "lexer.flex"
 {
     puts("ERROR: UNCLOSED STRING CONSTANT");
     yyterminate();
@@ -1728,10 +1730,10 @@ case YY_STATE_EOF(STRING):
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 404 "lexer.flex"
+#line 406 "lexer.flex"
 ECHO;
 	YY_BREAK
-#line 1735 "lexer.c"
+#line 1737 "lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2726,7 +2728,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 404 "lexer.flex"
+#line 406 "lexer.flex"
 
 
 
