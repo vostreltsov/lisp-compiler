@@ -76,9 +76,11 @@ void yyerror(const char * str);
 
 struct program_struct * root;
 
+int idCounter = 0;
+
 
 /* Line 336 of yacc.c  */
-#line 82 "parser.tab.c"
+#line 84 "parser.tab.c"
 
 # ifndef YY_NULL
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -140,19 +142,21 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 350 of yacc.c  */
-#line 15 "parser.y"
+#line 17 "parser.y"
 
-    int                     semantic_int;
-    char                    semantic_char;
-    char                  * semantic_string;
-    int                     semantic_bool;
-    char                  * semantic_id;
-    struct program_struct * semantic_program;
-    struct s_expr_struct  * semantic_s_expr;
+    int                          semantic_int;
+    char                         semantic_char;
+    char                       * semantic_string;
+    int                          semantic_bool;
+    char                       * semantic_id;
+    struct program_struct      * semantic_program;
+    struct s_expr_struct       * semantic_s_expr;
+    struct s_expr_list_struct  * semantic_s_expr_list;
+    struct list_struct         * semantic_list;
 
 
 /* Line 350 of yacc.c  */
-#line 156 "parser.tab.c"
+#line 160 "parser.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -180,7 +184,7 @@ int yyparse ();
 /* Copy the second part of user declarations.  */
 
 /* Line 353 of yacc.c  */
-#line 184 "parser.tab.c"
+#line 188 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -476,8 +480,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    55,    55,    58,    59,    60,    61,    62,    63,    66,
-      67,    70,    71,    72,    74,    75,    76,    77,    78,    79
+       0,    61,    61,    64,    65,    66,    67,    68,    69,    72,
+      73,    76,    77,    78,    80,    81,    82,    83,    84,    85
 };
 #endif
 
@@ -1421,115 +1425,115 @@ yyreduce:
     {
         case 2:
 /* Line 1787 of yacc.c  */
-#line 55 "parser.y"
-    {root = (yyval.semantic_program) = create_program((yyvsp[(1) - (1)].semantic_s_expr));}
+#line 61 "parser.y"
+    {root = (yyval.semantic_program) = create_program((yyvsp[(1) - (1)].semantic_s_expr), ++idCounter);}
     break;
 
   case 3:
 /* Line 1787 of yacc.c  */
-#line 58 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_int((yyvsp[(1) - (1)].semantic_int));}
+#line 64 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr_int((yyvsp[(1) - (1)].semantic_int), ++idCounter);}
     break;
 
   case 4:
 /* Line 1787 of yacc.c  */
-#line 59 "parser.y"
-    {}
+#line 65 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr_char((yyvsp[(1) - (1)].semantic_char), ++idCounter);}
     break;
 
   case 5:
 /* Line 1787 of yacc.c  */
-#line 60 "parser.y"
-    {}
+#line 66 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr_string((yyvsp[(1) - (1)].semantic_string), ++idCounter);}
     break;
 
   case 6:
 /* Line 1787 of yacc.c  */
-#line 61 "parser.y"
-    {}
+#line 67 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr_bool((yyvsp[(1) - (1)].semantic_bool), ++idCounter);}
     break;
 
   case 7:
 /* Line 1787 of yacc.c  */
-#line 62 "parser.y"
-    {}
+#line 68 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr_id((yyvsp[(1) - (1)].semantic_id), ++idCounter);}
     break;
 
   case 8:
 /* Line 1787 of yacc.c  */
-#line 63 "parser.y"
-    {}
+#line 69 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr_list((yyvsp[(1) - (1)].semantic_list), ++idCounter);}
     break;
 
   case 9:
-/* Line 1787 of yacc.c  */
-#line 66 "parser.y"
-    {}
-    break;
-
-  case 10:
-/* Line 1787 of yacc.c  */
-#line 67 "parser.y"
-    {}
-    break;
-
-  case 11:
-/* Line 1787 of yacc.c  */
-#line 70 "parser.y"
-    {}
-    break;
-
-  case 12:
-/* Line 1787 of yacc.c  */
-#line 71 "parser.y"
-    {}
-    break;
-
-  case 13:
 /* Line 1787 of yacc.c  */
 #line 72 "parser.y"
     {}
     break;
 
-  case 14:
+  case 10:
 /* Line 1787 of yacc.c  */
-#line 74 "parser.y"
+#line 73 "parser.y"
     {}
     break;
 
-  case 15:
-/* Line 1787 of yacc.c  */
-#line 75 "parser.y"
-    {}
-    break;
-
-  case 16:
+  case 11:
 /* Line 1787 of yacc.c  */
 #line 76 "parser.y"
     {}
     break;
 
-  case 17:
+  case 12:
 /* Line 1787 of yacc.c  */
 #line 77 "parser.y"
     {}
     break;
 
-  case 18:
+  case 13:
 /* Line 1787 of yacc.c  */
 #line 78 "parser.y"
     {}
     break;
 
+  case 14:
+/* Line 1787 of yacc.c  */
+#line 80 "parser.y"
+    {}
+    break;
+
+  case 15:
+/* Line 1787 of yacc.c  */
+#line 81 "parser.y"
+    {}
+    break;
+
+  case 16:
+/* Line 1787 of yacc.c  */
+#line 82 "parser.y"
+    {}
+    break;
+
+  case 17:
+/* Line 1787 of yacc.c  */
+#line 83 "parser.y"
+    {}
+    break;
+
+  case 18:
+/* Line 1787 of yacc.c  */
+#line 84 "parser.y"
+    {}
+    break;
+
   case 19:
 /* Line 1787 of yacc.c  */
-#line 79 "parser.y"
+#line 85 "parser.y"
     {}
     break;
 
 
 /* Line 1787 of yacc.c  */
-#line 1533 "parser.tab.c"
+#line 1537 "parser.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1759,7 +1763,7 @@ yyreturn:
 
 
 /* Line 2048 of yacc.c  */
-#line 82 "parser.y"
+#line 88 "parser.y"
 
 
 void yyerror(const char * str) {

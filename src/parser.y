@@ -10,28 +10,34 @@ void yyerror(const char * str);
 
 struct program_struct * root;
 
+int idCounter = 0;
+
 %}
 
 %union {
-    int                     semantic_int;
-    char                    semantic_char;
-    char                  * semantic_string;
-    int                     semantic_bool;
-    char                  * semantic_id;
-    struct program_struct * semantic_program;
-    struct s_expr_struct  * semantic_s_expr;
+    int                          semantic_int;
+    char                         semantic_char;
+    char                       * semantic_string;
+    int                          semantic_bool;
+    char                       * semantic_id;
+    struct program_struct      * semantic_program;
+    struct s_expr_struct       * semantic_s_expr;
+    struct s_expr_list_struct  * semantic_s_expr_list;
+    struct list_struct         * semantic_list;
 }
 
 %error-verbose
 
-%type   <semantic_program>    program
-%type   <semantic_s_expr>     s_expr
+%type   <semantic_program>      program
+%type   <semantic_s_expr>       s_expr
+%type   <semantic_s_expr_list>  s_expr_list
+%type   <semantic_list>         list
 
-%token  <semantic_int>        INT
-%token  <semantic_char>       CHAR
-%token  <semantic_string>     STRING
-%token  <semantic_bool>       BOOL
-%token  <semantic_bool>       ID
+%token  <semantic_int>          INT
+%token  <semantic_char>         CHAR
+%token  <semantic_string>       STRING
+%token  <semantic_bool>         BOOL
+%token  <semantic_id>           ID
 
 %token GRTR_EQ
 %token LESS_EQ
@@ -52,15 +58,15 @@ struct program_struct * root;
 
 %%
 
-program : s_expr                        {root = $$ = create_program($1);}
+program : s_expr                        {root = $$ = create_program($1, ++idCounter);}
         ;
 
-s_expr : INT                            {$$ = create_s_expr_int($1);}
-       | CHAR                           {}
-       | STRING                         {}
-       | BOOL                           {}
-       | ID                             {}
-       | list                           {}
+s_expr : INT                            {$$ = create_s_expr_int($1, ++idCounter);}
+       | CHAR                           {$$ = create_s_expr_char($1, ++idCounter);}
+       | STRING                         {$$ = create_s_expr_string($1, ++idCounter);}
+       | BOOL                           {$$ = create_s_expr_bool($1, ++idCounter);}
+       | ID                             {$$ = create_s_expr_id($1, ++idCounter);}
+       | list                           {$$ = create_s_expr_list($1, ++idCounter);}
        ;
 
 s_expr_list : s_expr                    {}

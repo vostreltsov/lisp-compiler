@@ -4,6 +4,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Исходные файлы"
                    projectFiles="true">
+      <itemPath>dotcode.c</itemPath>
       <itemPath>../lexer.c</itemPath>
       <itemPath>main.c</itemPath>
       <itemPath>../parser.tab.c</itemPath>
@@ -12,6 +13,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Файлы заголовков"
                    projectFiles="true">
+      <itemPath>dotcode.h</itemPath>
       <itemPath>../parser.tab.h</itemPath>
       <itemPath>../parser_funcs.h</itemPath>
       <itemPath>../parser_structs.h</itemPath>

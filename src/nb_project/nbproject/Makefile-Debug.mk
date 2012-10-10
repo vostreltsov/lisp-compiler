@@ -37,6 +37,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/_ext/1472/lexer.o \
 	${OBJECTDIR}/_ext/1472/parser_funcs.o \
+	${OBJECTDIR}/dotcode.o \
 	${OBJECTDIR}/_ext/1472/parser.tab.o \
 	${OBJECTDIR}/main.o
 
@@ -74,6 +75,11 @@ ${OBJECTDIR}/_ext/1472/parser_funcs.o: ../parser_funcs.c
 	${MKDIR} -p ${OBJECTDIR}/_ext/1472
 	${RM} $@.d
 	$(COMPILE.c) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1472/parser_funcs.o ../parser_funcs.c
+
+${OBJECTDIR}/dotcode.o: dotcode.c 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.c) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/dotcode.o dotcode.c
 
 ${OBJECTDIR}/_ext/1472/parser.tab.o: ../parser.tab.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1472

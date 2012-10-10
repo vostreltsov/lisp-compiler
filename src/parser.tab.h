@@ -72,19 +72,21 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2049 of yacc.c  */
-#line 15 "parser.y"
+#line 17 "parser.y"
 
-    int                     semantic_int;
-    char                    semantic_char;
-    char                  * semantic_string;
-    int                     semantic_bool;
-    char                  * semantic_id;
-    struct program_struct * semantic_program;
-    struct s_expr_struct  * semantic_s_expr;
+    int                          semantic_int;
+    char                         semantic_char;
+    char                       * semantic_string;
+    int                          semantic_bool;
+    char                       * semantic_id;
+    struct program_struct      * semantic_program;
+    struct s_expr_struct       * semantic_s_expr;
+    struct s_expr_list_struct  * semantic_s_expr_list;
+    struct list_struct         * semantic_list;
 
 
 /* Line 2049 of yacc.c  */
-#line 88 "parser.tab.h"
+#line 90 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
