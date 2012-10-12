@@ -39,20 +39,39 @@ int idCounter = 0;
 %token  <semantic_bool>         BOOL
 %token  <semantic_id>           ID
 
-%token GRTR_EQ
-%token LESS_EQ
-%token AND
-%token OR
-%token NOT
-
 %token LOOP
 %token FOR
 %token IN
+%token DO
 %token FROM
 %token TO
+%token WHILE
 %token PROGN
+%token DEFPARAMETER
 %token SETF
+%token LET
+%token VECTOR
+%token VECTORPUSH
+%token VECTORPOP
+%token ELT
+%token LIST
+%token LISTLENGTH
+%token LENGTH
+%token FIND
+%token POSITION
+%token REMOVE
+%token SUBSTITUTE
+%token CONCATENATE
 %token IF
+%token DOTIMES
+%token DEFUN
+%token SLOTVALUE
+%token OPEN
+%token CLOSE
+%token WITHOPENFILE
+%token FORMAT
+%token FUNCALL
+%token DEFCLASS
 
 %start program
 
@@ -73,9 +92,10 @@ s_expr_seq : s_expr                     {$$ = create_s_expr_seq($1, ++idCounter)
            | s_expr_seq s_expr          {$$ = add_to_s_expr_seq($1, $2);}
            ;
 
-list : '(' ')'                                            {$$ = create_list_empty(++idCounter);}
-     | '(' ID s_expr_seq ')'                              {$$ = create_list_id_s_expr_seq($2, $3, ++idCounter);}
-     | '\'' s_expr                                        {}
+list : '(' ')'                                            {$$ = create_list(LIST_TYPE_EMPTY, NULL, NULL, ++idCounter);}
+     | '(' ID s_expr_seq ')'                              {$$ = create_list(LIST_TYPE_FCALL, $2, $3, ++idCounter);}
+
+     | '\'' s_expr                                        {/* TODO: ~ (list s_expr) */}
 
      | '(' LOOP FOR ID IN list s_expr ')'                 {}
      | '(' LOOP FOR ID FROM s_expr TO s_expr s_expr ')'   {}

@@ -14,11 +14,10 @@ struct s_expr_struct * create_s_expr_bool(int value, int nodeId);
 struct s_expr_struct * create_s_expr_id(char * value, int nodeId);
 struct s_expr_struct * create_s_expr_list(struct list_struct * value, int nodeId);
 struct s_expr_seq_struct * create_s_expr_seq(struct s_expr_struct * first, int nodeId);
-
-struct list_struct * create_list_empty(int nodeId);
-struct list_struct * create_list_id_s_expr_seq(char * id, struct s_expr_seq_struct * s_expr_seq, int nodeId);
-
 struct s_expr_seq_struct * add_to_s_expr_seq(struct s_expr_seq_struct * list, struct s_expr_struct * expr);
+
+struct list_struct * create_list(enum list_type type, char * id, struct s_expr_seq_struct * ops, int nodeId);
+
 
 #endif
 

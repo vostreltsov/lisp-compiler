@@ -64,22 +64,18 @@ struct s_expr_seq_struct * create_s_expr_seq(struct s_expr_struct * first, int n
     return result;
 }
 
-struct list_struct * create_list_empty(int nodeId) {
-    struct list_struct * result = (struct list_struct *)malloc(sizeof(struct list_struct));
-    memset(result, 0, sizeof(struct list_struct));
-    result->nodeId = nodeId;
-    return result;
-}
-
-struct list_struct * create_list_id_s_expr_seq(char * id, struct s_expr_seq_struct * s_expr_seq, int nodeId) {
-    struct list_struct * result = create_list_empty(nodeId);
-    result->id = id;
-    result->s_expr_seq = s_expr_seq;
-    return result;
-}
-
 struct s_expr_seq_struct * add_to_s_expr_seq(struct s_expr_seq_struct * list, struct s_expr_struct * expr) {
     list->last->next = expr;
     list->last = expr;
     return list;
+}
+
+struct list_struct * create_list(enum list_type type, char * id, struct s_expr_seq_struct * ops, int nodeId) {
+    struct list_struct * result = (struct list_struct *)malloc(sizeof(struct list_struct));
+    memset(result, 0, sizeof(struct list_struct));
+    result->nodeId = nodeId;
+    result->type = type;
+    result->id = id;
+    result->ops = ops;
+    return result;
 }

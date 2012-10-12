@@ -216,109 +216,103 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     return CHAR;
 }
 "loop" {
-    printf("Key word:                  %s\n", yytext);
+    return LOOP;
 }
 "for" {
-    printf("Key word:                  %s\n", yytext);
+    return FOR;
 }
 "in" {
-    printf("Key word:                  %s\n", yytext);
+    return IN;
 }
 "do" {
-    printf("Key word:                  %s\n", yytext);
+    return DO;
 }
 "from" {
-    printf("Key word:                  %s\n", yytext);
+    return FROM;
 }
 "to" {
-    printf("Key word:                  %s\n", yytext);
-}
-"repeat" {
-    printf("Key word:                  %s\n", yytext);
+    return TO;
 }
 "while" {
-    printf("Key word:                  %s\n", yytext);
-}
-"until" {
-    printf("Key word:                  %s\n", yytext);
+    return WHILE;
 }
 "progn" {
-    printf("Key word:                  %s\n", yytext);
+    return PROGN;
 }
 "defparameter" {
-    printf("Key word:                  %s\n", yytext);
+    return DEFPARAMETER;
 }
 "setf" {
-    printf("Key word:                  %s\n", yytext);
+    return SETF;
 }
 "let" {
-    printf("Key word:                  %s\n", yytext);
+    return LET;
 }
 "vector" {
-    printf("Key word:                  %s\n", yytext);
+    return VECTOR;
 }
 "vector-push" {
-    printf("Key word:                  %s\n", yytext);
+    return VECTORPUSH;
 }
 "vector-pop" {
-    printf("Key word:                  %s\n", yytext);
+    return VECTORPOP;
 }
 "elt" {
-    printf("Key word:                  %s\n", yytext);
+    return ELT;
 }
 "list" {
-    printf("Key word:                  %s\n", yytext);
+    return LIST;
 }
 "list-length" {
-    printf("Key word:                  %s\n", yytext);
+    return LISTLENGTH;
 }
 "length" {
-    printf("Key word:                  %s\n", yytext);
+    return LENGTH;
 }
 "find" {
-    printf("Key word:                  %s\n", yytext);
+    return FIND;
 }
 "position" {
-    printf("Key word:                  %s\n", yytext);
+    return POSITION;
 }
 "remove" {
-    printf("Key word:                  %s\n", yytext);
+    return REMOVE;
 }
 "substitute" {
-    printf("Key word:                  %s\n", yytext);
+    return SUBSTITUTE;
 }
 "concatenate" {
-    printf("Key word:                  %s\n", yytext);
+    return CONCATENATE;
 }
 "if" {
-    printf("Key word:                  %s\n", yytext);
+    return IF;
 }
 "dotimes" {
-    printf("Key word:                  %s\n", yytext);
+    return DOTIMES;
 }
 "defun" {
-    printf("Key word:                  %s\n", yytext);
+    return DEFUN;
 }
 "slot-value" {
-    printf("Key word:                  %s\n", yytext);
+    return SLOTVALUE;
 }
 "open" {
-    printf("Key word:                  %s\n", yytext);
+    return OPEN;
 }
 "close" {
-    printf("Key word:                  %s\n", yytext);
+    return CLOSE;
 }
 "with-open-file" {
-    printf("Key word:                  %s\n", yytext);
+    return WITHOPENFILE;
 }
 "format" {
-    printf("Key word:                  %s\n", yytext);
+    return FORMAT;
 }
 "funcall" {
-    printf("Key word:                  %s\n", yytext);
+    return FUNCALL;
 }
 "defclass" {
-    printf("Key word:                  %s\n", yytext);
+    return DEFCLASS;
 }
 "'" {
     return (unsigned char)'\'';

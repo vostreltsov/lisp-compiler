@@ -51,19 +51,39 @@ extern int yydebug;
      STRING = 260,
      BOOL = 261,
      ID = 262,
-     GRTR_EQ = 263,
-     LESS_EQ = 264,
-     AND = 265,
-     OR = 266,
-     NOT = 267,
-     LOOP = 268,
-     FOR = 269,
-     IN = 270,
-     FROM = 271,
-     TO = 272,
-     PROGN = 273,
-     SETF = 274,
-     IF = 275
+     LOOP = 263,
+     FOR = 264,
+     IN = 265,
+     DO = 266,
+     FROM = 267,
+     TO = 268,
+     WHILE = 269,
+     PROGN = 270,
+     DEFPARAMETER = 271,
+     SETF = 272,
+     LET = 273,
+     VECTOR = 274,
+     VECTORPUSH = 275,
+     VECTORPOP = 276,
+     ELT = 277,
+     LIST = 278,
+     LISTLENGTH = 279,
+     LENGTH = 280,
+     FIND = 281,
+     POSITION = 282,
+     REMOVE = 283,
+     SUBSTITUTE = 284,
+     CONCATENATE = 285,
+     IF = 286,
+     DOTIMES = 287,
+     DEFUN = 288,
+     SLOTVALUE = 289,
+     OPEN = 290,
+     CLOSE = 291,
+     WITHOPENFILE = 292,
+     FORMAT = 293,
+     FUNCALL = 294,
+     DEFCLASS = 295
    };
 #endif
 
@@ -86,7 +106,7 @@ typedef union YYSTYPE
 
 
 /* Line 2049 of yacc.c  */
-#line 90 "parser.tab.h"
+#line 110 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

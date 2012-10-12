@@ -1,3 +1,4 @@
+(not (+ 1 2) (- 3 4) (* 5 6) (/ 7 8) (and 9 10) (or t nil) (> 11 12) (>= 13 13) (< 14 15) (<= 16 16) (= 17 17) (myfunc "str"))
 #|multiline #| # |comment
 here#| still here |#
 "do cats \\eat quotes\" or recognize single \slashes?"

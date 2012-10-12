@@ -1,13 +1,13 @@
 #include "dotcode.h"
 
 void exec_dot(const char * dotFileName, const char * pngFileName) {
-    char cmd[256];
+    char cmd[256] = "";
     sprintf(cmd, "dot -Tpng -o%s %s", pngFileName, dotFileName);
     system(cmd);
 }
 
 void dot_for_program(FILE * file, struct program_struct * program) {
-    char tmp[BUFFER_SIZE];
+    char tmp[BUFFER_SIZE] = "";
     sprintf(tmp, "\"id%d\\n program\"", program->nodeId);
     fprintf(file, "digraph {\n");
     fprintf(file, "%s;\n", tmp);
@@ -16,7 +16,7 @@ void dot_for_program(FILE * file, struct program_struct * program) {
 }
 
 void dot_for_s_expr(FILE * file, char * lastNode, struct s_expr_struct * expr) {
-    char tmp[BUFFER_SIZE];
+    char tmp[BUFFER_SIZE] = "";
 
     switch (expr->type) {
         case S_EXPR_TYPE_INT:
@@ -46,7 +46,7 @@ void dot_for_s_expr(FILE * file, char * lastNode, struct s_expr_struct * expr) {
 }
 
 void dot_for_s_expr_seq(FILE * file, char * lastNode, struct s_expr_seq_struct * expr_seq) {
-    char tmp[BUFFER_SIZE];
+    char tmp[BUFFER_SIZE] = "";
     sprintf(tmp, "\"id%d\\ns_expr_seq\"", expr_seq->nodeId);
     fprintf(file, "%s->%s;\n", lastNode, tmp);
     struct s_expr_struct * expr = expr_seq->first;
@@ -57,18 +57,14 @@ void dot_for_s_expr_seq(FILE * file, char * lastNode, struct s_expr_seq_struct *
 }
 
 void dot_for_list(FILE * file, char * lastNode, struct list_struct * list) {
-    char tmp[BUFFER_SIZE];
-    if (list->id == NULL) {
-        sprintf(tmp, "\"id%d\\nlist\"", list->nodeId);
-    } else {
-        sprintf(tmp, "\"id%d\\nlist\\n%s\"", list->nodeId, list->id);
+    char tmp[BUFFER_SIZE] = "";
+    switch (list->type) {
+    case LIST_TYPE_FCALL:
+        sprintf(tmp, "\"id%d\\ncall %s\"", list->nodeId, list->id != NULL ? list->id : "");
+        dot_for_s_expr_seq(file, tmp, list->ops);
+        break;
+    default:
+        break;
     }
     fprintf(file, "%s->%s;\n", lastNode, tmp);
-    if (list->s_expr != NULL) {
-        dot_for_s_expr(file, tmp, list->s_expr);
-    } else if (list->s_expr_seq != NULL) {
-        dot_for_s_expr_seq(file, tmp, list->s_expr_seq);
-    } else {
-        // Empty list, do nothing.
-    }
 }
