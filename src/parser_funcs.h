@@ -5,7 +5,7 @@
 #include <string.h>
 #include "parser_structs.h"
 
-struct program_struct * create_program(int nodeId, struct s_expr_struct * s_expr);
+struct program_struct * create_program(int nodeId, struct s_expr_seq_struct * s_expr_seq);
 struct s_expr_struct * create_s_expr_empty(int nodeId);
 struct s_expr_struct * create_s_expr_int(int nodeId, long int value);
 struct s_expr_struct * create_s_expr_char(int nodeId, char value);

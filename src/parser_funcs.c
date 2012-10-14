@@ -1,8 +1,8 @@
 #include "parser_funcs.h"
 
-struct program_struct * create_program(int nodeId, struct s_expr_struct * s_expr) {
+struct program_struct * create_program(int nodeId, struct s_expr_seq_struct * s_expr_seq) {
     struct program_struct * result = (struct program_struct *)malloc(sizeof(struct program_struct));
-    result->s_expr = s_expr;
+    result->s_expr_seq = s_expr_seq;
     result->nodeId = nodeId;
     return result;
 }

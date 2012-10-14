@@ -11,7 +11,7 @@ void dot_for_program(FILE * file, struct program_struct * program) {
     sprintf(tmp, "\"id%d\\n program\"", program->nodeId);
     fprintf(file, "digraph {\n");
     fprintf(file, "%s;\n", tmp);
-    dot_for_s_expr(file, tmp, "", program->s_expr);
+    dot_for_s_expr_seq(file, tmp, "", program->s_expr_seq);
     fprintf(file, "}");
 }
 
@@ -85,6 +85,13 @@ void dot_for_list(FILE * file, char * lastNode, char * label, struct list_struct
         if (list->body2 != NULL) {
             dot_for_s_expr(file, tmp, "neg", list->body2);
         }
+        break;
+    case LIST_TYPE_DEFUN:
+        sprintf(tmp, "\"id%d\\ndefun %s\"", list->nodeId, list->id);
+        if (list->ops != NULL) {
+            dot_for_s_expr_seq(file, tmp, "args", list->ops);
+        }
+        dot_for_s_expr(file, tmp, "body", list->body1);
         break;
     default:
         break;

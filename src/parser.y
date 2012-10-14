@@ -70,7 +70,7 @@ int idCounter = 0;
 
 %%
 
-program : s_expr                        {root = $$ = create_program(++idCounter, $1);}
+program : s_expr_seq                    {root = $$ = create_program(++idCounter, $1);}
         ;
 
 s_expr : INT                            {$$ = create_s_expr_int(++idCounter, $1);}
@@ -87,11 +87,13 @@ s_expr_seq : s_expr                     {$$ = create_s_expr_seq(++idCounter, $1)
 
 list : '(' ')'                                              {$$ = create_list(++idCounter, LIST_TYPE_EMPTY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
      | '(' ID s_expr_seq ')'                                {$$ = create_list(++idCounter, LIST_TYPE_FCALL, $2, $3, NULL, NULL, NULL, NULL, NULL, NULL);}
-     | '(' LOOP FOR ID IN s_expr DO s_expr ')'                {$$ = create_list(++idCounter, LIST_TYPE_LOOP_IN, $4, NULL, NULL, $6, NULL, NULL, $8, NULL);}
+     | '(' LOOP FOR ID IN s_expr DO s_expr ')'              {$$ = create_list(++idCounter, LIST_TYPE_LOOP_IN, $4, NULL, NULL, $6, NULL, NULL, $8, NULL);}
      | '(' LOOP FOR ID FROM s_expr TO s_expr DO s_expr ')'  {$$ = create_list(++idCounter, LIST_TYPE_LOOP_FROM_TO, $4, NULL, NULL, NULL, $6, $8, $10, NULL);}
      | '(' PROGN s_expr_seq ')'                             {$$ = create_list(++idCounter, LIST_TYPE_PROGN, NULL, $3, NULL, NULL, NULL, NULL, NULL, NULL);}
      | '(' IF s_expr s_expr ')'                             {$$ = create_list(++idCounter, LIST_TYPE_IF, NULL, NULL, $3, NULL, NULL, NULL, $4, NULL);}
      | '(' IF s_expr s_expr s_expr ')'                      {$$ = create_list(++idCounter, LIST_TYPE_IF, NULL, NULL, $3, NULL, NULL, NULL, $4, $5);}
+     | '(' DEFUN ID '(' ')' s_expr ')'                      {$$ = create_list(++idCounter, LIST_TYPE_DEFUN, $3, NULL, NULL, NULL, NULL, NULL, $6, NULL);}
+     | '(' DEFUN ID '(' s_expr_seq ')' s_expr ')'           {$$ = create_list(++idCounter, LIST_TYPE_DEFUN, $3, $5, NULL, NULL, NULL, NULL, $7, NULL);}
      ;
 
 %%

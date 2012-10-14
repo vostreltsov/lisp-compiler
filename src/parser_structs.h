@@ -22,12 +22,13 @@ enum list_type {
     LIST_TYPE_LOOP_IN,      // Loop "loop for x in array do (print x)".
     LIST_TYPE_LOOP_FROM_TO, // Loop "loop for x from 1 to 10 do (print x)".
     LIST_TYPE_PROGN,        // Uniting a couple of expressions to a one expression.
-    LIST_TYPE_IF            // Conditional operator.
+    LIST_TYPE_IF,           // Conditional operator.
+    LIST_TYPE_DEFUN         // Function definition.
 };
 
 struct program_struct {
-    int                    nodeId;     // Identifier of the node in the syntax tree.
-    struct s_expr_struct * s_expr;     // Program is an s-expression.
+    int                        nodeId;     // Identifier of the node in the syntax tree.
+    struct s_expr_seq_struct * s_expr_seq; // Program is an s-expression sequence.
 };
 
 struct s_expr_struct {
@@ -52,7 +53,7 @@ struct list_struct {
     int                            nodeId;     // Identifier of the node in the syntax tree.
     enum list_type                 type;       // Type of the list.
     char                         * id;         // Id of the function to call.
-    struct s_expr_seq_struct     * ops;        // List of operands in case of a function call.
+    struct s_expr_seq_struct     * ops;        // List of arguments in case of a function definition/call.
     struct s_expr_struct         * cond;       // Condition in case of "IF" or "LOOP WHILE".
     struct s_expr_struct         * container;  // Container to iterate over in case of "LOOP".
     struct s_expr_struct         * from;       // "FROM" value in case of "LOOP".
