@@ -47,62 +47,51 @@ int idCounter = 0;
 %token TO
 %token WHILE
 %token PROGN
-%token DEFPARAMETER
-%token SETF
-%token LET
-%token VECTOR
-%token VECTORPUSH
-%token VECTORPOP
-%token ELT
-%token LIST
-%token LISTLENGTH
-%token LENGTH
-%token FIND
-%token POSITION
-%token REMOVE
-%token SUBSTITUTE
-%token CONCATENATE
 %token IF
-%token DOTIMES
+
 %token DEFUN
 %token SLOTVALUE
 %token OPEN
 %token CLOSE
 %token WITHOPENFILE
-%token FORMAT
 %token FUNCALL
 %token DEFCLASS
+
+%token INITFORM
+%token READER
+%token WRITER
+%token ACCESSOR
+%token INITARG
+%token ALLOCATION
+%token TYPE
+%token DOCUMENTATION
 
 %start program
 
 %%
 
-program : s_expr                        {root = $$ = create_program($1, ++idCounter);}
+program : s_expr                        {root = $$ = create_program(++idCounter, $1);}
         ;
 
-s_expr : INT                            {$$ = create_s_expr_int($1, ++idCounter);}
-       | CHAR                           {$$ = create_s_expr_char($1, ++idCounter);}
-       | STRING                         {$$ = create_s_expr_string($1, ++idCounter);}
-       | BOOL                           {$$ = create_s_expr_bool($1, ++idCounter);}
-       | ID                             {$$ = create_s_expr_id($1, ++idCounter);}
-       | list                           {$$ = create_s_expr_list($1, ++idCounter);}
+s_expr : INT                            {$$ = create_s_expr_int(++idCounter, $1);}
+       | CHAR                           {$$ = create_s_expr_char(++idCounter, $1);}
+       | STRING                         {$$ = create_s_expr_string(++idCounter, $1);}
+       | BOOL                           {$$ = create_s_expr_bool(++idCounter, $1);}
+       | ID                             {$$ = create_s_expr_id(++idCounter, $1);}
+       | list                           {$$ = create_s_expr_list(++idCounter, $1);}
        ;
 
-s_expr_seq : s_expr                     {$$ = create_s_expr_seq($1, ++idCounter);}
+s_expr_seq : s_expr                     {$$ = create_s_expr_seq(++idCounter, $1);}
            | s_expr_seq s_expr          {$$ = add_to_s_expr_seq($1, $2);}
            ;
 
-list : '(' ')'                                            {$$ = create_list(LIST_TYPE_EMPTY, NULL, NULL, ++idCounter);}
-     | '(' ID s_expr_seq ')'                              {$$ = create_list(LIST_TYPE_FCALL, $2, $3, ++idCounter);}
-
-     | '\'' s_expr                                        {/* TODO: ~ (list s_expr) */}
-
-     | '(' LOOP FOR ID IN list s_expr ')'                 {}
-     | '(' LOOP FOR ID FROM s_expr TO s_expr s_expr ')'   {}
-     | '(' PROGN s_expr_seq ')'                           {}
-     | '(' SETF ID s_expr ')'                             {}
-     | '(' IF s_expr s_expr ')'                           {}
-     | '(' IF s_expr s_expr s_expr ')'                    {}
+list : '(' ')'                                              {$$ = create_list(++idCounter, LIST_TYPE_EMPTY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+     | '(' ID s_expr_seq ')'                                {$$ = create_list(++idCounter, LIST_TYPE_FCALL, $2, $3, NULL, NULL, NULL, NULL, NULL, NULL);}
+     | '(' LOOP FOR ID IN s_expr DO s_expr ')'                {$$ = create_list(++idCounter, LIST_TYPE_LOOP_IN, $4, NULL, NULL, $6, NULL, NULL, $8, NULL);}
+     | '(' LOOP FOR ID FROM s_expr TO s_expr DO s_expr ')'  {$$ = create_list(++idCounter, LIST_TYPE_LOOP_FROM_TO, $4, NULL, NULL, NULL, $6, $8, $10, NULL);}
+     | '(' PROGN s_expr_seq ')'                             {$$ = create_list(++idCounter, LIST_TYPE_PROGN, NULL, $3, NULL, NULL, NULL, NULL, NULL, NULL);}
+     | '(' IF s_expr s_expr ')'                             {$$ = create_list(++idCounter, LIST_TYPE_IF, NULL, NULL, $3, NULL, NULL, NULL, $4, NULL);}
+     | '(' IF s_expr s_expr s_expr ')'                      {$$ = create_list(++idCounter, LIST_TYPE_IF, NULL, NULL, $3, NULL, NULL, NULL, $4, $5);}
      ;
 
 %%

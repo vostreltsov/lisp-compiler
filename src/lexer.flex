@@ -239,56 +239,72 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "progn" {
     return PROGN;
 }
-"defparameter" {
-    return DEFPARAMETER;
-}
-"setf" {
-    return SETF;
-}
-"let" {
-    return LET;
-}
-"vector" {
-    return VECTOR;
-}
-"vector-push" {
-    return VECTORPUSH;
-}
-"vector-pop" {
-    return VECTORPOP;
-}
-"elt" {
-    return ELT;
-}
-"list" {
-    return LIST;
-}
-"list-length" {
-    return LISTLENGTH;
-}
-"length" {
-    return LENGTH;
-}
-"find" {
-    return FIND;
-}
-"position" {
-    return POSITION;
-}
-"remove" {
-    return REMOVE;
-}
-"substitute" {
-    return SUBSTITUTE;
-}
-"concatenate" {
-    return CONCATENATE;
-}
 "if" {
     return IF;
 }
-"dotimes" {
-    return DOTIMES;
+"defparameter" {
+    store_function_id();
+    return ID;
+}
+"defvar" {
+    store_function_id();
+    return ID;
+}
+"setf" {
+    store_function_id();
+    return ID;
+}
+"let" {
+    store_function_id();
+    return ID;
+}
+"vector" {
+    store_function_id();
+    return ID;
+}
+"vector-push" {
+    store_function_id();
+    return ID;
+}
+"vector-pop" {
+    store_function_id();
+    return ID;
+}
+"elt" {
+    store_function_id();
+    return ID;
+}
+"list" {
+    store_function_id();
+    return ID;
+}
+"list-length" {
+    store_function_id();
+    return ID;
+}
+"length" {
+    store_function_id();
+    return ID;
+}
+"find" {
+    store_function_id();
+    return ID;
+}
+"position" {
+    store_function_id();
+    return ID;
+}
+"remove" {
+    store_function_id();
+    return ID;
+}
+"substitute" {
+    store_function_id();
+    return ID;
+}
+"concatenate" {
+    store_function_id();
+    return ID;
 }
 "defun" {
     return DEFUN;
@@ -305,9 +321,6 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "with-open-file" {
     return WITHOPENFILE;
 }
-"format" {
-    return FORMAT;
-}
 "funcall" {
     return FUNCALL;
 }
@@ -318,34 +331,36 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     return (unsigned char)'\'';
 }
 "print" {
-    printf("Key word:                  %s\n", yytext);
+    store_function_id();
+    return ID;
 }
 ":initform" {
-    printf("Key word:                  %s\n", yytext);
+    return INITFORM;
 }
 ":reader" {
-    printf("Key word:                  %s\n", yytext);
+    return READER;
 }
 ":writer" {
-    printf("Key word:                  %s\n", yytext);
+    return WRITER;
 }
 ":accessor" {
-    printf("Key word:                  %s\n", yytext);
+    return ACCESSOR;
 }
 ":initarg" {
-    printf("Key word:                  %s\n", yytext);
+    return INITARG;
 }
 ":allocation" {
-    printf("Key word:                  %s\n", yytext);
+    return ALLOCATION;
 }
 ":type" {
-    printf("Key word:                  %s\n", yytext);
+    return TYPE;
 }
 ":documentation" {
-    printf("Key word:                  %s\n", yytext);
+    return DOCUMENTATION;
 }
 ":"{SYMBOLID}+ {
-    printf("Key word:                  %s\n", yytext);
+    store_function_id();
+    return ID;
 }
 {SYMBOLID}+ {
     // User-defined symbol.

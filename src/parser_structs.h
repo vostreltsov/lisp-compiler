@@ -17,16 +17,12 @@ enum s_expr_type {
 };
 
 enum list_type {
-    LIST_TYPE_EMPTY,    // Reserved value.
-    LIST_TYPE_FCALL,    // Function call.
-
-    LIST_TYPE_LOOP_IN,
-    LIST_TYPE_LOOP_FROM_TO,
-
-    LIST_TYPE_SETF      // Assignment.
-
-
-    // TODO: all the functions and keywords go here
+    LIST_TYPE_EMPTY,        // Reserved value.
+    LIST_TYPE_FCALL,        // Function call.
+    LIST_TYPE_LOOP_IN,      // Loop "loop for x in array do (print x)".
+    LIST_TYPE_LOOP_FROM_TO, // Loop "loop for x from 1 to 10 do (print x)".
+    LIST_TYPE_PROGN,        // Uniting a couple of expressions to a one expression.
+    LIST_TYPE_IF            // Conditional operator.
 };
 
 struct program_struct {
@@ -53,10 +49,16 @@ struct s_expr_seq_struct {
 };
 
 struct list_struct {
-    int                            nodeId; // Identifier of the node in the syntax tree.
-    enum list_type                 type;   // Type of the list.
-    char                         * id;     // Id of the function to call.
-    struct s_expr_seq_struct     * ops;    // List of operands.
+    int                            nodeId;     // Identifier of the node in the syntax tree.
+    enum list_type                 type;       // Type of the list.
+    char                         * id;         // Id of the function to call.
+    struct s_expr_seq_struct     * ops;        // List of operands in case of a function call.
+    struct s_expr_struct         * cond;       // Condition in case of "IF" or "LOOP WHILE".
+    struct s_expr_struct         * container;  // Container to iterate over in case of "LOOP".
+    struct s_expr_struct         * from;       // "FROM" value in case of "LOOP".
+    struct s_expr_struct         * to;         // "TO" value in case of "LOOP".
+    struct s_expr_struct         * body1;      // Positive branch in case of "IF" or a body in case of "LOOP".
+    struct s_expr_struct         * body2;      // Negative branch in case of "IF".
 };
 
 #endif

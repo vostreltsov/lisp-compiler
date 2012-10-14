@@ -18,6 +18,9 @@ void run_dot(struct program_struct * program) {
         dot_for_program(dot, program);
         fclose(dot);
         exec_dot(dotFN, pngFN);
+        char cmd[256];
+        sprintf(cmd, "ristretto %s", pngFN);
+        system(cmd);    // run image viewer automatically.
         unlink(dotFN);
     }
 }

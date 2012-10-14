@@ -11,11 +11,11 @@ void dot_for_program(FILE * file, struct program_struct * program) {
     sprintf(tmp, "\"id%d\\n program\"", program->nodeId);
     fprintf(file, "digraph {\n");
     fprintf(file, "%s;\n", tmp);
-    dot_for_s_expr(file, tmp, program->s_expr);
+    dot_for_s_expr(file, tmp, "", program->s_expr);
     fprintf(file, "}");
 }
 
-void dot_for_s_expr(FILE * file, char * lastNode, struct s_expr_struct * expr) {
+void dot_for_s_expr(FILE * file, char * lastNode, char * label, struct s_expr_struct * expr) {
     char tmp[BUFFER_SIZE] = "";
 
     switch (expr->type) {
@@ -36,35 +36,58 @@ void dot_for_s_expr(FILE * file, char * lastNode, struct s_expr_struct * expr) {
             break;
         case S_EXPR_TYPE_LIST:
             sprintf(tmp, "\"id%d\\ns_expr-list\"", expr->nodeId);
-            dot_for_list(file, tmp, expr->list);
+            dot_for_list(file, tmp, "", expr->list);
             break;
         default:
             strcpy(tmp, "");
             break;
     }
-    fprintf(file, "%s->%s;\n", lastNode, tmp);
+    fprintf(file, "%s->%s[label=\"%s\"];\n", lastNode, tmp, label);
 }
 
-void dot_for_s_expr_seq(FILE * file, char * lastNode, struct s_expr_seq_struct * expr_seq) {
+void dot_for_s_expr_seq(FILE * file, char * lastNode, char * label, struct s_expr_seq_struct * expr_seq) {
     char tmp[BUFFER_SIZE] = "";
     sprintf(tmp, "\"id%d\\ns_expr_seq\"", expr_seq->nodeId);
-    fprintf(file, "%s->%s;\n", lastNode, tmp);
+    fprintf(file, "%s->%s[label=\"%s\"];\n", lastNode, tmp, label);
     struct s_expr_struct * expr = expr_seq->first;
     while (expr != NULL) {
-        dot_for_s_expr(file, tmp, expr);
+        dot_for_s_expr(file, tmp, "", expr);
         expr = expr->next;
     }
 }
 
-void dot_for_list(FILE * file, char * lastNode, struct list_struct * list) {
+void dot_for_list(FILE * file, char * lastNode, char * label, struct list_struct * list) {
     char tmp[BUFFER_SIZE] = "";
     switch (list->type) {
     case LIST_TYPE_FCALL:
         sprintf(tmp, "\"id%d\\ncall %s\"", list->nodeId, list->id != NULL ? list->id : "");
-        dot_for_s_expr_seq(file, tmp, list->ops);
+        dot_for_s_expr_seq(file, tmp, "", list->ops);
+        break;
+    case LIST_TYPE_LOOP_IN:
+        sprintf(tmp, "\"id%d\\nloop %s in\"", list->nodeId, list->id);
+        dot_for_s_expr(file, tmp, "container", list->container);
+        dot_for_s_expr(file, tmp, "body", list->body1);
+        break;
+    case LIST_TYPE_LOOP_FROM_TO:
+        sprintf(tmp, "\"id%d\\nloop %s in\"", list->nodeId, list->id);
+        dot_for_s_expr(file, tmp, "from", list->from);
+        dot_for_s_expr(file, tmp, "to", list->to);
+        dot_for_s_expr(file, tmp, "body", list->body1);
+        break;
+    case LIST_TYPE_PROGN:
+        sprintf(tmp, "\"id%d\\nprogn\"", list->nodeId);
+        dot_for_s_expr_seq(file, tmp, "", list->ops);
+        break;
+    case LIST_TYPE_IF:
+        sprintf(tmp, "\"id%d\\nif\"", list->nodeId);
+        dot_for_s_expr(file, tmp, "cond", list->cond);
+        dot_for_s_expr(file, tmp, "pos", list->body1);
+        if (list->body2 != NULL) {
+            dot_for_s_expr(file, tmp, "neg", list->body2);
+        }
         break;
     default:
         break;
     }
-    fprintf(file, "%s->%s;\n", lastNode, tmp);
+    fprintf(file, "%s->%s[label=\"%s\"];\n", lastNode, tmp, label);
 }
