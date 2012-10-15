@@ -367,6 +367,11 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     store_function_id();
     return ID;
 }
+"|".+"|" {
+    // User-defined symbol.
+    store_function_id();
+    return ID;
+}
 . {
     printf("UNEXPECTED CHARACTER:      %s\n", yytext);
 }
