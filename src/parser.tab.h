@@ -71,10 +71,9 @@ extern int yydebug;
      READER = 280,
      WRITER = 281,
      ACCESSOR = 282,
-     INITARG = 283,
-     ALLOCATION = 284,
-     TYPE = 285,
-     DOCUMENTATION = 286
+     ALLOCATION = 283,
+     ALLOCINSTANCE = 284,
+     ALLOCCLASS = 285
    };
 #endif
 
@@ -83,21 +82,23 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2049 of yacc.c  */
-#line 17 "parser.y"
+#line 16 "parser.y"
 
-    int                         semantic_int;
-    char                        semantic_char;
-    char                      * semantic_string;
-    int                         semantic_bool;
-    char                      * semantic_id;
-    struct program_struct     * semantic_program;
-    struct s_expr_struct      * semantic_s_expr;
-    struct s_expr_seq_struct  * semantic_s_expr_seq;
-    struct list_struct        * semantic_list;
+    int                          semantic_int;
+    char                         semantic_char;
+    char                       * semantic_string;
+    int                          semantic_bool;
+    char                       * semantic_id;
+    struct program_struct      * semantic_program;
+    struct s_expr_struct       * semantic_s_expr;
+    struct s_expr_seq_struct   * semantic_s_expr_seq;
+    struct slot_def_struct     * semantic_slot_def;
+    struct slot_def_seq_struct * semantic_slot_def_seq;
+    struct list_struct         * semantic_list;
 
 
 /* Line 2049 of yacc.c  */
-#line 101 "parser.tab.h"
+#line 102 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

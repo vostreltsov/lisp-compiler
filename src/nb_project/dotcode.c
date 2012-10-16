@@ -93,6 +93,9 @@ void dot_for_list(FILE * file, char * lastNode, char * label, struct list_struct
         }
         dot_for_s_expr(file, tmp, "body", list->body1);
         break;
+    case LIST_TYPE_DEFCLASS:
+        // TODO
+        break;
     default:
         break;
     }

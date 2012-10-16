@@ -346,17 +346,18 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 ":accessor" {
     return ACCESSOR;
 }
-":initarg" {
-    return INITARG;
-}
 ":allocation" {
     return ALLOCATION;
 }
-":type" {
-    return TYPE;
+":instance" {
+    return ALLOCINSTANCE;
 }
-":documentation" {
-    return DOCUMENTATION;
+":class" {
+    return ALLOCCLASS;
+}
+"make-instance" {
+    store_function_id();
+    return ID;
 }
 ":"{SYMBOLID}+ {
     store_function_id();

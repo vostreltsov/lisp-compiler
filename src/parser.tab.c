@@ -65,7 +65,6 @@
 /* Line 336 of yacc.c  */
 #line 1 "parser.y"
 
-
 #include <stdio.h>
 #include "parser.tab.h"
 #include "parser_structs.h"
@@ -80,7 +79,7 @@ int idCounter = 0;
 
 
 /* Line 336 of yacc.c  */
-#line 84 "parser.tab.c"
+#line 83 "parser.tab.c"
 
 # ifndef YY_NULL
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -141,10 +140,9 @@ extern int yydebug;
      READER = 280,
      WRITER = 281,
      ACCESSOR = 282,
-     INITARG = 283,
-     ALLOCATION = 284,
-     TYPE = 285,
-     DOCUMENTATION = 286
+     ALLOCATION = 283,
+     ALLOCINSTANCE = 284,
+     ALLOCCLASS = 285
    };
 #endif
 
@@ -153,17 +151,19 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 350 of yacc.c  */
-#line 17 "parser.y"
+#line 16 "parser.y"
 
-    int                         semantic_int;
-    char                        semantic_char;
-    char                      * semantic_string;
-    int                         semantic_bool;
-    char                      * semantic_id;
-    struct program_struct     * semantic_program;
-    struct s_expr_struct      * semantic_s_expr;
-    struct s_expr_seq_struct  * semantic_s_expr_seq;
-    struct list_struct        * semantic_list;
+    int                          semantic_int;
+    char                         semantic_char;
+    char                       * semantic_string;
+    int                          semantic_bool;
+    char                       * semantic_id;
+    struct program_struct      * semantic_program;
+    struct s_expr_struct       * semantic_s_expr;
+    struct s_expr_seq_struct   * semantic_s_expr_seq;
+    struct slot_def_struct     * semantic_slot_def;
+    struct slot_def_seq_struct * semantic_slot_def_seq;
+    struct list_struct         * semantic_list;
 
 
 /* Line 350 of yacc.c  */
@@ -413,22 +413,22 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  17
+#define YYFINAL  18
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   107
+#define YYLAST   112
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  34
+#define YYNTOKENS  33
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  5
+#define YYNNTS  7
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  19
+#define YYNRULES  29
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  51
+#define YYNSTATES  72
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   286
+#define YYMAXUTOK   285
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -440,7 +440,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      32,    33,     2,     2,     2,     2,     2,     2,     2,     2,
+      31,    32,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -464,7 +464,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31
+      25,    26,    27,    28,    29,    30
 };
 
 #if YYDEBUG
@@ -473,28 +473,34 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     5,     7,     9,    11,    13,    15,    17,
-      19,    22,    25,    30,    40,    52,    57,    63,    70,    78
+      19,    22,    25,    28,    31,    34,    37,    40,    42,    45,
+      48,    53,    63,    75,    80,    86,    93,   101,   110,   117
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      35,     0,    -1,    37,    -1,     3,    -1,     4,    -1,     5,
-      -1,     6,    -1,     7,    -1,    38,    -1,    36,    -1,    37,
-      36,    -1,    32,    33,    -1,    32,     7,    37,    33,    -1,
-      32,     8,     9,     7,    10,    36,    11,    36,    33,    -1,
-      32,     8,     9,     7,    12,    36,    13,    36,    11,    36,
-      33,    -1,    32,    15,    37,    33,    -1,    32,    16,    36,
-      36,    33,    -1,    32,    16,    36,    36,    36,    33,    -1,
-      32,    17,     7,    32,    33,    36,    33,    -1,    32,    17,
-       7,    32,    37,    33,    36,    33,    -1
+      34,     0,    -1,    36,    -1,     3,    -1,     4,    -1,     5,
+      -1,     6,    -1,     7,    -1,    39,    -1,    35,    -1,    36,
+      35,    -1,    24,    35,    -1,    25,     7,    -1,    26,     7,
+      -1,    27,     7,    -1,    28,    29,    -1,    28,    30,    -1,
+      37,    -1,    38,    37,    -1,    31,    32,    -1,    31,     7,
+      36,    32,    -1,    31,     8,     9,     7,    10,    35,    11,
+      35,    32,    -1,    31,     8,     9,     7,    12,    35,    13,
+      35,    11,    35,    32,    -1,    31,    15,    36,    32,    -1,
+      31,    16,    35,    35,    32,    -1,    31,    16,    35,    35,
+      35,    32,    -1,    31,    17,     7,    31,    32,    35,    32,
+      -1,    31,    17,     7,    31,    36,    32,    35,    32,    -1,
+      31,    23,     7,    31,    32,    32,    -1,    31,    23,     7,
+      31,    38,    32,    32,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    73,    73,    76,    77,    78,    79,    80,    81,    84,
-      85,    88,    89,    90,    91,    92,    93,    94,    95,    96
+       0,    75,    75,    78,    79,    80,    81,    82,    83,    86,
+      87,    90,    91,    92,    93,    94,    95,    98,    99,   102,
+     103,   104,   105,   106,   107,   108,   109,   110,   111,   112
 };
 #endif
 
@@ -506,9 +512,9 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "INT", "CHAR", "STRING", "BOOL", "ID",
   "LOOP", "FOR", "IN", "DO", "FROM", "TO", "WHILE", "PROGN", "IF", "DEFUN",
   "SLOTVALUE", "OPEN", "CLOSE", "WITHOPENFILE", "FUNCALL", "DEFCLASS",
-  "INITFORM", "READER", "WRITER", "ACCESSOR", "INITARG", "ALLOCATION",
-  "TYPE", "DOCUMENTATION", "'('", "')'", "$accept", "program", "s_expr",
-  "s_expr_seq", "list", YY_NULL
+  "INITFORM", "READER", "WRITER", "ACCESSOR", "ALLOCATION",
+  "ALLOCINSTANCE", "ALLOCCLASS", "'('", "')'", "$accept", "program",
+  "s_expr", "s_expr_seq", "slot_def", "slot_def_seq", "list", YY_NULL
 };
 #endif
 
@@ -520,22 +526,24 @@ static const yytype_uint16 yytoknum[] =
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-     285,   286,    40,    41
+     285,    40,    41
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    34,    35,    36,    36,    36,    36,    36,    36,    37,
-      37,    38,    38,    38,    38,    38,    38,    38,    38,    38
+       0,    33,    34,    35,    35,    35,    35,    35,    35,    36,
+      36,    37,    37,    37,    37,    37,    37,    38,    38,    39,
+      39,    39,    39,    39,    39,    39,    39,    39,    39,    39
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     1,     1,     1,     1,     1,     1,     1,     1,
-       2,     2,     4,     9,    11,     4,     5,     6,     7,     8
+       2,     2,     2,     2,     2,     2,     2,     1,     2,     2,
+       4,     9,    11,     4,     5,     6,     7,     8,     6,     7
 };
 
 /* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
@@ -544,36 +552,40 @@ static const yytype_uint8 yyr2[] =
 static const yytype_uint8 yydefact[] =
 {
        0,     3,     4,     5,     6,     7,     0,     0,     9,     2,
-       8,     0,     0,     0,     0,     0,    11,     1,    10,     0,
-       0,     0,     0,     0,    12,     0,    15,     0,     0,     0,
-       0,    16,     0,     0,     0,     0,     0,    17,     0,     0,
-       0,     0,    18,     0,     0,     0,    19,    13,     0,     0,
-      14
+       8,     0,     0,     0,     0,     0,     0,    19,     1,    10,
+       0,     0,     0,     0,     0,     0,    20,     0,    23,     0,
+       0,     0,     0,     0,    24,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,    17,     0,     0,     0,    25,     0,
+       0,    11,    12,    13,    14,    15,    16,    28,     0,    18,
+       0,     0,    26,     0,    29,     0,     0,    27,    21,     0,
+       0,    22
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     7,     8,     9,    10
+      -1,     7,     8,     9,    44,    45,    10
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -22
+#define YYPACT_NINF -10
 static const yytype_int8 yypact[] =
 {
-      61,   -22,   -22,   -22,   -22,   -22,    74,     1,   -22,    61,
-     -22,    61,    -6,    61,    61,     0,   -22,   -22,   -22,    30,
-       2,    37,    61,   -21,   -22,    -8,   -22,    42,    47,    61,
-      61,   -22,   -19,    61,    52,     4,     3,   -22,   -16,    61,
-      61,    61,   -22,   -14,   -11,    15,   -22,   -22,    61,    -4,
-     -22
+      63,   -10,   -10,   -10,   -10,   -10,    68,     1,   -10,    63,
+     -10,    63,    -6,    63,    63,     5,    14,   -10,   -10,   -10,
+       3,    15,    12,    63,    -1,    11,   -10,    -8,   -10,    33,
+      42,    71,    63,    63,   -10,     0,    63,    50,    63,    51,
+      52,    54,    -4,    30,   -10,    80,    60,    59,   -10,    31,
+      63,   -10,   -10,   -10,   -10,   -10,   -10,   -10,    45,   -10,
+      63,    63,   -10,    46,   -10,    47,    69,   -10,   -10,    63,
+      55,   -10
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -22,   -22,    -9,    -5,   -22
+     -10,   -10,    -9,    20,    41,   -10,   -10
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -582,50 +594,54 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      18,    17,    29,    20,    30,    22,    19,    23,    21,    25,
-      18,    28,    18,    27,    37,    40,    41,    42,    32,    46,
-      35,    36,    47,    34,    38,    18,    48,     0,     0,    50,
-      43,    44,    45,     1,     2,     3,     4,     5,     0,    49,
-       1,     2,     3,     4,     5,     1,     2,     3,     4,     5,
-       1,     2,     3,     4,     5,     1,     2,     3,     4,     5,
-       0,     0,     6,    24,     1,     2,     3,     4,     5,     6,
-      26,     0,     0,     0,     6,    31,     0,     0,     0,     6,
-      33,    11,    12,     0,     6,    39,     0,     0,     0,    13,
-      14,    15,     0,     6,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,    16
+      19,    18,    32,    21,    33,    23,     1,     2,     3,     4,
+       5,    19,    24,    19,    29,     1,     2,     3,     4,     5,
+      35,    25,    27,    46,    47,    55,    56,    49,    19,    51,
+      30,    20,    48,    22,     6,    26,     1,     2,     3,     4,
+       5,    63,    31,     6,    28,     1,     2,     3,     4,     5,
+      37,    65,    66,     1,     2,     3,     4,     5,    52,    53,
+      70,    54,    57,    62,     6,    34,     1,     2,     3,     4,
+       5,    60,    61,     6,    36,    11,    12,    64,    67,    68,
+      69,     6,    50,    13,    14,    15,    59,    71,     0,     0,
+       0,    16,     0,     0,     6,    38,    39,    40,    41,    42,
+      17,     0,     0,    43,    38,    39,    40,    41,    42,     0,
+       0,     0,    58
 };
 
 #define yypact_value_is_default(yystate) \
-  ((yystate) == (-22))
+  ((yystate) == (-10))
 
 #define yytable_value_is_error(yytable_value) \
   YYID (0)
 
 static const yytype_int8 yycheck[] =
 {
-       9,     0,    10,     9,    12,    14,    11,     7,    13,     7,
-      19,    32,    21,    22,    33,    11,    13,    33,    27,    33,
-      29,    30,    33,    28,    33,    34,    11,    -1,    -1,    33,
-      39,    40,    41,     3,     4,     5,     6,     7,    -1,    48,
-       3,     4,     5,     6,     7,     3,     4,     5,     6,     7,
-       3,     4,     5,     6,     7,     3,     4,     5,     6,     7,
-      -1,    -1,    32,    33,     3,     4,     5,     6,     7,    32,
-      33,    -1,    -1,    -1,    32,    33,    -1,    -1,    -1,    32,
-      33,     7,     8,    -1,    32,    33,    -1,    -1,    -1,    15,
-      16,    17,    -1,    32,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    33
+       9,     0,    10,     9,    12,    14,     3,     4,     5,     6,
+       7,    20,     7,    22,    23,     3,     4,     5,     6,     7,
+      29,     7,     7,    32,    33,    29,    30,    36,    37,    38,
+      31,    11,    32,    13,    31,    32,     3,     4,     5,     6,
+       7,    50,    31,    31,    32,     3,     4,     5,     6,     7,
+      30,    60,    61,     3,     4,     5,     6,     7,     7,     7,
+      69,     7,    32,    32,    31,    32,     3,     4,     5,     6,
+       7,    11,    13,    31,    32,     7,     8,    32,    32,    32,
+      11,    31,    32,    15,    16,    17,    45,    32,    -1,    -1,
+      -1,    23,    -1,    -1,    31,    24,    25,    26,    27,    28,
+      32,    -1,    -1,    32,    24,    25,    26,    27,    28,    -1,
+      -1,    -1,    32
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     4,     5,     6,     7,    32,    35,    36,    37,
-      38,     7,     8,    15,    16,    17,    33,     0,    36,    37,
-       9,    37,    36,     7,    33,     7,    33,    36,    32,    10,
-      12,    33,    36,    33,    37,    36,    36,    33,    36,    33,
-      11,    13,    33,    36,    36,    36,    33,    33,    11,    36,
-      33
+       0,     3,     4,     5,     6,     7,    31,    34,    35,    36,
+      39,     7,     8,    15,    16,    17,    23,    32,     0,    35,
+      36,     9,    36,    35,     7,     7,    32,     7,    32,    35,
+      31,    31,    10,    12,    32,    35,    32,    36,    24,    25,
+      26,    27,    28,    32,    37,    38,    35,    35,    32,    35,
+      32,    35,     7,     7,     7,    29,    30,    32,    32,    37,
+      11,    13,    32,    35,    32,    35,    35,    32,    32,    11,
+      35,    32
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1450,115 +1466,175 @@ yyreduce:
     {
         case 2:
 /* Line 1787 of yacc.c  */
-#line 73 "parser.y"
+#line 75 "parser.y"
     {root = (yyval.semantic_program) = create_program(++idCounter, (yyvsp[(1) - (1)].semantic_s_expr_seq));}
     break;
 
   case 3:
 /* Line 1787 of yacc.c  */
-#line 76 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_int(++idCounter, (yyvsp[(1) - (1)].semantic_int));}
+#line 78 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr(++idCounter, S_EXPR_TYPE_INT,    (yyvsp[(1) - (1)].semantic_int), (char)0,  NULL, 0,   NULL,  NULL);}
     break;
 
   case 4:
 /* Line 1787 of yacc.c  */
-#line 77 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_char(++idCounter, (yyvsp[(1) - (1)].semantic_char));}
+#line 79 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr(++idCounter, S_EXPR_TYPE_CHAR,   0,  (yyvsp[(1) - (1)].semantic_char),       NULL, 0,   NULL,  NULL);}
     break;
 
   case 5:
 /* Line 1787 of yacc.c  */
-#line 78 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_string(++idCounter, (yyvsp[(1) - (1)].semantic_string));}
+#line 80 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr(++idCounter, S_EXPR_TYPE_STRING, 0,  (char)0,  (yyvsp[(1) - (1)].semantic_string),   0,   NULL,  NULL);}
     break;
 
   case 6:
 /* Line 1787 of yacc.c  */
-#line 79 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_bool(++idCounter, (yyvsp[(1) - (1)].semantic_bool));}
+#line 81 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr(++idCounter, S_EXPR_TYPE_BOOL,   0,  (char)0,  NULL, (yyvsp[(1) - (1)].semantic_bool),  NULL,  NULL);}
     break;
 
   case 7:
 /* Line 1787 of yacc.c  */
-#line 80 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_id(++idCounter, (yyvsp[(1) - (1)].semantic_id));}
+#line 82 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr(++idCounter, S_EXPR_TYPE_ID,     0,  (char)0,  NULL, 0,   (yyvsp[(1) - (1)].semantic_id),    NULL);}
     break;
 
   case 8:
 /* Line 1787 of yacc.c  */
-#line 81 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_list(++idCounter, (yyvsp[(1) - (1)].semantic_list));}
+#line 83 "parser.y"
+    {(yyval.semantic_s_expr) = create_s_expr(++idCounter, S_EXPR_TYPE_LIST,   0,  (char)0,  NULL, 0,   NULL,  (yyvsp[(1) - (1)].semantic_list));}
     break;
 
   case 9:
 /* Line 1787 of yacc.c  */
-#line 84 "parser.y"
+#line 86 "parser.y"
     {(yyval.semantic_s_expr_seq) = create_s_expr_seq(++idCounter, (yyvsp[(1) - (1)].semantic_s_expr));}
     break;
 
   case 10:
 /* Line 1787 of yacc.c  */
-#line 85 "parser.y"
+#line 87 "parser.y"
     {(yyval.semantic_s_expr_seq) = add_to_s_expr_seq((yyvsp[(1) - (2)].semantic_s_expr_seq), (yyvsp[(2) - (2)].semantic_s_expr));}
     break;
 
   case 11:
 /* Line 1787 of yacc.c  */
-#line 88 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_EMPTY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 90 "parser.y"
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter, (yyvsp[(2) - (2)].semantic_s_expr), NULL, NULL, NULL, SLOT_ALLOC_TYPE_RESERVED);}
     break;
 
   case 12:
 /* Line 1787 of yacc.c  */
-#line 89 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_FCALL, (yyvsp[(2) - (4)].semantic_id), (yyvsp[(3) - (4)].semantic_s_expr_seq), NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 91 "parser.y"
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter, NULL, (yyvsp[(2) - (2)].semantic_id), NULL, NULL, SLOT_ALLOC_TYPE_RESERVED);}
     break;
 
   case 13:
 /* Line 1787 of yacc.c  */
-#line 90 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_LOOP_IN, (yyvsp[(4) - (9)].semantic_id), NULL, NULL, (yyvsp[(6) - (9)].semantic_s_expr), NULL, NULL, (yyvsp[(8) - (9)].semantic_s_expr), NULL);}
+#line 92 "parser.y"
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter, NULL, NULL, (yyvsp[(2) - (2)].semantic_id), NULL, SLOT_ALLOC_TYPE_RESERVED);}
     break;
 
   case 14:
 /* Line 1787 of yacc.c  */
-#line 91 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_LOOP_FROM_TO, (yyvsp[(4) - (11)].semantic_id), NULL, NULL, NULL, (yyvsp[(6) - (11)].semantic_s_expr), (yyvsp[(8) - (11)].semantic_s_expr), (yyvsp[(10) - (11)].semantic_s_expr), NULL);}
+#line 93 "parser.y"
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter, NULL, NULL, NULL, (yyvsp[(2) - (2)].semantic_id), SLOT_ALLOC_TYPE_RESERVED);}
     break;
 
   case 15:
 /* Line 1787 of yacc.c  */
-#line 92 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_PROGN, NULL, (yyvsp[(3) - (4)].semantic_s_expr_seq), NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 94 "parser.y"
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter, NULL, NULL, NULL, NULL, SLOT_ALLOC_TYPE_INSTANCE);}
     break;
 
   case 16:
 /* Line 1787 of yacc.c  */
-#line 93 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_IF, NULL, NULL, (yyvsp[(3) - (5)].semantic_s_expr), NULL, NULL, NULL, (yyvsp[(4) - (5)].semantic_s_expr), NULL);}
+#line 95 "parser.y"
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter, NULL, NULL, NULL, NULL, SLOT_ALLOC_TYPE_CLASS);}
     break;
 
   case 17:
 /* Line 1787 of yacc.c  */
-#line 94 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_IF, NULL, NULL, (yyvsp[(3) - (6)].semantic_s_expr), NULL, NULL, NULL, (yyvsp[(4) - (6)].semantic_s_expr), (yyvsp[(5) - (6)].semantic_s_expr));}
+#line 98 "parser.y"
+    {(yyval.semantic_slot_def_seq) = create_slot_def_seq(++idCounter, (yyvsp[(1) - (1)].semantic_slot_def));}
     break;
 
   case 18:
 /* Line 1787 of yacc.c  */
-#line 95 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFUN, (yyvsp[(3) - (7)].semantic_id), NULL, NULL, NULL, NULL, NULL, (yyvsp[(6) - (7)].semantic_s_expr), NULL);}
+#line 99 "parser.y"
+    {(yyval.semantic_slot_def_seq) = add_to_slot_def_seq((yyvsp[(1) - (2)].semantic_slot_def_seq), (yyvsp[(2) - (2)].semantic_slot_def));}
     break;
 
   case 19:
 /* Line 1787 of yacc.c  */
-#line 96 "parser.y"
-    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFUN, (yyvsp[(3) - (8)].semantic_id), (yyvsp[(5) - (8)].semantic_s_expr_seq), NULL, NULL, NULL, NULL, (yyvsp[(7) - (8)].semantic_s_expr), NULL);}
+#line 102 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_EMPTY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+    break;
+
+  case 20:
+/* Line 1787 of yacc.c  */
+#line 103 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_FCALL, (yyvsp[(2) - (4)].semantic_id), (yyvsp[(3) - (4)].semantic_s_expr_seq), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+    break;
+
+  case 21:
+/* Line 1787 of yacc.c  */
+#line 104 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_LOOP_IN, (yyvsp[(4) - (9)].semantic_id), NULL, NULL, (yyvsp[(6) - (9)].semantic_s_expr), NULL, NULL, (yyvsp[(8) - (9)].semantic_s_expr), NULL, NULL);}
+    break;
+
+  case 22:
+/* Line 1787 of yacc.c  */
+#line 105 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_LOOP_FROM_TO, (yyvsp[(4) - (11)].semantic_id), NULL, NULL, NULL, (yyvsp[(6) - (11)].semantic_s_expr), (yyvsp[(8) - (11)].semantic_s_expr), (yyvsp[(10) - (11)].semantic_s_expr), NULL, NULL);}
+    break;
+
+  case 23:
+/* Line 1787 of yacc.c  */
+#line 106 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_PROGN, NULL, (yyvsp[(3) - (4)].semantic_s_expr_seq), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+    break;
+
+  case 24:
+/* Line 1787 of yacc.c  */
+#line 107 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_IF, NULL, NULL, (yyvsp[(3) - (5)].semantic_s_expr), NULL, NULL, NULL, (yyvsp[(4) - (5)].semantic_s_expr), NULL, NULL);}
+    break;
+
+  case 25:
+/* Line 1787 of yacc.c  */
+#line 108 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_IF, NULL, NULL, (yyvsp[(3) - (6)].semantic_s_expr), NULL, NULL, NULL, (yyvsp[(4) - (6)].semantic_s_expr), (yyvsp[(5) - (6)].semantic_s_expr), NULL);}
+    break;
+
+  case 26:
+/* Line 1787 of yacc.c  */
+#line 109 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFUN, (yyvsp[(3) - (7)].semantic_id), NULL, NULL, NULL, NULL, NULL, (yyvsp[(6) - (7)].semantic_s_expr), NULL, NULL);}
+    break;
+
+  case 27:
+/* Line 1787 of yacc.c  */
+#line 110 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFUN, (yyvsp[(3) - (8)].semantic_id), (yyvsp[(5) - (8)].semantic_s_expr_seq), NULL, NULL, NULL, NULL, (yyvsp[(7) - (8)].semantic_s_expr), NULL, NULL);}
+    break;
+
+  case 28:
+/* Line 1787 of yacc.c  */
+#line 111 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFCLASS, (yyvsp[(3) - (6)].semantic_id), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+    break;
+
+  case 29:
+/* Line 1787 of yacc.c  */
+#line 112 "parser.y"
+    {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFCLASS, (yyvsp[(3) - (7)].semantic_id), NULL, NULL, NULL, NULL, NULL, NULL, NULL, (yyvsp[(5) - (7)].semantic_slot_def_seq));}
     break;
 
 
 /* Line 1787 of yacc.c  */
-#line 1562 "parser.tab.c"
+#line 1638 "parser.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1788,7 +1864,7 @@ yyreturn:
 
 
 /* Line 2048 of yacc.c  */
-#line 99 "parser.y"
+#line 115 "parser.y"
 
 
 void yyerror(const char * str) {

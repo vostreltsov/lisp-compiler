@@ -4,6 +4,7 @@
 struct program_struct;
 struct s_expr_struct;
 struct s_expr_seq_struct;
+struct slot_def_struct;
 struct list_struct;
 
 enum s_expr_type {
@@ -13,7 +14,12 @@ enum s_expr_type {
     S_EXPR_TYPE_BOOL,
     S_EXPR_TYPE_ID,
     S_EXPR_TYPE_LIST
+};
 
+enum slot_alloc_type {
+	SLOT_ALLOC_TYPE_RESERVED,	// NULL is reserved value.
+	SLOT_ALLOC_TYPE_INSTANCE,	// Slot-per-instance.
+	SLOT_ALLOC_TYPE_CLASS       // Slot-per-class.
 };
 
 enum list_type {
@@ -23,7 +29,8 @@ enum list_type {
     LIST_TYPE_LOOP_FROM_TO, // Loop "loop for x from 1 to 10 do (print x)".
     LIST_TYPE_PROGN,        // Uniting a couple of expressions to a one expression.
     LIST_TYPE_IF,           // Conditional operator.
-    LIST_TYPE_DEFUN         // Function definition.
+    LIST_TYPE_DEFUN,        // Function definition.
+    LIST_TYPE_DEFCLASS      // Class definition.
 };
 
 struct program_struct {
@@ -49,6 +56,22 @@ struct s_expr_seq_struct {
     struct s_expr_struct     * last;   // Last s-expression in the list.
 };
 
+struct slot_def_struct {
+    int                        nodeId;   // Identifier of the node in the syntax tree.
+    struct s_expr_struct     * initform; // Definition of an initial value.
+    char                     * reader;   // Definition of a reader method.
+    char                     * writer;   // Definition of a writer method.
+    char                     * accessor; // Definition of an accessor method.
+    struct slot_def_struct   * next;     // Pointer to the next slot_def_struct.
+    enum slot_alloc_type       alloc;    // Allocation type.
+};
+
+struct slot_def_seq_struct {
+    int                        nodeId; // Identifier of the node in the syntax tree.
+    struct slot_def_struct   * first;  // First slot definition in the list.
+    struct slot_def_struct   * last;   // Last slot definition in the list.
+};
+
 struct list_struct {
     int                            nodeId;     // Identifier of the node in the syntax tree.
     enum list_type                 type;       // Type of the list.
@@ -60,6 +83,7 @@ struct list_struct {
     struct s_expr_struct         * to;         // "TO" value in case of "LOOP".
     struct s_expr_struct         * body1;      // Positive branch in case of "IF" or a body in case of "LOOP".
     struct s_expr_struct         * body2;      // Negative branch in case of "IF".
+    struct slot_def_seq_struct   * slots;      // Slot definitions in case of a class definition.
 };
 
 #endif
