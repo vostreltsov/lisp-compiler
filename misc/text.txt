@@ -7,7 +7,10 @@
     4)
 (defun myfunc2 (x y)
     (* x y))
-
+(defclass Myclass ()
+    ((Width :reader getWidth :writer setWidth :accessor Width :initform 200)
+     (Height :reader getHeight :writer setHeight :accessor Height :initform 100)))
+     
 #|multiline #| # |comment
 here#| still here |#
 "do cats \\eat quotes\" or recognize single \slashes?"

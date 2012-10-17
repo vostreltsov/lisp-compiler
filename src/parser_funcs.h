@@ -35,7 +35,8 @@ struct list_struct * create_list(int nodeId, enum list_type type, char * id, str
                                                                              struct s_expr_struct * to,
                                                                              struct s_expr_struct * body1,
                                                                              struct s_expr_struct * body2,
-                                                                             struct slot_def_seq_struct * slots);
+                                                                             struct slot_def_seq_struct * slotdefs,
+                                                                             char * parent);
 
 #endif
 

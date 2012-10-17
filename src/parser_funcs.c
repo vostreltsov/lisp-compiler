@@ -23,6 +23,7 @@ struct s_expr_struct * create_s_expr(int nodeId, enum s_expr_type type, long int
     result->boolean = boolean;
     result->id = id;
     result->list = list;
+    result->next = NULL;
     return result;
 }
 
@@ -52,6 +53,7 @@ struct slot_def_struct * create_slot_def(int nodeId, struct s_expr_struct * init
     result->writer = writer;
     result->accessor = accessor;
     result->alloc = alloc;
+    result->next = NULL;
     return result;
 }
 
@@ -76,7 +78,8 @@ struct list_struct * create_list(int nodeId, enum list_type type, char * id, str
                                                                              struct s_expr_struct * to,
                                                                              struct s_expr_struct * body1,
                                                                              struct s_expr_struct * body2,
-                                                                             struct slot_def_seq_struct * slots) {
+                                                                             struct slot_def_seq_struct * slotdefs,
+                                                                             char * parent) {
 
     struct list_struct * result = (struct list_struct *)malloc(sizeof(struct list_struct));
     result->nodeId = nodeId;
@@ -89,6 +92,7 @@ struct list_struct * create_list(int nodeId, enum list_type type, char * id, str
     result->to = to;
     result->body1 = body1;
     result->body2 = body2;
-    result->slots = slots;
+    result->slotdefs = slotdefs;
+    result->parent = parent;
     return result;
 }
