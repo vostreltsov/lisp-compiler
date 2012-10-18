@@ -7,8 +7,7 @@
 extern int yylex(void);
 void yyerror(const char * str);
 
-struct program_struct * root;
-
+struct program_struct * root = NULL;
 int idCounter = 0;
 
 %}

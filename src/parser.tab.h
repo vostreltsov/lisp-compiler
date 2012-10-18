@@ -82,7 +82,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2049 of yacc.c  */
-#line 16 "parser.y"
+#line 15 "parser.y"
 
     int                          semantic_int;
     char                         semantic_char;

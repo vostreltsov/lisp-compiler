@@ -34,6 +34,7 @@ int main(int argc, char * argv[]) {
         yyparse();
         fclose(yyin);
         run_dot(root);
+        free_program(root);
     }
     return 0;
 }

@@ -96,3 +96,84 @@ struct list_struct * create_list(int nodeId, enum list_type type, char * id, str
     result->parent = parent;
     return result;
 }
+
+void free_program(struct program_struct * program) {
+    if (program != NULL) {
+        free_s_expr_seq(program->s_expr_seq);
+        free(program);
+    }
+}
+
+void free_s_expr(struct s_expr_struct * s_expr) {
+    if (s_expr != NULL) {
+        if (s_expr->string != NULL) {
+            free(s_expr->string);
+        }
+        if (s_expr->id != NULL) {
+            free(s_expr->id);
+        }
+        free_list(s_expr->list);
+        free(s_expr);
+    }
+}
+
+void free_s_expr_seq(struct s_expr_seq_struct * s_expr_seq) {
+    if (s_expr_seq != NULL) {
+        struct s_expr_struct * expr = s_expr_seq->first;
+        while (expr != NULL) {
+            struct s_expr_struct * tmp = expr;
+            expr = expr->next;
+            free_s_expr(tmp);
+        }
+        free(s_expr_seq);
+    }
+}
+
+void free_slot_def(struct slot_def_struct * slot_def) {
+    if (slot_def != NULL) {
+        free_s_expr(slot_def->initform);
+        if (slot_def->reader != NULL) {
+            free(slot_def->reader);
+        }
+        if (slot_def->writer != NULL) {
+            free(slot_def->writer);
+        }
+        if (slot_def->accessor != NULL) {
+            free(slot_def->accessor);
+        }
+        free(slot_def);
+    }
+}
+
+void free_slot_def_seq(struct slot_def_seq_struct * slot_def_seq) {
+    if (slot_def_seq != NULL) {
+        struct slot_def_struct * slot_def = slot_def_seq->first;
+        while (slot_def != NULL) {
+            struct s_expr_struct * tmp = slot_def;
+            slot_def = slot_def->next;
+            free_slot_def(tmp);
+        }
+        free(slot_def_seq);
+    }
+}
+
+void free_list(struct list_struct * list) {
+    if (list != NULL) {
+        if (list->id != NULL) {
+            free(list->id);
+        }
+        free_s_expr_seq(list->ops);
+        free_s_expr(list->cond);
+        free_s_expr(list->container);
+        free_s_expr(list->from);
+        free_s_expr(list->to);
+        free_s_expr(list->body1);
+        free_s_expr(list->body2);
+        free_slot_def_seq(list->slotdefs);
+        if (list->parent != NULL) {
+            free(list->parent);
+        }
+        free(list);
+    }
+}
+

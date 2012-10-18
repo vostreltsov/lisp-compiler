@@ -38,6 +38,13 @@ struct list_struct * create_list(int nodeId, enum list_type type, char * id, str
                                                                              struct slot_def_seq_struct * slotdefs,
                                                                              char * parent);
 
+void free_program(struct program_struct * program);
+void free_s_expr(struct s_expr_struct * s_expr);
+void free_s_expr_seq(struct s_expr_seq_struct * s_expr_seq);
+void free_slot_def(struct slot_def_struct * slot_def);
+void free_slot_def_seq(struct slot_def_seq_struct * slot_def_seq);
+void free_list(struct list_struct * list);
+
 #endif
 
 
