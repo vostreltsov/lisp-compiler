@@ -12,8 +12,8 @@ CND_DISTDIR=dist
 CND_BUILDDIR=build
 NBTMPDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tmp-packaging
 TMPDIRNAME=tmp-packaging
-OUTPUT_PATH=${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/nb_project
-OUTPUT_BASENAME=nb_project
+OUTPUT_PATH=lisp2java
+OUTPUT_BASENAME=lisp2java
 PACKAGE_TOP_DIR=nbproject/
 
 # Functions

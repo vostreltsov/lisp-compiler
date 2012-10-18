@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../parser_structs.h"
+#include "parser_structs.h"
 
 #define BUFFER_SIZE 128
 

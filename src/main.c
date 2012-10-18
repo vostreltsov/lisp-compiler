@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../parser_structs.h"
+#include "parser_structs.h"
 #include "dotcode.h"
 
 extern int yyparse();
@@ -27,7 +27,7 @@ void run_dot(struct program_struct * program) {
 }
 
 int main(int argc, char * argv[]) {
-    yyin = fopen("../../misc/text.txt", "r");
+    yyin = fopen("../misc/text.txt", "r");
     if (yyin == 0) {
         printf("error opening text.txt\n");
     } else {

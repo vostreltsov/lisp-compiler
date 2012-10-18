@@ -4,19 +4,19 @@
     <logicalFolder name="SourceFiles"
                    displayName="Исходные файлы"
                    projectFiles="true">
-      <itemPath>dotcode.c</itemPath>
-      <itemPath>../lexer.c</itemPath>
-      <itemPath>main.c</itemPath>
-      <itemPath>../parser.tab.c</itemPath>
-      <itemPath>../parser_funcs.c</itemPath>
+      <itemPath>../src/dotcode.c</itemPath>
+      <itemPath>../src/lexer.c</itemPath>
+      <itemPath>../src/main.c</itemPath>
+      <itemPath>../src/parser.tab.c</itemPath>
+      <itemPath>../src/parser_funcs.c</itemPath>
     </logicalFolder>
     <logicalFolder name="HeaderFiles"
                    displayName="Файлы заголовков"
                    projectFiles="true">
-      <itemPath>dotcode.h</itemPath>
-      <itemPath>../parser.tab.h</itemPath>
-      <itemPath>../parser_funcs.h</itemPath>
-      <itemPath>../parser_structs.h</itemPath>
+      <itemPath>../src/dotcode.h</itemPath>
+      <itemPath>../src/parser.tab.h</itemPath>
+      <itemPath>../src/parser_funcs.h</itemPath>
+      <itemPath>../src/parser_structs.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Файлы ресурсов"
@@ -32,6 +32,9 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
+      <itemPath>../src/lexer.flex</itemPath>
+      <itemPath>../src/parser.y</itemPath>
+      <itemPath>../misc/text.txt</itemPath>
     </logicalFolder>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
@@ -45,6 +48,9 @@
         <cTool>
           <commandLine>-std=c99</commandLine>
         </cTool>
+        <linkerTool>
+          <output>lisp2java</output>
+        </linkerTool>
       </compileType>
     </conf>
     <conf name="Release" type="1">
@@ -66,6 +72,9 @@
         <asmTool>
           <developmentMode>5</developmentMode>
         </asmTool>
+        <linkerTool>
+          <output>lisp2java</output>
+        </linkerTool>
       </compileType>
     </conf>
   </confs>
