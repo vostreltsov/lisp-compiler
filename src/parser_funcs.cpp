@@ -149,7 +149,7 @@ void free_slot_def_seq(struct slot_def_seq_struct * slot_def_seq) {
     if (slot_def_seq != NULL) {
         struct slot_def_struct * slot_def = slot_def_seq->first;
         while (slot_def != NULL) {
-            struct s_expr_struct * tmp = slot_def;
+            struct slot_def_struct * tmp = slot_def;
             slot_def = slot_def->next;
             free_slot_def(tmp);
         }

@@ -1,20 +1,19 @@
 TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
-CONFIG -= qt
 
-QMAKE_CFLAGS_DEBUG += -std=c99
-QMAKE_CFLAGS_RELEASE += -std=c99
+QT += core
+QT -= gui
 
 SOURCES += \
-    parser.tab.c \
-    main.c \
-    lexer.c \
-    dotcode.c \
-    parser_funcs.c
+    parser.cpp \
+    main.cpp \
+    lexer.cpp \
+    dotcode.cpp \
+    parser_funcs.cpp
 
 HEADERS += \
-    parser.tab.h \
+    parser.hpp \
     dotcode.h \
     parser_structs.h \
     parser_funcs.h

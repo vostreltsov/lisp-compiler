@@ -1,18 +1,20 @@
 #ifndef DOTCODE_H
 #define DOTCODE_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <QProcess>
+#include <QTextStream>
 #include "parser_structs.h"
 
-#define BUFFER_SIZE 128
-
-void exec_dot(const char * dotFileName, const char * pngFileName);
-
-void dot_for_program(FILE * file, struct program_struct * program);
-void dot_for_s_expr(FILE * file, char * lastNode, char * label, struct s_expr_struct * expr);
-void dot_for_s_expr_seq(FILE * file, char * lastNode, char * label, struct s_expr_seq_struct * expr_list);
-void dot_for_list(FILE * file, char * lastNode, char * label, struct list_struct * list);
+class DotCode
+{
+public:
+    static void exec_dot(const QString & dotBinFileName, const QString & dotFileName, const QString & pngFileName);
+    static void dot_for_program(QTextStream & out, struct program_struct * program);
+    static void dot_for_s_expr(QTextStream & out, const QString & lastNode, const QString & label, struct s_expr_struct * expr);
+    static void dot_for_s_expr_seq(QTextStream & out, const QString & lastNode, const QString & label, struct s_expr_seq_struct * expr_list);
+    static void dot_for_slot_def(QTextStream & out, const QString & lastNode, const QString & label, struct slot_def_struct * slot_def);
+    static void dot_for_slot_def_seq(QTextStream & out, const QString & lastNode, const QString & label, struct slot_def_seq_struct * slot_def_seq);
+    static void dot_for_list(QTextStream & out, const QString & lastNode, const QString & label, struct list_struct * list);
+};
 
 #endif

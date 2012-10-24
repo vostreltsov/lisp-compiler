@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include <ctype.h>
-#include "parser.tab.h"
+#include "parser.hpp"
 
 int my_powah(int base, int n)
 {
@@ -70,7 +70,7 @@ void store_function_id() {
 %option noyywrap
 %option never-interactive
 %option case-insensitive
-%option outfile="lexer.c"
+%option outfile="lexer.cpp"
 
 DIGIT_BIN       [0-1]
 DIGIT_OCT       [0-7]

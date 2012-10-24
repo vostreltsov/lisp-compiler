@@ -1,6 +1,6 @@
-#line 2 "lexer.c"
+#line 2 "lexer.cpp"
 
-#line 4 "lexer.c"
+#line 4 "lexer.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -734,7 +734,7 @@ char *yytext;
 
 #include <string.h>
 #include <ctype.h>
-#include "parser.tab.h"
+#include "parser.hpp"
 
 int my_powah(int base, int n)
 {
@@ -799,7 +799,7 @@ void store_function_id() {
 
 
 
-#line 803 "lexer.c"
+#line 803 "lexer.cpp"
 
 #define INITIAL 0
 #define COMMENT_ML_ST 1
@@ -991,7 +991,7 @@ char            buffer[8 * 1024];   // For storing strings, comments etc.
 unsigned int    buffer_length = 0;  // Length of the buffer.
 
 
-#line 995 "lexer.c"
+#line 995 "lexer.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -1740,7 +1740,7 @@ YY_RULE_SETUP
 #line 426 "lexer.flex"
 ECHO;
 	YY_BREAK
-#line 1744 "lexer.c"
+#line 1744 "lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

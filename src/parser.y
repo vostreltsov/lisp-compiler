@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include "parser.tab.h"
+#include "parser.hpp"
 #include "parser_structs.h"
 #include "parser_funcs.h"
 
@@ -26,6 +26,7 @@ int idCounter = 0;
     struct list_struct         * semantic_list;
 }
 
+%output "parser.cpp"
 %error-verbose
 
 %type   <semantic_program>      program
