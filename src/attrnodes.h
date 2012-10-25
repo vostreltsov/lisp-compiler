@@ -38,7 +38,7 @@ public:
     /**
      * @brief Generates dot code for this node.
      */
-    virtual QString dotCode() const = 0;
+    virtual QString dotCode(QString parent, QString label) const = 0;
 };
 
 class ProgramNode : public AttributedNode
@@ -47,7 +47,7 @@ public:
     QLinkedList<SExpressionNode *> fExpressions;
     ProgramNode();
     ~ProgramNode();
-    QString dotCode() const;
+    QString dotCode(QString parent, QString label) const;
     static ProgramNode * fromSyntaxNode(program_struct * syntaxNode);
 };
 
@@ -63,7 +63,7 @@ public:
     ListNode  * fList;
     SExpressionNode();
     ~SExpressionNode();
-    QString dotCode() const;
+    QString dotCode(QString parent, QString label) const;
     static SExpressionNode * fromSyntaxNode(s_expr_struct * syntaxNode);
 };
 
@@ -76,7 +76,7 @@ public:
     slot_alloc_type   fAllocType;
     SlotDefinitionNode();
     ~SlotDefinitionNode();
-    QString dotCode() const;
+    QString dotCode(QString parent, QString label) const;
     static SlotDefinitionNode * fromSyntaxNode(slot_def_struct * syntaxNode);
 };
 
@@ -96,7 +96,7 @@ public:
     QString                           fParent;
     ListNode();
     ~ListNode();
-    QString dotCode() const;
+    QString dotCode(QString parent, QString label) const;
     static ListNode * fromSyntaxNode(list_struct * syntaxNode);
 };
 

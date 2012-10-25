@@ -412,6 +412,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 <STRING_ST>"\"" {
     // String constant ending.
+    buffer[buffer_length] = '\0';
     yylval.semantic_string = (char *)malloc(sizeof(char) * (buffer_length + 1));
     strcpy(yylval.semantic_string, buffer);
     buffer_length = 0;

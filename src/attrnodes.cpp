@@ -15,20 +15,27 @@ ProgramNode::ProgramNode() : AttributedNode()
 
 ProgramNode::~ProgramNode()
 {
-    foreach(SExpressionNode * expr, fExpressions) {
+    foreach (SExpressionNode * expr, fExpressions) {
         delete expr;
     }
 }
 
-QString ProgramNode::dotCode() const
+QString ProgramNode::dotCode(QString parent, QString label) const
 {
-    return "";
+    QString tmp = "\"id" + QString::number(fNodeId) + "\\n program\"";
+    QString result = "digraph {\n";
+    foreach (SExpressionNode * expr, fExpressions) {
+        result += expr->dotCode(tmp, "");
+    }
+    result += "}\n";
+    return result;
 }
 
 ProgramNode * ProgramNode::fromSyntaxNode(program_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
         ProgramNode * result = new ProgramNode();
+        result->fNodeId = syntaxNode->nodeId;
         s_expr_struct * expr = (syntaxNode->s_expr_seq != NULL ? syntaxNode->s_expr_seq->first : NULL);
         while (expr != NULL) {
             result->fExpressions.append(SExpressionNode::fromSyntaxNode(expr));
@@ -52,9 +59,30 @@ SExpressionNode::~SExpressionNode()
     }
 }
 
-QString SExpressionNode::dotCode() const
+QString SExpressionNode::dotCode(QString parent, QString label) const
 {
-    return "";
+    QString tmp = "\"id" + QString::number(fNodeId) + "\\ns_expr:";
+    switch (fSubType) {
+    case S_EXPR_TYPE_INT:
+        tmp += "int\\n" + QString::number(fInteger) + "\"";
+        return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+    case S_EXPR_TYPE_CHAR:
+        tmp += "char\\n" + QString(fCharacter) + "\"";
+        return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+    case S_EXPR_TYPE_STRING:
+        tmp += "string\\n" + fString + "\"";
+        return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+    case S_EXPR_TYPE_BOOL:
+        tmp += "bool\\n" + QString(fBoolean ? "TRUE" : "FALSE") + "\"";
+        return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+    case S_EXPR_TYPE_ID:
+        tmp += "id\\n" + fId + "\"";
+        return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+    case S_EXPR_TYPE_LIST:
+        tmp += "list\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        return result + fList->dotCode(tmp, "");
+    }
 }
 
 SExpressionNode * SExpressionNode::fromSyntaxNode(s_expr_struct * syntaxNode)
@@ -87,9 +115,25 @@ SlotDefinitionNode::~SlotDefinitionNode()
     }
 }
 
-QString SlotDefinitionNode::dotCode() const
+QString SlotDefinitionNode::dotCode(QString parent, QString label) const
 {
-    return "";
+    QString tmp = "\"id" + QString::number(fNodeId) + "\\n:";
+    if (fSubType == SLOT_DEF_INITFORM) {
+        tmp += "initform\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        return result + fInitform->dotCode(tmp, "");
+    } else if (fSubType == SLOT_DEF_READER) {
+        tmp += "reader " + fId + "\"";
+    } else if (fSubType == SLOT_DEF_WRITER) {
+        tmp += "writer " + fId + "\"";
+    } else if (fSubType == SLOT_DEF_ACCESSOR) {
+        tmp += "accessor " + fId + "\"";
+    } else if (fSubType == SLOT_DEF_ALLOCATION && fAllocType == SLOT_ALLOC_TYPE_INSTANCE) {
+        tmp += "alloc instance\"";
+    } else if (fSubType == SLOT_DEF_ALLOCATION && fAllocType == SLOT_ALLOC_TYPE_CLASS) {
+        tmp += "alloc class\"";
+    }
+    return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
 }
 
 SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(slot_def_struct * syntaxNode)
@@ -132,14 +176,91 @@ ListNode::~ListNode()
     if (fBody2 != NULL) {
         delete fBody2;
     }
-    foreach(SlotDefinitionNode * slotdef, fSlotDefs) {
+    foreach (SlotDefinitionNode * slotdef, fSlotDefs) {
         delete slotdef;
     }
 }
 
-QString ListNode::dotCode() const
+QString ListNode::dotCode(QString parent, QString label) const
 {
-    return "";
+    QString tmp = "\"id" + QString::number(fNodeId) + "\\nlist:";
+    switch (fSubType) {
+    case LIST_TYPE_FCALL: {
+        tmp += "call " + fId + "\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        int cnt = 0;
+        foreach (SExpressionNode * op, fOperands) {
+            result += op->dotCode(tmp, "operand " + QString::number(cnt++));
+        }
+        return result;
+    }
+    case LIST_TYPE_LOOP_IN: {
+        tmp += "call " + fId + "\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        result += fContainer->dotCode(tmp, "container");
+        result += fBody1->dotCode(tmp, "body");
+        return result;
+    }
+    case LIST_TYPE_LOOP_FROM_TO: {
+        tmp += "call " + fId + "\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        result += fFrom->dotCode(tmp, "from");
+        result += fTo->dotCode(tmp, "to");
+        result += fBody1->dotCode(tmp, "body");
+        return result;
+    }
+    case LIST_TYPE_PROGN: {
+        tmp += "progn\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        foreach (SExpressionNode * op, fOperands) {
+            result += op->dotCode(tmp, "");
+        }
+        return result;
+    }
+    case LIST_TYPE_IF: {
+        tmp += "if\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        result += fCondition->dotCode(tmp, "condition");
+        result += fBody1->dotCode(tmp, "positive");
+        if (fBody2 != NULL) {
+            result += fBody2->dotCode(tmp, "negative");
+        }
+        return result;
+    }
+    case LIST_TYPE_SLOTDEF: {
+        tmp += "slot " + fId + "\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        foreach (SlotDefinitionNode * slotdef, fSlotDefs) {
+            result += slotdef->dotCode(tmp, "");
+        }
+        return result;
+    }
+    case LIST_TYPE_DEFUN: {
+        tmp += "defun " + fId + "\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        int cnt = 0;
+        foreach (SExpressionNode * op, fOperands) {
+            result += op->dotCode(tmp, "argument " + QString::number(cnt++));
+        }
+        result += fBody1->dotCode(tmp, "body");
+        return result;
+    }
+    case LIST_TYPE_DEFCLASS: {
+        if (fParent.length() == 0) {
+            tmp += "defclass " + fId + "\"";
+        } else {
+            tmp += "defclass " + fId + "\\nparent:" + fParent + "\"";
+        }
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        int cnt = 0;
+        foreach (SExpressionNode * op, fOperands) {
+            result += op->dotCode(tmp, "slot " + QString::number(cnt++));
+        }
+        return result;
+    }
+    default:
+        break;
+    }
 }
 
 ListNode * ListNode::fromSyntaxNode(list_struct * syntaxNode)
@@ -147,6 +268,7 @@ ListNode * ListNode::fromSyntaxNode(list_struct * syntaxNode)
     if (syntaxNode != NULL) {
         ListNode * result = new ListNode();
         result->fNodeId = syntaxNode->nodeId;
+        result->fSubType = syntaxNode->type;
         result->fId = syntaxNode->id;
         s_expr_struct * expr = (syntaxNode->ops != NULL ? syntaxNode->ops->first : NULL);
         while (expr != NULL) {

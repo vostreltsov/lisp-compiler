@@ -1721,6 +1721,7 @@ YY_RULE_SETUP
 #line 413 "lexer.flex"
 {
     // String constant ending.
+    buffer[buffer_length] = '\0';
     yylval.semantic_string = (char *)malloc(sizeof(char) * (buffer_length + 1));
     strcpy(yylval.semantic_string, buffer);
     buffer_length = 0;
@@ -1729,7 +1730,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING_ST):
-#line 421 "lexer.flex"
+#line 422 "lexer.flex"
 {
     puts("ERROR: UNCLOSED STRING CONSTANT");
     yyterminate();
@@ -1737,10 +1738,10 @@ case YY_STATE_EOF(STRING_ST):
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 426 "lexer.flex"
+#line 427 "lexer.flex"
 ECHO;
 	YY_BREAK
-#line 1744 "lexer.cpp"
+#line 1745 "lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2735,7 +2736,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 426 "lexer.flex"
+#line 427 "lexer.flex"
 
 
 
