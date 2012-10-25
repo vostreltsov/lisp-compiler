@@ -1533,37 +1533,37 @@ yyreduce:
   case 11:
 /* Line 1787 of yacc.c  */
 #line 90 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  (yyvsp[(2) - (2)].semantic_s_expr),    NULL,  NULL,  NULL,  SLOT_ALLOC_TYPE_RESERVED);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_INITFORM,   (yyvsp[(2) - (2)].semantic_s_expr),    NULL,  SLOT_ALLOC_TYPE_INSTANCE);}
     break;
 
   case 12:
 /* Line 1787 of yacc.c  */
 #line 91 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  NULL,  (yyvsp[(2) - (2)].semantic_id),    NULL,  NULL,  SLOT_ALLOC_TYPE_RESERVED);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_READER,     NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_TYPE_INSTANCE);}
     break;
 
   case 13:
 /* Line 1787 of yacc.c  */
 #line 92 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  NULL,  NULL,  (yyvsp[(2) - (2)].semantic_id),    NULL,  SLOT_ALLOC_TYPE_RESERVED);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_WRITER,     NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_TYPE_INSTANCE);}
     break;
 
   case 14:
 /* Line 1787 of yacc.c  */
 #line 93 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  NULL,  NULL,  NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_TYPE_RESERVED);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ACCESSOR,   NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_TYPE_INSTANCE);}
     break;
 
   case 15:
 /* Line 1787 of yacc.c  */
 #line 94 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  NULL,  NULL,  NULL,  NULL,  SLOT_ALLOC_TYPE_INSTANCE);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_TYPE_INSTANCE);}
     break;
 
   case 16:
 /* Line 1787 of yacc.c  */
 #line 95 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  NULL,  NULL,  NULL,  NULL,  SLOT_ALLOC_TYPE_CLASS);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_TYPE_CLASS);}
     break;
 
   case 17:

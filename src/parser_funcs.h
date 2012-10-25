@@ -18,10 +18,9 @@ struct s_expr_seq_struct * create_s_expr_seq(int nodeId, struct s_expr_struct * 
 
 struct s_expr_seq_struct * add_to_s_expr_seq(struct s_expr_seq_struct * seq, struct s_expr_struct * expr);
 
-struct slot_def_struct * create_slot_def(int nodeId, struct s_expr_struct * initform,
-                                                     char * reader,
-                                                     char * writer,
-                                                     char * accessor,
+struct slot_def_struct * create_slot_def(int nodeId, enum slot_def_type type,
+                                                     struct s_expr_struct * initform,
+                                                     char * id,
                                                      enum slot_alloc_type alloc);
 
 struct slot_def_seq_struct * create_slot_def_seq(int nodeId, struct slot_def_struct * first);

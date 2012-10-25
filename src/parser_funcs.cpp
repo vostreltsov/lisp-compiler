@@ -41,17 +41,15 @@ struct s_expr_seq_struct * add_to_s_expr_seq(struct s_expr_seq_struct * seq, str
     return seq;
 }
 
-struct slot_def_struct * create_slot_def(int nodeId, struct s_expr_struct * initform,
-                                                     char * reader,
-                                                     char * writer,
-                                                     char * accessor,
+struct slot_def_struct * create_slot_def(int nodeId, enum slot_def_type type,
+                                                     struct s_expr_struct * initform,
+                                                     char * id,
                                                      enum slot_alloc_type alloc) {
     struct slot_def_struct * result = (struct slot_def_struct *)malloc(sizeof(struct slot_def_struct));
     result->nodeId = nodeId;
+    result->type = type;
     result->initform = initform;
-    result->reader = reader;
-    result->writer = writer;
-    result->accessor = accessor;
+    result->id = id;
     result->alloc = alloc;
     result->next = NULL;
     return result;
@@ -132,14 +130,8 @@ void free_s_expr_seq(struct s_expr_seq_struct * s_expr_seq) {
 void free_slot_def(struct slot_def_struct * slot_def) {
     if (slot_def != NULL) {
         free_s_expr(slot_def->initform);
-        if (slot_def->reader != NULL) {
-            free(slot_def->reader);
-        }
-        if (slot_def->writer != NULL) {
-            free(slot_def->writer);
-        }
-        if (slot_def->accessor != NULL) {
-            free(slot_def->accessor);
+        if (slot_def->id != NULL) {
+            free(slot_def->id);
         }
         free(slot_def);
     }

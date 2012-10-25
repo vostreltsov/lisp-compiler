@@ -15,7 +15,7 @@ ProgramNode::ProgramNode() : AttributedNode()
 
 ProgramNode::~ProgramNode()
 {
-    foreach(AttributedNode * expr, fExpressions) {
+    foreach(SExpressionNode * expr, fExpressions) {
         delete expr;
     }
 }
@@ -29,7 +29,7 @@ ProgramNode * ProgramNode::fromSyntaxNode(program_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
         ProgramNode * result = new ProgramNode();
-        s_expr_struct * expr = syntaxNode->s_expr_seq->first;
+        s_expr_struct * expr = (syntaxNode->s_expr_seq != NULL ? syntaxNode->s_expr_seq->first : NULL);
         while (expr != NULL) {
             result->fExpressions.append(SExpressionNode::fromSyntaxNode(expr));
             expr = expr->next;
@@ -47,6 +47,9 @@ SExpressionNode::SExpressionNode() : AttributedNode()
 
 SExpressionNode::~SExpressionNode()
 {
+    if (fList != NULL) {
+        delete fList;
+    }
 }
 
 QString SExpressionNode::dotCode() const
@@ -79,6 +82,9 @@ SlotDefinitionNode::SlotDefinitionNode() : AttributedNode()
 
 SlotDefinitionNode::~SlotDefinitionNode()
 {
+    if (fInitform != NULL) {
+        delete fInitform;
+    }
 }
 
 QString SlotDefinitionNode::dotCode() const
@@ -89,7 +95,13 @@ QString SlotDefinitionNode::dotCode() const
 SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(slot_def_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
-
+        SlotDefinitionNode * result = new SlotDefinitionNode();
+        result->fNodeId = syntaxNode->nodeId;
+        result->fSubType = syntaxNode->type;
+        result->fInitform = SExpressionNode::fromSyntaxNode(syntaxNode->initform);
+        result->fId = syntaxNode->id;
+        result->fAllocType = syntaxNode->alloc;
+        return result;
     } else {
         return NULL;
     }
@@ -102,6 +114,27 @@ ListNode::ListNode() : AttributedNode()
 
 ListNode::~ListNode()
 {
+    if (fCondition != NULL) {
+        delete fCondition;
+    }
+    if (fContainer != NULL) {
+        delete fContainer;
+    }
+    if (fFrom != NULL) {
+        delete fFrom;
+    }
+    if (fTo != NULL) {
+        delete fTo;
+    }
+    if (fBody1 != NULL) {
+        delete fBody1;
+    }
+    if (fBody2 != NULL) {
+        delete fBody2;
+    }
+    foreach(SlotDefinitionNode * slotdef, fSlotDefs) {
+        delete slotdef;
+    }
 }
 
 QString ListNode::dotCode() const
@@ -112,7 +145,27 @@ QString ListNode::dotCode() const
 ListNode * ListNode::fromSyntaxNode(list_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
-
+        ListNode * result = new ListNode();
+        result->fNodeId = syntaxNode->nodeId;
+        result->fId = syntaxNode->id;
+        s_expr_struct * expr = (syntaxNode->ops != NULL ? syntaxNode->ops->first : NULL);
+        while (expr != NULL) {
+            result->fOperands.append(SExpressionNode::fromSyntaxNode(expr));
+            expr = expr->next;
+        }
+        result->fCondition = SExpressionNode::fromSyntaxNode(syntaxNode->cond);
+        result->fContainer = SExpressionNode::fromSyntaxNode(syntaxNode->container);
+        result->fFrom = SExpressionNode::fromSyntaxNode(syntaxNode->from);
+        result->fTo = SExpressionNode::fromSyntaxNode(syntaxNode->to);
+        result->fBody1 = SExpressionNode::fromSyntaxNode(syntaxNode->body1);
+        result->fBody2 = SExpressionNode::fromSyntaxNode(syntaxNode->body2);
+        slot_def_struct * slotdef = (syntaxNode->slotdefs != NULL ? syntaxNode->slotdefs->first : NULL);
+        while (slotdef != NULL) {
+            result->fSlotDefs.append(SlotDefinitionNode::fromSyntaxNode(slotdef));
+            slotdef = slotdef->next;
+        }
+        result->fParent = syntaxNode->parent;
+        return result;
     } else {
         return NULL;
     }

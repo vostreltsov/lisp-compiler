@@ -18,15 +18,6 @@ enum AttributedTypes
     ATTR_TYPE_LIST      // List.
 };
 
-enum SlotDefTypes
-{
-    SLOT_DEF_TYPE_INITFORM, // :initform
-    SLOT_DEF_TYPE_READER,   // :reader
-    SLOT_DEF_TYPE_WRITER,   // :writer
-    SLOT_DEF_TYPE_ACCESSOR, // :accessor
-    SLOT_DEF_TYPE_ALLOC     // :allocation
-};
-
 class AttributedNode
 {
 public:
@@ -53,7 +44,7 @@ public:
 class ProgramNode : public AttributedNode
 {
 public:
-    QLinkedList<AttributedNode *> fExpressions;
+    QLinkedList<SExpressionNode *> fExpressions;
     ProgramNode();
     ~ProgramNode();
     QString dotCode() const;
@@ -79,8 +70,10 @@ public:
 class SlotDefinitionNode : public AttributedNode
 {
 public:
-    SlotDefTypes fSubType;
-    QString      fId;
+    slot_def_type     fSubType;
+    SExpressionNode * fInitform;
+    QString           fId;
+    slot_alloc_type   fAllocType;
     SlotDefinitionNode();
     ~SlotDefinitionNode();
     QString dotCode() const;
@@ -90,6 +83,17 @@ public:
 class ListNode : public AttributedNode
 {
 public:
+    list_type                         fSubType;
+    QString                           fId;
+    QLinkedList<SExpressionNode *>    fOperands;
+    SExpressionNode                 * fCondition;
+    SExpressionNode                 * fContainer;
+    SExpressionNode                 * fFrom;
+    SExpressionNode                 * fTo;
+    SExpressionNode                 * fBody1;
+    SExpressionNode                 * fBody2;
+    QLinkedList<SlotDefinitionNode *> fSlotDefs;
+    QString                           fParent;
     ListNode();
     ~ListNode();
     QString dotCode() const;

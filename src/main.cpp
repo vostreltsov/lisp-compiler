@@ -19,8 +19,8 @@ void exec_dot(const QString & dotBinFileName, const QString & dotFileName, const
 }
 
 void run_dot_on_syntax_node(struct program_struct * program) {
-    char * dotFN = "tmp.dot";
-    char * pngFN = "res.png";
+    QString dotFN = "tmp.dot";
+    QString pngFN = "res.png";
 
     QFile dot(dotFN);
     if (dot.open(QFile::WriteOnly)) {
@@ -28,12 +28,13 @@ void run_dot_on_syntax_node(struct program_struct * program) {
         SyntaxDotCode::dot_for_program(out, program);
         dot.close();
         exec_dot("dot", dotFN, pngFN);
-        char cmd[256];
-        sprintf(cmd, "ristretto %s", pngFN);
-        system(cmd);    // run image viewer automatically.
+        // Run image viewer automatically.
+        QStringList args;
+        args << pngFN;
+        QProcess::execute("ristretto", args);
         QFile::remove(dotFN);
     } else {
-        printf("error opening %s\n", pngFN);
+        // Error occured, don't tell anybody about it!
     }
 }
 

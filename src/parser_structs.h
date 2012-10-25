@@ -16,8 +16,16 @@ enum s_expr_type {
     S_EXPR_TYPE_LIST
 };
 
+enum slot_def_type {
+    SLOT_DEF_RESERVED,
+    SLOT_DEF_INITFORM,
+    SLOT_DEF_READER,
+    SLOT_DEF_WRITER,
+    SLOT_DEF_ACCESSOR,
+    SLOT_DEF_ALLOCATION
+};
+
 enum slot_alloc_type {
-    SLOT_ALLOC_TYPE_RESERVED,   // NULL is reserved value.
     SLOT_ALLOC_TYPE_INSTANCE,   // Slot-per-instance.
     SLOT_ALLOC_TYPE_CLASS       // Slot-per-class.
 };
@@ -59,10 +67,9 @@ struct s_expr_seq_struct {
 
 struct slot_def_struct {
     int                        nodeId;   // Identifier of the node in the syntax tree.
+    enum slot_def_type         type;     // Type of the slot definition.
     struct s_expr_struct     * initform; // Definition of an initial value.
-    char                     * reader;   // Definition of a reader method.
-    char                     * writer;   // Definition of a writer method.
-    char                     * accessor; // Definition of an accessor method.
+    char                     * id;       // Definition of a reader, writer or accessor method.
     enum slot_alloc_type       alloc;    // Allocation type.
     struct slot_def_struct   * next;     // Pointer to the next slot_def_struct.
 };

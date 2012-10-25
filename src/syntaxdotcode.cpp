@@ -48,18 +48,18 @@ void SyntaxDotCode::dot_for_s_expr_seq(QTextStream & out, const QString & lastNo
 
 void SyntaxDotCode::dot_for_slot_def(QTextStream & out, const QString & lastNode, const QString & label, struct slot_def_struct * slot_def) {
     QString tmp;
-    if (slot_def->initform != NULL) {
+    if (slot_def->type == SLOT_DEF_INITFORM) {
         tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:initform\"";
         dot_for_s_expr(out, tmp, "", slot_def->initform);
-    } else if (slot_def->reader != NULL) {
-        tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:reader " + slot_def->reader + "\"";
-    } else if (slot_def->writer != NULL) {
-        tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:writer " + slot_def->writer + "\"";
-    } else if (slot_def->accessor != NULL) {
-        tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:accessor " + slot_def->accessor + "\"";
-    } else if (slot_def->alloc == SLOT_ALLOC_TYPE_INSTANCE) {
+    } else if (slot_def->type == SLOT_DEF_READER) {
+        tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:reader " + slot_def->id + "\"";
+    } else if (slot_def->type == SLOT_DEF_WRITER) {
+        tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:writer " + slot_def->id + "\"";
+    } else if (slot_def->type == SLOT_DEF_ACCESSOR) {
+        tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:accessor " + slot_def->id + "\"";
+    } else if (slot_def->type == SLOT_DEF_ALLOCATION && slot_def->alloc == SLOT_ALLOC_TYPE_INSTANCE) {
         tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:alloc instance\"";
-    } if (slot_def->alloc == SLOT_ALLOC_TYPE_CLASS) {
+    } else if (slot_def->type == SLOT_DEF_ALLOCATION && slot_def->alloc == SLOT_ALLOC_TYPE_CLASS) {
         tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:alloc class\"";
     }
     out << lastNode << "->" << tmp << "[label=\"" << label << "\"];\n";
