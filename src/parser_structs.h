@@ -42,7 +42,7 @@ struct program_struct {
 struct s_expr_struct {
     int                    nodeId;     // Identifier of the node in the syntax tree.
     enum s_expr_type       type;       // Type of the s-expression.
-    long int               integer;    // S-expression may be an integer constant.
+    int                    integer;    // S-expression may be an integer constant.
     char                   character;  // S-expression may be a character constant.
     char                 * string;     // S-expression may be a string constant.
     int                    boolean;    // S-expression may be an boolean constant.

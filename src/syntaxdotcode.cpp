@@ -1,12 +1,6 @@
-#include "dotcode.h"
+#include "syntaxdotcode.h"
 
-void DotCode::exec_dot(const QString & dotBinFileName, const QString & dotFileName, const QString & pngFileName) {
-    QStringList args;
-    args << QString("-Tpng") << QString("-o") + pngFileName << dotFileName;
-    QProcess::execute(dotBinFileName, args);
-}
-
-void DotCode::dot_for_program(QTextStream & out, struct program_struct * program) {
+void SyntaxDotCode::dot_for_program(QTextStream & out, struct program_struct * program) {
     QString tmp = "\"id" + QString::number(program->nodeId) + "\\n program\"";
     out << "digraph {\n";
     out << tmp <<";\n";
@@ -14,7 +8,7 @@ void DotCode::dot_for_program(QTextStream & out, struct program_struct * program
     out << "}";
 }
 
-void DotCode::dot_for_s_expr(QTextStream & out, const QString & lastNode, const QString & label, struct s_expr_struct * expr) {
+void SyntaxDotCode::dot_for_s_expr(QTextStream & out, const QString & lastNode, const QString & label, struct s_expr_struct * expr) {
     QString tmp;
     switch (expr->type) {
         case S_EXPR_TYPE_INT:
@@ -42,7 +36,7 @@ void DotCode::dot_for_s_expr(QTextStream & out, const QString & lastNode, const 
     out << lastNode << "->" << tmp << "[label=\"" << label << "\"];\n";
 }
 
-void DotCode::dot_for_s_expr_seq(QTextStream & out, const QString & lastNode, const QString & label, struct s_expr_seq_struct * expr_seq) {
+void SyntaxDotCode::dot_for_s_expr_seq(QTextStream & out, const QString & lastNode, const QString & label, struct s_expr_seq_struct * expr_seq) {
     QString tmp = "\"id" + QString::number(expr_seq->nodeId) + "\\ns_expr_seq\"";
     out << lastNode << "->" << tmp << "[label=\"" << label << "\"];\n";
     struct s_expr_struct * expr = expr_seq->first;
@@ -52,7 +46,7 @@ void DotCode::dot_for_s_expr_seq(QTextStream & out, const QString & lastNode, co
     }
 }
 
-void DotCode::dot_for_slot_def(QTextStream & out, const QString & lastNode, const QString & label, struct slot_def_struct * slot_def) {
+void SyntaxDotCode::dot_for_slot_def(QTextStream & out, const QString & lastNode, const QString & label, struct slot_def_struct * slot_def) {
     QString tmp;
     if (slot_def->initform != NULL) {
         tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:initform\"";
@@ -71,7 +65,7 @@ void DotCode::dot_for_slot_def(QTextStream & out, const QString & lastNode, cons
     out << lastNode << "->" << tmp << "[label=\"" << label << "\"];\n";
 }
 
-void DotCode::dot_for_slot_def_seq(QTextStream & out, const QString & lastNode, const QString & label, struct slot_def_seq_struct * slot_def_seq) {
+void SyntaxDotCode::dot_for_slot_def_seq(QTextStream & out, const QString & lastNode, const QString & label, struct slot_def_seq_struct * slot_def_seq) {
     QString tmp = "\"id" + QString::number(slot_def_seq->nodeId) + "\\nslot_def_seq\"";
     out << lastNode << "->" << tmp << "[label=\"" << label << "\"];\n";
     struct slot_def_struct * slot_def = slot_def_seq->first;
@@ -81,7 +75,7 @@ void DotCode::dot_for_slot_def_seq(QTextStream & out, const QString & lastNode, 
     }
 }
 
-void DotCode::dot_for_list(QTextStream & out, const QString & lastNode, const QString & label, struct list_struct * list) {
+void SyntaxDotCode::dot_for_list(QTextStream & out, const QString & lastNode, const QString & label, struct list_struct * list) {
     QString tmp;
     switch (list->type) {
     case LIST_TYPE_FCALL:

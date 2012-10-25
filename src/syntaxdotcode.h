@@ -5,10 +5,9 @@
 #include <QTextStream>
 #include "parser_structs.h"
 
-class DotCode
+class SyntaxDotCode
 {
 public:
-    static void exec_dot(const QString & dotBinFileName, const QString & dotFileName, const QString & pngFileName);
     static void dot_for_program(QTextStream & out, struct program_struct * program);
     static void dot_for_s_expr(QTextStream & out, const QString & lastNode, const QString & label, struct s_expr_struct * expr);
     static void dot_for_s_expr_seq(QTextStream & out, const QString & lastNode, const QString & label, struct s_expr_seq_struct * expr_list);

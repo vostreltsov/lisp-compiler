@@ -7,7 +7,7 @@
 
 struct program_struct * create_program(int nodeId, struct s_expr_seq_struct * s_expr_seq);
 
-struct s_expr_struct * create_s_expr(int nodeId, enum s_expr_type type, long int integer,
+struct s_expr_struct * create_s_expr(int nodeId, enum s_expr_type type, int integer,
                                                                         char character,
                                                                         char * string,
                                                                         int boolean,

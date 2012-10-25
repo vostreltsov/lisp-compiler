@@ -5,22 +5,29 @@
 #include <stdlib.h>
 #include "parser_structs.h"
 #include "parser_funcs.h"
-#include "dotcode.h"
+#include "syntaxdotcode.h"
+#include "attrnodes.h"
 
 extern int yyparse();
 extern FILE * yyin;
 extern struct program_struct * root;
 
-void run_dot(struct program_struct * program) {
+void exec_dot(const QString & dotBinFileName, const QString & dotFileName, const QString & pngFileName) {
+    QStringList args;
+    args << QString("-Tpng") << QString("-o") + pngFileName << dotFileName;
+    QProcess::execute(dotBinFileName, args);
+}
+
+void run_dot_on_syntax_node(struct program_struct * program) {
     char * dotFN = "tmp.dot";
     char * pngFN = "res.png";
 
     QFile dot(dotFN);
     if (dot.open(QFile::WriteOnly)) {
         QTextStream out(&dot);
-        DotCode::dot_for_program(out, program);
+        SyntaxDotCode::dot_for_program(out, program);
         dot.close();
-        DotCode::exec_dot("dot", dotFN, pngFN);
+        exec_dot("dot", dotFN, pngFN);
         char cmd[256];
         sprintf(cmd, "ristretto %s", pngFN);
         system(cmd);    // run image viewer automatically.
@@ -39,8 +46,10 @@ int main(int argc, char *argv[])
     } else {
         yyparse();
         fclose(yyin);
-        run_dot(root);
+        ProgramNode * program = ProgramNode::fromSyntaxNode(root);
+        run_dot_on_syntax_node(root);
         free_program(root);
+        delete program;
     }
     return /*a.exec()*/0;
 }

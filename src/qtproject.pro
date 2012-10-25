@@ -9,11 +9,13 @@ SOURCES += \
     parser.cpp \
     main.cpp \
     lexer.cpp \
-    dotcode.cpp \
-    parser_funcs.cpp
+    parser_funcs.cpp \
+    attrnodes.cpp \
+    syntaxdotcode.cpp
 
 HEADERS += \
     parser.hpp \
-    dotcode.h \
     parser_structs.h \
-    parser_funcs.h
+    parser_funcs.h \
+    attrnodes.h \
+    syntaxdotcode.h
