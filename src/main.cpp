@@ -5,10 +5,13 @@
 #include <stdlib.h>
 #include "parser_structs.h"
 #include "parser_funcs.h"
+#include "errors.h"
 #include "syntaxdotcode.h"
 #include "attrnodes.h"
+#include "semanticanalyzer.h"
 
 extern int yyparse();
+extern int errorCode;
 extern FILE * yyin;
 extern struct program_struct * root;
 
@@ -37,6 +40,9 @@ void run_dot_on_syntax_node(struct program_struct * program, QString fileName) {
 }
 
 void run_don_on_attr_node(ProgramNode * program, QString fileName) {
+    if (program == NULL) {
+        return;
+    }
     QString dotFN = "tmp.dot";
     QFile dot(dotFN);
     if (dot.open(QFile::WriteOnly)) {
@@ -62,12 +68,35 @@ int main(int argc, char *argv[])
         printf("error opening text.txt\n");
     } else {
         yyparse();
+        switch (errorCode) {
+        case ERROR_NO_ERROR: {
+            SemanticAnalyzer * sem = new SemanticAnalyzer(root);
+            run_don_on_attr_node(sem->getRoot(), "attr.res");
+            delete sem;
+            break;
+        }
+        case ERROR_LEXICAL_UNCLOSED_COMMENT: {
+            puts("lexical error: unclosed comment");
+            break;
+        }
+        case ERROR_LEXICAL_UNCLOSED_STRING: {
+            puts("lexical error: unclosed string constant");
+            break;
+        }
+        case ERROR_LEXICAL_UNEXPECTED_CHARACTER: {
+            puts("lexical error: unexpected character");
+            break;
+        }
+        case ERROR_SYNTAX: {
+            puts("syntax");
+            break;
+        }
+        default: {
+            break;
+        }
+        }
         fclose(yyin);
-        ProgramNode * program = ProgramNode::fromSyntaxNode(root);
-        //run_dot_on_syntax_node(root, "syntax.png");
-        run_don_on_attr_node(program, "attr.res");
         free_program(root);
-        delete program;
     }
     return /*a.exec()*/0;
 }

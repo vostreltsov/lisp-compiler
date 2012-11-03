@@ -39,7 +39,7 @@ void ProgramNode::doCheck(QLinkedList<QString> * errorList) const
     }
 }
 
-ProgramNode * ProgramNode::fromSyntaxNode(program_struct * syntaxNode)
+ProgramNode * ProgramNode::fromSyntaxNode(const program_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
         ProgramNode * result = new ProgramNode();
@@ -111,7 +111,7 @@ void SExpressionNode::doCheck(QLinkedList<QString> * errorList) const
     }
 }
 
-SExpressionNode * SExpressionNode::fromSyntaxNode(s_expr_struct * syntaxNode)
+SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
         SExpressionNode * result = new SExpressionNode();
@@ -167,7 +167,7 @@ void SlotDefinitionNode::doCheck(QLinkedList<QString> * errorList) const
     // TODO.
 }
 
-SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(slot_def_struct * syntaxNode)
+SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(const slot_def_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
         SlotDefinitionNode * result = new SlotDefinitionNode();
@@ -299,7 +299,7 @@ void ListNode::doCheck(QLinkedList<QString> * errorList) const
     // TODO
 }
 
-ListNode * ListNode::fromSyntaxNode(list_struct * syntaxNode)
+ListNode * ListNode::fromSyntaxNode(const list_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
         ListNode * result = new ListNode();

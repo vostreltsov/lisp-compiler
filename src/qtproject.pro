@@ -11,7 +11,9 @@ SOURCES += \
     lexer.cpp \
     parser_funcs.cpp \
     attrnodes.cpp \
-    syntaxdotcode.cpp
+    syntaxdotcode.cpp \
+    semanticanalyzer.cpp \
+    errors.cpp
 
 HEADERS += \
     parser.hpp \
@@ -19,4 +21,6 @@ HEADERS += \
     parser_funcs.h \
     attrnodes.h \
     syntaxdotcode.h \
-    nodetypes.h
+    nodetypes.h \
+    semanticanalyzer.h \
+    errors.h

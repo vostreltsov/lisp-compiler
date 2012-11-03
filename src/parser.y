@@ -3,8 +3,11 @@
 #include "parser.hpp"
 #include "parser_structs.h"
 #include "parser_funcs.h"
+#include "errors.h"
 
 extern int yylex(void);
+extern enum error_types errorCode;
+
 void yyerror(const char * str);
 
 struct program_struct * root = NULL;
@@ -116,5 +119,6 @@ list : '(' ')'                                              {$$ = create_list(++
 %%
 
 void yyerror(const char * str) {
+    errorCode = ERROR_SYNTAX;
     printf("error: %s\n", str);
 }

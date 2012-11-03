@@ -58,7 +58,7 @@ public:
     /**
      * @brief Creates an instance of ProgramNode from a program_struct node.
      */
-    static ProgramNode * fromSyntaxNode(program_struct * syntaxNode);
+    static ProgramNode * fromSyntaxNode(const program_struct * syntaxNode);
 };
 
 class SExpressionNode : public AttributedNode
@@ -79,7 +79,7 @@ public:
     /**
      * @brief Creates an instance of SExpressionNode from a s_expr_struct node.
      */
-    static SExpressionNode * fromSyntaxNode(s_expr_struct * syntaxNode);
+    static SExpressionNode * fromSyntaxNode(const s_expr_struct * syntaxNode);
 };
 
 class SlotDefinitionNode : public AttributedNode
@@ -97,7 +97,7 @@ public:
     /**
      * @brief Creates an instance of SlotDefinitionNode from a slot_def_struct node.
      */
-    static SlotDefinitionNode * fromSyntaxNode(slot_def_struct * syntaxNode);
+    static SlotDefinitionNode * fromSyntaxNode(const slot_def_struct * syntaxNode);
 };
 
 class ListNode : public AttributedNode
@@ -122,7 +122,7 @@ public:
     /**
      * @brief Creates an instance of ListNode from a list_struct node.
      */
-    static ListNode * fromSyntaxNode(list_struct * syntaxNode);
+    static ListNode * fromSyntaxNode(const list_struct * syntaxNode);
 };
 
 #endif // ATTRNODES_H

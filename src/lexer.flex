@@ -3,6 +3,9 @@
 #include <string.h>
 #include <ctype.h>
 #include "parser.hpp"
+#include "errors.h"
+
+extern enum error_types errorCode;
 
 int my_powah(int base, int n)
 {
@@ -374,7 +377,8 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     return ID;
 }
 . {
-    printf("UNEXPECTED CHARACTER:      %s\n", yytext);
+    errorCode = ERROR_LEXICAL_UNEXPECTED_CHARACTER;
+    yyterminate();
 }
 <COMMENT_ML_ST>"|" {
     // Multiline comment body: any character.
@@ -390,7 +394,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     BEGIN(INITIAL);
 }
 <COMMENT_ML_ST><<EOF>> {
-    puts("ERROR: UNCLOSED COMMENT");
+    errorCode = ERROR_LEXICAL_UNCLOSED_COMMENT;
     yyterminate();
 }
 <STRING_ST>"\\\"" {
@@ -420,7 +424,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     return STRING;
 }
 <STRING_ST><<EOF>> {
-    puts("ERROR: UNCLOSED STRING CONSTANT");
+    errorCode = ERROR_LEXICAL_UNCLOSED_STRING;
     yyterminate();
 }
 
