@@ -18,4 +18,5 @@ HEADERS += \
     parser_structs.h \
     parser_funcs.h \
     attrnodes.h \
-    syntaxdotcode.h
+    syntaxdotcode.h \
+    nodetypes.h

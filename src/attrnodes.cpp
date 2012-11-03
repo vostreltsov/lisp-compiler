@@ -128,9 +128,9 @@ QString SlotDefinitionNode::dotCode(QString parent, QString label) const
         tmp += "writer " + fId + "\"";
     } else if (fSubType == SLOT_DEF_ACCESSOR) {
         tmp += "accessor " + fId + "\"";
-    } else if (fSubType == SLOT_DEF_ALLOCATION && fAllocType == SLOT_ALLOC_TYPE_INSTANCE) {
+    } else if (fSubType == SLOT_DEF_ALLOCATION && fAllocType == SLOT_ALLOC_INSTANCE) {
         tmp += "alloc instance\"";
-    } else if (fSubType == SLOT_DEF_ALLOCATION && fAllocType == SLOT_ALLOC_TYPE_CLASS) {
+    } else if (fSubType == SLOT_DEF_ALLOCATION && fAllocType == SLOT_ALLOC_CLASS) {
         tmp += "alloc class\"";
     }
     return parent + "->" + tmp + "[label=\"" + label + "\"];\n";

@@ -57,9 +57,9 @@ void SyntaxDotCode::dot_for_slot_def(QTextStream & out, const QString & lastNode
         tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:writer " + slot_def->id + "\"";
     } else if (slot_def->type == SLOT_DEF_ACCESSOR) {
         tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:accessor " + slot_def->id + "\"";
-    } else if (slot_def->type == SLOT_DEF_ALLOCATION && slot_def->alloc == SLOT_ALLOC_TYPE_INSTANCE) {
+    } else if (slot_def->type == SLOT_DEF_ALLOCATION && slot_def->alloc == SLOT_ALLOC_INSTANCE) {
         tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:alloc instance\"";
-    } else if (slot_def->type == SLOT_DEF_ALLOCATION && slot_def->alloc == SLOT_ALLOC_TYPE_CLASS) {
+    } else if (slot_def->type == SLOT_DEF_ALLOCATION && slot_def->alloc == SLOT_ALLOC_CLASS) {
         tmp = "\"id" + QString::number(slot_def->nodeId) + "\\n:alloc class\"";
     }
     out << lastNode << "->" << tmp << "[label=\"" << label << "\"];\n";

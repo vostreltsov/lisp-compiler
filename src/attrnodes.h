@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QLinkedList>
+#include "nodetypes.h"
 #include "parser_structs.h"
 
 class AttributedNode;

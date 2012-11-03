@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 2.6.2.  */
+/* A Bison parser, made by GNU Bison 2.6.4.  */
 
 /* Bison interface for Yacc-like parsers in C
    
@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_PARSER_HPP
-# define YY_PARSER_HPP
+#ifndef YY_YY_PARSER_HPP_INCLUDED
+# define YY_YY_PARSER_HPP_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -81,7 +81,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-/* Line 2049 of yacc.c  */
+/* Line 2077 of yacc.c  */
 #line 15 "parser.y"
 
     int                          semantic_int;
@@ -97,7 +97,7 @@ typedef union YYSTYPE
     struct list_struct         * semantic_list;
 
 
-/* Line 2049 of yacc.c  */
+/* Line 2077 of yacc.c  */
 #line 102 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
@@ -121,4 +121,4 @@ int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_PARSER_HPP  */
+#endif /* !YY_YY_PARSER_HPP_INCLUDED  */

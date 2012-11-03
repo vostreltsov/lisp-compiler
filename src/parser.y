@@ -87,12 +87,12 @@ s_expr_seq : s_expr                     {$$ = create_s_expr_seq(++idCounter, $1)
            | s_expr_seq s_expr          {$$ = add_to_s_expr_seq($1, $2);}
            ;
 
-slot_def : INITFORM s_expr              {$$ = create_slot_def(++idCounter,  SLOT_DEF_INITFORM,   $2,    NULL,  SLOT_ALLOC_TYPE_INSTANCE);}
-         | READER ID                    {$$ = create_slot_def(++idCounter,  SLOT_DEF_READER,     NULL,  $2,    SLOT_ALLOC_TYPE_INSTANCE);}
-         | WRITER ID                    {$$ = create_slot_def(++idCounter,  SLOT_DEF_WRITER,     NULL,  $2,    SLOT_ALLOC_TYPE_INSTANCE);}
-         | ACCESSOR ID                  {$$ = create_slot_def(++idCounter,  SLOT_DEF_ACCESSOR,   NULL,  $2,    SLOT_ALLOC_TYPE_INSTANCE);}
-         | ALLOCATION ALLOCINSTANCE     {$$ = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_TYPE_INSTANCE);}
-         | ALLOCATION ALLOCCLASS        {$$ = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_TYPE_CLASS);}
+slot_def : INITFORM s_expr              {$$ = create_slot_def(++idCounter,  SLOT_DEF_INITFORM,   $2,    NULL,  SLOT_ALLOC_INSTANCE);}
+         | READER ID                    {$$ = create_slot_def(++idCounter,  SLOT_DEF_READER,     NULL,  $2,    SLOT_ALLOC_INSTANCE);}
+         | WRITER ID                    {$$ = create_slot_def(++idCounter,  SLOT_DEF_WRITER,     NULL,  $2,    SLOT_ALLOC_INSTANCE);}
+         | ACCESSOR ID                  {$$ = create_slot_def(++idCounter,  SLOT_DEF_ACCESSOR,   NULL,  $2,    SLOT_ALLOC_INSTANCE);}
+         | ALLOCATION ALLOCINSTANCE     {$$ = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_INSTANCE);}
+         | ALLOCATION ALLOCCLASS        {$$ = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_CLASS);}
          ;
 
 slot_def_seq : slot_def                 {$$ = create_slot_def_seq(++idCounter, $1);}

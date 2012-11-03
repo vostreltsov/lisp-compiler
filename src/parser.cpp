@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 2.6.2.  */
+/* A Bison parser, made by GNU Bison 2.6.4.  */
 
 /* Bison implementation for Yacc-like parsers in C
    
@@ -44,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.6.2"
+#define YYBISON_VERSION "2.6.4"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -62,7 +62,7 @@
 
 
 /* Copy the first part of user declarations.  */
-/* Line 336 of yacc.c  */
+/* Line 358 of yacc.c  */
 #line 1 "parser.y"
 
 #include <stdio.h>
@@ -77,7 +77,7 @@ struct program_struct * root = NULL;
 int idCounter = 0;
 
 
-/* Line 336 of yacc.c  */
+/* Line 358 of yacc.c  */
 #line 82 "parser.cpp"
 
 # ifndef YY_NULL
@@ -98,8 +98,8 @@ int idCounter = 0;
 
 /* In a future release of Bison, this section will be replaced
    by #include "parser.hpp".  */
-#ifndef YY_PARSER_HPP
-# define YY_PARSER_HPP
+#ifndef YY_YY_PARSER_HPP_INCLUDED
+# define YY_YY_PARSER_HPP_INCLUDED
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -149,7 +149,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-/* Line 350 of yacc.c  */
+/* Line 374 of yacc.c  */
 #line 15 "parser.y"
 
     int                          semantic_int;
@@ -165,7 +165,7 @@ typedef union YYSTYPE
     struct list_struct         * semantic_list;
 
 
-/* Line 350 of yacc.c  */
+/* Line 374 of yacc.c  */
 #line 170 "parser.cpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
@@ -189,11 +189,11 @@ int yyparse ();
 #endif
 #endif /* ! YYPARSE_PARAM */
 
-#endif /* !YY_PARSER_HPP  */
+#endif /* !YY_YY_PARSER_HPP_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-/* Line 353 of yacc.c  */
+/* Line 377 of yacc.c  */
 #line 198 "parser.cpp"
 
 #ifdef short
@@ -247,24 +247,24 @@ typedef short int yytype_int16;
 # if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
-#   define YY_(msgid) dgettext ("bison-runtime", msgid)
+#   define YY_(Msgid) dgettext ("bison-runtime", Msgid)
 #  endif
 # endif
 # ifndef YY_
-#  define YY_(msgid) msgid
+#  define YY_(Msgid) Msgid
 # endif
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(e) ((void) (e))
+# define YYUSE(E) ((void) (E))
 #else
-# define YYUSE(e) /* empty */
+# define YYUSE(E) /* empty */
 #endif
 
 /* Identity function, used to suppress warnings about constant conditions.  */
 #ifndef lint
-# define YYID(n) (n)
+# define YYID(N) (N)
 #else
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
@@ -616,10 +616,10 @@ static const yytype_uint8 yytable[] =
        0,     0,     0,     0,    17
 };
 
-#define yypact_value_is_default(yystate) \
-  ((yystate) == (-21))
+#define yypact_value_is_default(Yystate) \
+  (!!((Yystate) == (-21)))
 
-#define yytable_value_is_error(yytable_value) \
+#define yytable_value_is_error(Yytable_value) \
   YYID (0)
 
 static const yytype_int8 yycheck[] =
@@ -1205,6 +1205,15 @@ yydestruct (yymsg, yytype, yyvaluep)
 /* The lookahead symbol.  */
 int yychar;
 
+
+#ifndef YYLVAL_INITIALIZE
+# define YYLVAL_INITIALIZE()
+#endif
+#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+# define YY_IGNORE_MAYBE_UNINITIALIZED_END
+#endif
+
 /* The semantic value of the lookahead symbol.  */
 YYSTYPE yylval;
 
@@ -1264,7 +1273,7 @@ yyparse ()
   int yyn;
   int yyresult;
   /* Lookahead token as an internal (translated) token number.  */
-  int yytoken;
+  int yytoken = 0;
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
@@ -1282,7 +1291,6 @@ yyparse ()
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
 
-  yytoken = 0;
   yyss = yyssa;
   yyvs = yyvsa;
   yystacksize = YYINITDEPTH;
@@ -1300,6 +1308,8 @@ yyparse ()
      The wasted elements are never initialized.  */
   yyssp = yyss;
   yyvsp = yyvs;
+
+  YYLVAL_INITIALIZE ();
   goto yysetstate;
 
 /*------------------------------------------------------------.
@@ -1440,7 +1450,9 @@ yybackup:
   yychar = YYEMPTY;
 
   yystate = yyn;
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
   goto yynewstate;
 
@@ -1477,182 +1489,182 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 75 "parser.y"
     {root = (yyval.semantic_program) = create_program(++idCounter, (yyvsp[(1) - (1)].semantic_s_expr_seq));}
     break;
 
   case 3:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 78 "parser.y"
     {(yyval.semantic_s_expr) = create_s_expr(++idCounter,  S_EXPR_TYPE_INT,     (yyvsp[(1) - (1)].semantic_int),  (char)0,  NULL,  0,   NULL,  NULL);}
     break;
 
   case 4:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 79 "parser.y"
     {(yyval.semantic_s_expr) = create_s_expr(++idCounter,  S_EXPR_TYPE_CHAR,    0,   (yyvsp[(1) - (1)].semantic_char),       NULL,  0,   NULL,  NULL);}
     break;
 
   case 5:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 80 "parser.y"
     {(yyval.semantic_s_expr) = create_s_expr(++idCounter,  S_EXPR_TYPE_STRING,  0,   (char)0,  (yyvsp[(1) - (1)].semantic_string),    0,   NULL,  NULL);}
     break;
 
   case 6:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 81 "parser.y"
     {(yyval.semantic_s_expr) = create_s_expr(++idCounter,  S_EXPR_TYPE_BOOL,    0,   (char)0,  NULL,  (yyvsp[(1) - (1)].semantic_bool),  NULL,  NULL);}
     break;
 
   case 7:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 82 "parser.y"
     {(yyval.semantic_s_expr) = create_s_expr(++idCounter,  S_EXPR_TYPE_ID,      0,   (char)0,  NULL,  0,   (yyvsp[(1) - (1)].semantic_id),    NULL);}
     break;
 
   case 8:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 83 "parser.y"
     {(yyval.semantic_s_expr) = create_s_expr(++idCounter,  S_EXPR_TYPE_LIST,    0,   (char)0,  NULL,  0,   NULL,  (yyvsp[(1) - (1)].semantic_list));}
     break;
 
   case 9:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 86 "parser.y"
     {(yyval.semantic_s_expr_seq) = create_s_expr_seq(++idCounter, (yyvsp[(1) - (1)].semantic_s_expr));}
     break;
 
   case 10:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 87 "parser.y"
     {(yyval.semantic_s_expr_seq) = add_to_s_expr_seq((yyvsp[(1) - (2)].semantic_s_expr_seq), (yyvsp[(2) - (2)].semantic_s_expr));}
     break;
 
   case 11:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 90 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_INITFORM,   (yyvsp[(2) - (2)].semantic_s_expr),    NULL,  SLOT_ALLOC_TYPE_INSTANCE);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_INITFORM,   (yyvsp[(2) - (2)].semantic_s_expr),    NULL,  SLOT_ALLOC_INSTANCE);}
     break;
 
   case 12:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 91 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_READER,     NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_TYPE_INSTANCE);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_READER,     NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_INSTANCE);}
     break;
 
   case 13:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 92 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_WRITER,     NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_TYPE_INSTANCE);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_WRITER,     NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_INSTANCE);}
     break;
 
   case 14:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 93 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ACCESSOR,   NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_TYPE_INSTANCE);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ACCESSOR,   NULL,  (yyvsp[(2) - (2)].semantic_id),    SLOT_ALLOC_INSTANCE);}
     break;
 
   case 15:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 94 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_TYPE_INSTANCE);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_INSTANCE);}
     break;
 
   case 16:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 95 "parser.y"
-    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_TYPE_CLASS);}
+    {(yyval.semantic_slot_def) = create_slot_def(++idCounter,  SLOT_DEF_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_CLASS);}
     break;
 
   case 17:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 98 "parser.y"
     {(yyval.semantic_slot_def_seq) = create_slot_def_seq(++idCounter, (yyvsp[(1) - (1)].semantic_slot_def));}
     break;
 
   case 18:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 99 "parser.y"
     {(yyval.semantic_slot_def_seq) = add_to_slot_def_seq((yyvsp[(1) - (2)].semantic_slot_def_seq), (yyvsp[(2) - (2)].semantic_slot_def));}
     break;
 
   case 19:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 102 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_EMPTY,         NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL);}
     break;
 
   case 20:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 103 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_FCALL,         (yyvsp[(2) - (4)].semantic_id),    (yyvsp[(3) - (4)].semantic_s_expr_seq),    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL);}
     break;
 
   case 21:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 104 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_LOOP_IN,       (yyvsp[(4) - (9)].semantic_id),    NULL,  NULL,  (yyvsp[(6) - (9)].semantic_s_expr),    NULL,  NULL,  (yyvsp[(8) - (9)].semantic_s_expr),    NULL,  NULL,  NULL);}
     break;
 
   case 22:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 105 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_LOOP_FROM_TO,  (yyvsp[(4) - (11)].semantic_id),    NULL,  NULL,  NULL,  (yyvsp[(6) - (11)].semantic_s_expr),    (yyvsp[(8) - (11)].semantic_s_expr),    (yyvsp[(10) - (11)].semantic_s_expr),   NULL,  NULL,  NULL);}
     break;
 
   case 23:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 106 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_PROGN,         NULL,  (yyvsp[(3) - (4)].semantic_s_expr_seq),    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL);}
     break;
 
   case 24:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 107 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_IF,            NULL,  NULL,  (yyvsp[(3) - (5)].semantic_s_expr),    NULL,  NULL,  NULL,  (yyvsp[(4) - (5)].semantic_s_expr),    NULL,  NULL,  NULL);}
     break;
 
   case 25:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 108 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_IF,            NULL,  NULL,  (yyvsp[(3) - (6)].semantic_s_expr),    NULL,  NULL,  NULL,  (yyvsp[(4) - (6)].semantic_s_expr),    (yyvsp[(5) - (6)].semantic_s_expr),    NULL,  NULL);}
     break;
 
   case 26:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 109 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_SLOTDEF,       (yyvsp[(2) - (4)].semantic_id),    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  (yyvsp[(3) - (4)].semantic_slot_def_seq),    NULL);}
     break;
 
   case 27:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 110 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFUN,         (yyvsp[(3) - (7)].semantic_id),    NULL,  NULL,  NULL,  NULL,  NULL,  (yyvsp[(6) - (7)].semantic_s_expr),    NULL,  NULL,  NULL);}
     break;
 
   case 28:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 111 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFUN,         (yyvsp[(3) - (8)].semantic_id),    (yyvsp[(5) - (8)].semantic_s_expr_seq),    NULL,  NULL,  NULL,  NULL,  (yyvsp[(7) - (8)].semantic_s_expr),    NULL,  NULL,  NULL);}
     break;
 
   case 29:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 112 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFCLASS,      (yyvsp[(3) - (9)].semantic_id),    (yyvsp[(7) - (9)].semantic_s_expr_seq),    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL);}
     break;
 
   case 30:
-/* Line 1787 of yacc.c  */
+/* Line 1813 of yacc.c  */
 #line 113 "parser.y"
     {(yyval.semantic_list) = create_list(++idCounter, LIST_TYPE_DEFCLASS,      (yyvsp[(3) - (10)].semantic_id),    (yyvsp[(8) - (10)].semantic_s_expr_seq),    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  (yyvsp[(5) - (10)].semantic_id));}
     break;
 
 
-/* Line 1787 of yacc.c  */
-#line 1656 "parser.cpp"
+/* Line 1813 of yacc.c  */
+#line 1668 "parser.cpp"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1815,7 +1827,9 @@ yyerrlab1:
       YY_STACK_PRINT (yyss, yyssp);
     }
 
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
 
   /* Shift the error token.  */
@@ -1881,7 +1895,7 @@ yyreturn:
 }
 
 
-/* Line 2048 of yacc.c  */
+/* Line 2076 of yacc.c  */
 #line 116 "parser.y"
 
 
