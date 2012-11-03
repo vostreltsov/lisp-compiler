@@ -22,9 +22,8 @@ enum AttributedTypes
 class AttributedNode
 {
 public:
-    int                  fNodeId;         // Id of the node.
-    AttributedTypes      fType;           // Type of the node.
-    QLinkedList<QString> fErrorMessages;  // Errors found in this node.
+    int             fNodeId; // Id of the node.
+    AttributedTypes fType;   // Type of the node.
 
     /**
      * @brief Default constructor.
@@ -40,6 +39,11 @@ public:
      * @brief Generates dot code for this node.
      */
     virtual QString dotCode(QString parent, QString label) const = 0;
+
+    /**
+     * @brief Checks the semantics of the node.
+     */
+    virtual void doCheck(QLinkedList<QString> * errorList) const = 0;
 };
 
 class ProgramNode : public AttributedNode
@@ -49,6 +53,11 @@ public:
     ProgramNode();
     ~ProgramNode();
     QString dotCode(QString parent, QString label) const;
+    void doCheck(QLinkedList<QString> * errorList) const;
+
+    /**
+     * @brief Creates an instance of ProgramNode from a program_struct node.
+     */
     static ProgramNode * fromSyntaxNode(program_struct * syntaxNode);
 };
 
@@ -65,6 +74,11 @@ public:
     SExpressionNode();
     ~SExpressionNode();
     QString dotCode(QString parent, QString label) const;
+    void doCheck(QLinkedList<QString> * errorList) const;
+
+    /**
+     * @brief Creates an instance of SExpressionNode from a s_expr_struct node.
+     */
     static SExpressionNode * fromSyntaxNode(s_expr_struct * syntaxNode);
 };
 
@@ -78,6 +92,11 @@ public:
     SlotDefinitionNode();
     ~SlotDefinitionNode();
     QString dotCode(QString parent, QString label) const;
+    void doCheck(QLinkedList<QString> * errorList) const;
+
+    /**
+     * @brief Creates an instance of SlotDefinitionNode from a slot_def_struct node.
+     */
     static SlotDefinitionNode * fromSyntaxNode(slot_def_struct * syntaxNode);
 };
 
@@ -98,6 +117,11 @@ public:
     ListNode();
     ~ListNode();
     QString dotCode(QString parent, QString label) const;
+    void doCheck(QLinkedList<QString> * errorList) const;
+
+    /**
+     * @brief Creates an instance of ListNode from a list_struct node.
+     */
     static ListNode * fromSyntaxNode(list_struct * syntaxNode);
 };
 

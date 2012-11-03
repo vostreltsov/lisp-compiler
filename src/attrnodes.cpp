@@ -31,6 +31,14 @@ QString ProgramNode::dotCode(QString parent, QString label) const
     return result;
 }
 
+void ProgramNode::doCheck(QLinkedList<QString> * errorList) const
+{
+    // Just check every single operand.
+    foreach (SExpressionNode * node, fExpressions) {
+        node->doCheck(errorList);
+    }
+}
+
 ProgramNode * ProgramNode::fromSyntaxNode(program_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
@@ -85,6 +93,24 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
     }
 }
 
+void SExpressionNode::doCheck(QLinkedList<QString> * errorList) const
+{
+    switch (fSubType) {
+    case S_EXPR_TYPE_INT:
+    case S_EXPR_TYPE_CHAR:
+    case S_EXPR_TYPE_STRING:
+    case S_EXPR_TYPE_BOOL:
+    case S_EXPR_TYPE_ID:
+        break;
+    case S_EXPR_TYPE_LIST:
+        fList->doCheck(errorList);
+        break;
+    default:
+        errorList->append("Unknown s-expression subtype: " + QString::number(fSubType));
+        break;
+    }
+}
+
 SExpressionNode * SExpressionNode::fromSyntaxNode(s_expr_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
@@ -134,6 +160,11 @@ QString SlotDefinitionNode::dotCode(QString parent, QString label) const
         tmp += "alloc class\"";
     }
     return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+}
+
+void SlotDefinitionNode::doCheck(QLinkedList<QString> * errorList) const
+{
+    // TODO.
 }
 
 SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(slot_def_struct * syntaxNode)
@@ -261,6 +292,11 @@ QString ListNode::dotCode(QString parent, QString label) const
     default:
         break;
     }
+}
+
+void ListNode::doCheck(QLinkedList<QString> * errorList) const
+{
+    // TODO
 }
 
 ListNode * ListNode::fromSyntaxNode(list_struct * syntaxNode)
