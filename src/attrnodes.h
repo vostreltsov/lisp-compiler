@@ -6,6 +6,9 @@
 #include "nodetypes.h"
 #include "parser_structs.h"
 
+#define FUNC_NAME_SETF "setf"
+#define FUNC_NAME_ELT "elt"
+
 class AttributedNode;
 class ProgramNode;
 class SExpressionNode;
@@ -43,7 +46,12 @@ public:
     /**
      * @brief Checks the semantics of the node.
      */
-    virtual void doCheck(QLinkedList<QString> * errorList) const = 0;
+    virtual void check(QLinkedList<QString> * errorList) const = 0;
+
+    /**
+     * @brief Transforms the subtree of this node.
+     */
+    virtual void transform() = 0;
 };
 
 class ProgramNode : public AttributedNode
@@ -53,7 +61,8 @@ public:
     ProgramNode();
     ~ProgramNode();
     QString dotCode(QString parent, QString label) const;
-    void doCheck(QLinkedList<QString> * errorList) const;
+    void check(QLinkedList<QString> * errorList) const;
+    void transform();
 
     /**
      * @brief Creates an instance of ProgramNode from a program_struct node.
@@ -74,7 +83,8 @@ public:
     SExpressionNode();
     ~SExpressionNode();
     QString dotCode(QString parent, QString label) const;
-    void doCheck(QLinkedList<QString> * errorList) const;
+    void check(QLinkedList<QString> * errorList) const;
+    void transform();
 
     /**
      * @brief Creates an instance of SExpressionNode from a s_expr_struct node.
@@ -92,7 +102,8 @@ public:
     SlotDefinitionNode();
     ~SlotDefinitionNode();
     QString dotCode(QString parent, QString label) const;
-    void doCheck(QLinkedList<QString> * errorList) const;
+    void check(QLinkedList<QString> * errorList) const;
+    void transform();
 
     /**
      * @brief Creates an instance of SlotDefinitionNode from a slot_def_struct node.
@@ -117,7 +128,8 @@ public:
     ListNode();
     ~ListNode();
     QString dotCode(QString parent, QString label) const;
-    void doCheck(QLinkedList<QString> * errorList) const;
+    void check(QLinkedList<QString> * errorList) const;
+    void transform();
 
     /**
      * @brief Creates an instance of ListNode from a list_struct node.

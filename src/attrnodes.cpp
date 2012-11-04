@@ -31,11 +31,19 @@ QString ProgramNode::dotCode(QString parent, QString label) const
     return result;
 }
 
-void ProgramNode::doCheck(QLinkedList<QString> * errorList) const
+void ProgramNode::check(QLinkedList<QString> * errorList) const
 {
-    // Just check every single operand.
+    // Check every single operand.
     foreach (SExpressionNode * node, fExpressions) {
-        node->doCheck(errorList);
+        node->check(errorList);
+    }
+}
+
+void ProgramNode::transform()
+{
+    // Transform every single operand.
+    foreach (SExpressionNode * node, fExpressions) {
+        node->transform();
     }
 }
 
@@ -93,7 +101,7 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
     }
 }
 
-void SExpressionNode::doCheck(QLinkedList<QString> * errorList) const
+void SExpressionNode::check(QLinkedList<QString> * errorList) const
 {
     switch (fSubType) {
     case S_EXPR_TYPE_INT:
@@ -103,11 +111,18 @@ void SExpressionNode::doCheck(QLinkedList<QString> * errorList) const
     case S_EXPR_TYPE_ID:
         break;
     case S_EXPR_TYPE_LIST:
-        fList->doCheck(errorList);
+        fList->check(errorList);
         break;
     default:
         errorList->append("Unknown s-expression subtype: " + QString::number(fSubType));
         break;
+    }
+}
+
+void SExpressionNode::transform()
+{
+    if (fList != NULL) {
+        fList->transform();
     }
 }
 
@@ -162,9 +177,14 @@ QString SlotDefinitionNode::dotCode(QString parent, QString label) const
     return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
 }
 
-void SlotDefinitionNode::doCheck(QLinkedList<QString> * errorList) const
+void SlotDefinitionNode::check(QLinkedList<QString> * errorList) const
 {
     // TODO.
+}
+
+void SlotDefinitionNode::transform()
+{
+
 }
 
 SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(const slot_def_struct * syntaxNode)
@@ -189,6 +209,9 @@ ListNode::ListNode() : AttributedNode()
 
 ListNode::~ListNode()
 {
+    foreach (SExpressionNode * op, fOperands) {
+        delete op;
+    }
     if (fCondition != NULL) {
         delete fCondition;
     }
@@ -289,14 +312,101 @@ QString ListNode::dotCode(QString parent, QString label) const
         }
         return result;
     }
-    default:
+    case LIST_TYPE_ASSIGN_ELT: {
+        tmp += "[]= \"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        int cnt = 0;
+        foreach (SExpressionNode * op, fOperands) {
+            result += op->dotCode(tmp, "operand " + QString::number(cnt++));
+        }
+        return result;
+    }
+    default: {
         break;
+    }
     }
 }
 
-void ListNode::doCheck(QLinkedList<QString> * errorList) const
+void ListNode::check(QLinkedList<QString> * errorList) const
 {
     // TODO
+}
+
+void ListNode::transform()
+{
+    // First, transform the subtree.
+    foreach (SExpressionNode * op, fOperands) {
+        op->transform();
+    }
+    if (fCondition != NULL) {
+        fCondition->transform();
+    }
+    if (fContainer != NULL) {
+        fContainer->transform();
+    }
+    if (fFrom != NULL) {
+        fFrom->transform();
+    }
+    if (fTo != NULL) {
+        fTo->transform();
+    }
+    if (fBody1 != NULL) {
+        fBody1->transform();
+    }
+    if (fBody2 != NULL) {
+        fBody2->transform();
+    }
+    foreach (SlotDefinitionNode * slotdef, fSlotDefs) {
+        slotdef->transform();
+    }
+
+    // Now transform this node.
+    switch (fSubType) {
+    case LIST_TYPE_FCALL: {
+        SExpressionNode * op1 = fOperands.first();
+        if (fId == FUNC_NAME_SETF) {
+            // Convert to ternary operator.
+            if (op1->fSubType == S_EXPR_TYPE_LIST && op1->fList->fSubType == LIST_TYPE_FCALL && op1->fList->fId == FUNC_NAME_ELT) {
+                fSubType = LIST_TYPE_ASSIGN_ELT;
+                // Remove the first element and concatenate the rest to the ELT's operands list.
+                fOperands.removeFirst();
+                op1->fList->fOperands << fOperands;
+                fOperands = op1->fList->fOperands;
+                // Clear the ELT's operands list and delete it.
+                op1->fList->fOperands.clear();
+                delete op1;
+            }
+        }
+        break;
+    }
+    case LIST_TYPE_LOOP_IN: {
+        break;
+    }
+    case LIST_TYPE_LOOP_FROM_TO: {
+        break;
+    }
+    case LIST_TYPE_PROGN: {
+        break;
+    }
+    case LIST_TYPE_IF: {
+        break;
+    }
+    case LIST_TYPE_SLOTDEF: {
+        break;
+    }
+    case LIST_TYPE_DEFUN: {
+        break;
+    }
+    case LIST_TYPE_DEFCLASS: {
+        break;
+    }
+    case LIST_TYPE_ASSIGN_ELT: {
+        break;
+    }
+    default: {
+        break;
+    }
+    }
 }
 
 ListNode * ListNode::fromSyntaxNode(const list_struct * syntaxNode)

@@ -26,8 +26,12 @@ public:
     SemanticAnalyzer(const program_struct * root);
     ~SemanticAnalyzer();
     ProgramNode * getRoot() const;
+    QLinkedList<QString> getErrors() const;
+    bool doCheck();
+    void doTransform();
 private:
     ProgramNode * program;
+    QLinkedList<QString> errors;
 };
 
 #endif // SEMANTICANALYZER_H

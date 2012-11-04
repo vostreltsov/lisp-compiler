@@ -71,6 +71,15 @@ int main(int argc, char *argv[])
         switch (errorCode) {
         case ERROR_NO_ERROR: {
             SemanticAnalyzer * sem = new SemanticAnalyzer(root);
+            if (sem->doCheck()) {
+                // Semantic check passed, transform the tree.
+                sem->doTransform();
+            } else {
+                // Display semantic errors.
+                foreach (QString str, sem->getErrors()) {
+                    QTextStream(stdout) << str << "\n";
+                }
+            }
             run_don_on_attr_node(sem->getRoot(), "attr.res");
             delete sem;
             break;
