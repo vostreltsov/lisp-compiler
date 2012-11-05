@@ -6,8 +6,10 @@
 #include "nodetypes.h"
 #include "parser_structs.h"
 
-#define FUNC_NAME_SETF "setf"
-#define FUNC_NAME_ELT "elt"
+#define FUNC_NAME_SETF    "setf"
+#define FUNC_NAME_VECTOR  "vector"
+#define FUNC_NAME_ELT     "elt"
+#define FUNC_NAME_LIST    "list"
 
 class AttributedNode;
 class ProgramNode;

@@ -63,9 +63,9 @@ void run_don_on_attr_node(ProgramNode * program, QString fileName) {
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    yyin = fopen("../misc/text.txt", "r");
+    yyin = fopen("../misc/example.cl", "r");
     if (yyin == 0) {
-        printf("error opening text.txt\n");
+        printf("error opening example.cl\n");
     } else {
         yyparse();
         switch (errorCode) {

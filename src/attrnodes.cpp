@@ -283,14 +283,14 @@ QString ListNode::dotCode(QString parent, QString label) const
         return result;
     }
     case LIST_TYPE_LOOP_IN: {
-        tmp += "call " + fId + "\"";
+        tmp += "loop (in) " + fId + "\"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         result += fContainer->dotCode(tmp, "container");
         result += fBody1->dotCode(tmp, "body");
         return result;
     }
     case LIST_TYPE_LOOP_FROM_TO: {
-        tmp += "call " + fId + "\"";
+        tmp += "loop (from to) " + fId + "\"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         result += fFrom->dotCode(tmp, "from");
         result += fTo->dotCode(tmp, "to");
@@ -402,31 +402,54 @@ void ListNode::check(QLinkedList<QString> * errorList) const
         break;
     }
     case LIST_TYPE_LOOP_IN: {
-        // TODO: check container
+        bool result = (fContainer->fSubType == S_EXPR_TYPE_ID) ||
+                      (fContainer->fSubType == S_EXPR_TYPE_LIST && (fContainer->fList->fId == FUNC_NAME_VECTOR || fContainer->fList->fId == FUNC_NAME_LIST));
+        if (!result) {
+            errorList->append("Wrong container specified for the loop.");
+        }
         break;
     }
     case LIST_TYPE_LOOP_FROM_TO: {
+        // Check if conditions are calculable.
         if (!fFrom->isCalculable() || !fTo->isCalculable()) {
             errorList->append("Only calculable expressions can be used as loop conditions.");
         }
         break;
     }
     case LIST_TYPE_PROGN: {
+        // Checked before this switch-case.
         break;
     }
     case LIST_TYPE_IF: {
+        // Check if the condition is calculable.
+        if (!fCondition->isCalculable()) {
+            errorList->append("Only calculable expressions can be used as conditions.");
+        }
         break;
     }
     case LIST_TYPE_SLOTDEF: {
+        // Checked before this switch-case.
         break;
     }
     case LIST_TYPE_DEFUN: {
+        // Function parameters are identifiers.
+        foreach (SExpressionNode * op, fOperands) {
+            if (op->fSubType != S_EXPR_TYPE_ID) {
+                errorList->append("Invalid function parameter name.");
+            }
+        }
+
         break;
     }
     case LIST_TYPE_DEFCLASS: {
+        // Checked before this switch-case.
         break;
     }
     case LIST_TYPE_ASSIGN_ELT: {
+        // Check if the assigned expression is calculable.
+        if (!fOperands.last()->isCalculable()) {
+            errorList->append("Only calculable expressions can be assigned.");
+        }
         break;
     }
     default: {
