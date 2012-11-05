@@ -49,6 +49,11 @@ public:
     virtual void check(QLinkedList<QString> * errorList) const = 0;
 
     /**
+     * @brief Checks if this s-expression is calculable, e.g. can be used as a condition, initform etc.
+     */
+    virtual bool isCalculable() const = 0;
+
+    /**
      * @brief Transforms the subtree of this node.
      */
     virtual void transform() = 0;
@@ -62,6 +67,7 @@ public:
     ~ProgramNode();
     QString dotCode(QString parent, QString label) const;
     void check(QLinkedList<QString> * errorList) const;
+    bool isCalculable() const;
     void transform();
 
     /**
@@ -84,6 +90,7 @@ public:
     ~SExpressionNode();
     QString dotCode(QString parent, QString label) const;
     void check(QLinkedList<QString> * errorList) const;
+    bool isCalculable() const;
     void transform();
 
     /**
@@ -103,6 +110,7 @@ public:
     ~SlotDefinitionNode();
     QString dotCode(QString parent, QString label) const;
     void check(QLinkedList<QString> * errorList) const;
+    bool isCalculable() const;
     void transform();
 
     /**
@@ -129,6 +137,7 @@ public:
     ~ListNode();
     QString dotCode(QString parent, QString label) const;
     void check(QLinkedList<QString> * errorList) const;
+    bool isCalculable() const;
     void transform();
 
     /**

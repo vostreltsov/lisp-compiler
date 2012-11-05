@@ -39,6 +39,11 @@ void ProgramNode::check(QLinkedList<QString> * errorList) const
     }
 }
 
+bool ProgramNode::isCalculable() const
+{
+    return false;
+}
+
 void ProgramNode::transform()
 {
     // Transform every single operand.
@@ -103,6 +108,7 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
 
 void SExpressionNode::check(QLinkedList<QString> * errorList) const
 {
+    // Only lists need to be checked.
     switch (fSubType) {
     case S_EXPR_TYPE_INT:
     case S_EXPR_TYPE_CHAR:
@@ -116,6 +122,22 @@ void SExpressionNode::check(QLinkedList<QString> * errorList) const
     default:
         errorList->append("Unknown s-expression subtype: " + QString::number(fSubType));
         break;
+    }
+}
+
+bool SExpressionNode::isCalculable() const
+{
+    switch (fSubType) {
+    case S_EXPR_TYPE_INT:
+    case S_EXPR_TYPE_CHAR:
+    case S_EXPR_TYPE_STRING:
+    case S_EXPR_TYPE_BOOL:
+    case S_EXPR_TYPE_ID:
+        return true;
+    case S_EXPR_TYPE_LIST:
+        return fList->isCalculable();
+    default:
+        return false;
     }
 }
 
@@ -179,12 +201,24 @@ QString SlotDefinitionNode::dotCode(QString parent, QString label) const
 
 void SlotDefinitionNode::check(QLinkedList<QString> * errorList) const
 {
-    // TODO.
+    // The only thing to check is calculability of the initform.
+    if (fSubType == SLOT_DEF_INITFORM) {
+        if (!fInitform->isCalculable()) {
+            errorList->append("Only calculable expressions can be used for :initform.");
+        }
+    }
+}
+
+bool SlotDefinitionNode::isCalculable() const
+{
+    return false;
 }
 
 void SlotDefinitionNode::transform()
 {
-
+    if (fInitform != NULL) {
+        fInitform->transform();
+    }
 }
 
 SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(const slot_def_struct * syntaxNode)
@@ -329,7 +363,86 @@ QString ListNode::dotCode(QString parent, QString label) const
 
 void ListNode::check(QLinkedList<QString> * errorList) const
 {
-    // TODO
+    // First, check the subtree.
+    foreach (SExpressionNode * op, fOperands) {
+        op->check(errorList);
+    }
+    if (fCondition != NULL) {
+        fCondition->check(errorList);
+    }
+    if (fContainer != NULL) {
+        fContainer->check(errorList);
+    }
+    if (fFrom != NULL) {
+        fFrom->check(errorList);
+    }
+    if (fTo != NULL) {
+        fTo->check(errorList);
+    }
+    if (fBody1 != NULL) {
+        fBody1->check(errorList);
+    }
+    if (fBody2 != NULL) {
+        fBody2->check(errorList);
+    }
+    foreach (SlotDefinitionNode * slotdef, fSlotDefs) {
+        slotdef->check(errorList);
+    }
+
+    // Now check this node.
+    switch (fSubType) {
+    case LIST_TYPE_FCALL: {
+        // Operands should be calculable.
+        foreach (SExpressionNode * op, fOperands) {
+            if (!op->isCalculable()) {
+                errorList->append("Only calculable expressions can be passed as arguments.");
+            }
+        }
+
+        break;
+    }
+    case LIST_TYPE_LOOP_IN: {
+        // TODO: check container
+        break;
+    }
+    case LIST_TYPE_LOOP_FROM_TO: {
+        if (!fFrom->isCalculable() || !fTo->isCalculable()) {
+            errorList->append("Only calculable expressions can be used as loop conditions.");
+        }
+        break;
+    }
+    case LIST_TYPE_PROGN: {
+        break;
+    }
+    case LIST_TYPE_IF: {
+        break;
+    }
+    case LIST_TYPE_SLOTDEF: {
+        break;
+    }
+    case LIST_TYPE_DEFUN: {
+        break;
+    }
+    case LIST_TYPE_DEFCLASS: {
+        break;
+    }
+    case LIST_TYPE_ASSIGN_ELT: {
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+}
+
+bool ListNode::isCalculable() const
+{
+    // Only function calls are calculable.
+    bool result = (fSubType == LIST_TYPE_FCALL);
+    foreach (SExpressionNode * op, fOperands) {
+        result &= op->isCalculable();
+    }
+    return result;
 }
 
 void ListNode::transform()
