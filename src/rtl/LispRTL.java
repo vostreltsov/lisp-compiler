@@ -65,6 +65,26 @@ public class LispRTL {
         return result;
     }
 
+    public static BaseClass setf() {
+        BaseClass result = new BaseClass();
+        return result;
+    }
+
+    public static BaseClass vector() {
+        BaseClass result = new BaseClass();
+        return result;
+    }
+
+    public static BaseClass elt() {
+        BaseClass result = new BaseClass();
+        return result;
+    }
+
+    public static BaseClass list() {
+        BaseClass result = new BaseClass();
+        return result;
+    }
+
     public static void print(BaseClass obj) {
         switch(obj.type) {
         case BaseClass.TYPE_INT:

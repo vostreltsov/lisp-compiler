@@ -4,7 +4,6 @@ SemanticConstant::SemanticConstant()
 {
     fId = -1;
     fType = CONSTANT_Utf8;
-    fUtf8 = "";
     fInteger = 0;
     fRef1 = NULL;
     fRef2 = NULL;
@@ -16,18 +15,23 @@ SemanticProgram::SemanticProgram()
 
 SemanticClass::SemanticClass()
 {
+    fConstClass = NULL;
+    fConstParent = NULL;
 }
 
 SemanticField::SemanticField()
 {
+    fConstFieldref = NULL;
 }
 
 SemanticMethod::SemanticMethod()
 {
+    fConstMethodref = NULL;
 }
 
 SemanticLocalVariable::SemanticLocalVariable()
 {
+    fId = -1;
 }
 
 SemanticAnalyzer::SemanticAnalyzer()

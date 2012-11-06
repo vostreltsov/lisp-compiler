@@ -70,9 +70,12 @@ int main(int argc, char *argv[])
         switch (errorCode) {
         case ERROR_NO_ERROR: {
             SemanticAnalyzer * sem = new SemanticAnalyzer(root);
+            // Transform the tree.
+            sem->doTransform();
+            // Perform semantic checks, generate tables, etc.
             if (sem->doSemantics()) {
-                // Semantic check passed, transform the tree.
-                sem->doTransform();
+                // Semantics passed, generate java bytecode.
+                // TODO
             } else {
                 // Display semantic errors.
                 foreach (QString str, sem->getErrors()) {

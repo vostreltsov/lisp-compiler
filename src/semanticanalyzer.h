@@ -19,20 +19,63 @@ class ProgramNode;
 class SExpressionNode;
 class ListNode;
 
-// Names of supported Lisp functions.
-#define NAME_FUNC_SETF    "setf"
-#define NAME_FUNC_VECTOR  "vector"
-#define NAME_FUNC_ELT     "elt"
-#define NAME_FUNC_LIST    "list"
+#define TWOBYTES_MAX = 327687;
+#define TWOBYTES_MIN = -32768;
 
-// Names of misc Java stuff.
+// Names of supported Lisp functions.
+#define NAME_FUNC_PLUS             "+"
+#define NAME_FUNC_MINUS            "="
+#define NAME_FUNC_MULT             "*"
+#define NAME_FUNC_DIV              "/"
+#define NAME_FUNC_GREATER          ">"
+#define NAME_FUNC_GREATER_EQ       ">="
+#define NAME_FUNC_LESS             "<"
+#define NAME_FUNC_LESS_EQ          "<="
+#define NAME_FUNC_EQ               "="
+#define NAME_FUNC_AND              "and"
+#define NAME_FUNC_OR               "or"
+#define NAME_FUNC_NOT              "not"
+#define NAME_FUNC_SETF             "setf"
+#define NAME_FUNC_VECTOR           "vector"
+#define NAME_FUNC_ELT              "elt"
+#define NAME_FUNC_LIST             "list"
+#define NAME_FUNC_PRINT            "print"
+
+// Constants to deal with Java and RTL.
 #define NAME_JAVA_CLASS_OBJECT     "java/lang/Object"
 #define NAME_JAVA_CLASS_BASECLASS  "BaseClass"
 #define NAME_JAVA_CLASS_MAINCLASS  "MainClass"
 #define NAME_JAVA_METHOD_MAIN      "main"
 #define NAME_JAVA_CONSTRUCTOR      "<init>"
 
-#define DESC_JAVA_CLASS_BASECLASS  "L"NAME_CLASS_JAVA_BASECLASS";"
+#define DESC_JAVA_INTEGER          "I"
+#define DESC_JAVA_STRING           "Ljava/lang/String;"
+#define DESC_JAVA_CLASS_BASECLASS  "L"NAME_JAVA_CLASS_BASECLASS";"
+#define DESC_JAVA_ARRAY            "["DESC_JAVA_CLASS_BASECLASS
+
+#define RTL_BASECLASS_TYPE_DAFUQ   0
+#define RTL_BASECLASS_TYPE_INT     1
+#define RTL_BASECLASS_TYPE_CHAR    2
+#define RTL_BASECLASS_TYPE_STRING  3
+#define RTL_BASECLASS_TYPE_BOOLEAN 4
+#define RTL_BASECLASS_TYPE_ARRAY   5
+#define RTL_METHOD_PLUS            "plus"
+#define RTL_METHOD_MINUS           "minus"
+#define RTL_METHOD_MULT            "mult"
+#define RTL_METHOD_DIV             "div"
+#define RTL_METHOD_GREATER         "greater"
+#define RTL_METHOD_GREATER_EQ      "greater_eq"
+#define RTL_METHOD_LESS            "less"
+#define RTL_METHOD_LESS_EQ         "less_eq"
+#define RTL_METHOD_EQ              "eq"
+#define RTL_METHOD_AND             "and"
+#define RTL_METHOD_OR              "or"
+#define RTL_METHOD_NOT             "not"
+#define RTL_METHOD_SETF            "setf"
+#define RTL_METHOD_VECTOR          "vector"
+#define RTL_METHOD_ELT             "elt"
+#define RTL_METHOD_LIST            "list"
+#define RTL_METHOD_PRINT           "print"
 
 /**
  * @brief Java constants types.
@@ -96,6 +139,11 @@ public:
 class SemanticClass
 {
 public:
+    SemanticConstant               * fConstClass;   // Name of the class (CONSTANT_Class).
+    SemanticConstant               * fConstParent;  // Name of the parent class (CONSTANT_Class).
+    QMap<QString, SemanticField *>   fFieldsTable;  // Fields table.
+    QMap<QString, SemanticMethod *>  fMethodsTable; // Methods table.
+
     SemanticClass();
 };
 
@@ -105,6 +153,9 @@ public:
 class SemanticField
 {
 public:
+    SemanticConstant * fConstFieldref;  // CONSTANT_Fieldref constant.
+    bool               fIsStatic;       // Is this field static?
+
     SemanticField();
 };
 
@@ -114,6 +165,9 @@ public:
 class SemanticMethod
 {
 public:
+    SemanticConstant * fConstMethodref;  // CONSTANT_Methodref constant.
+    bool               fIsStatic;        // Is this method static?
+
     SemanticMethod();
 };
 
@@ -123,6 +177,8 @@ public:
 class SemanticLocalVariable
 {
 public:
+    int      fId;   // Identifier of the variable.
+    QString  fName; // Name of the variable.
     SemanticLocalVariable();
 };
 
