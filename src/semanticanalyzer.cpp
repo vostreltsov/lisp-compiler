@@ -49,18 +49,19 @@ AttributedNode::AttributedNode()
 
 AttributedNode::~AttributedNode()
 {
+    foreach (AttributedNode * child, childNodes()) {
+        delete child;
+    }
+}
+
+QLinkedList<AttributedNode *> AttributedNode::childNodes() const
+{
+    return QLinkedList<AttributedNode *>();
 }
 
 ProgramNode::ProgramNode() : AttributedNode()
 {
     fType = ATTR_TYPE_PROGRAM;
-}
-
-ProgramNode::~ProgramNode()
-{
-    foreach (SExpressionNode * expr, fExpressions) {
-        delete expr;
-    }
 }
 
 QString ProgramNode::dotCode(QString parent, QString label) const
@@ -79,11 +80,20 @@ bool ProgramNode::isCalculable() const
     return false;
 }
 
+QLinkedList<AttributedNode *> ProgramNode::childNodes() const
+{
+    QLinkedList<AttributedNode *> result;
+    foreach (SExpressionNode * expr, fExpressions) {
+        result << expr;
+    }
+    return result;
+}
+
 void ProgramNode::transform()
 {
-    // Transform every single operand.
-    foreach (SExpressionNode * node, fExpressions) {
-        node->transform();
+    // Transform all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->transform();
     }
 }
 
@@ -114,13 +124,6 @@ ProgramNode * ProgramNode::fromSyntaxNode(const program_struct * syntaxNode)
 SExpressionNode::SExpressionNode() : AttributedNode()
 {
     fType = ATTR_TYPE_S_EXPR;
-}
-
-SExpressionNode::~SExpressionNode()
-{
-    if (fList != NULL) {
-        delete fList;
-    }
 }
 
 QString SExpressionNode::dotCode(QString parent, QString label) const
@@ -165,29 +168,28 @@ bool SExpressionNode::isCalculable() const
     }
 }
 
+QLinkedList<AttributedNode *> SExpressionNode::childNodes() const
+{
+    QLinkedList<AttributedNode *> result;
+    if (fList != NULL) {
+        result << fList;
+    }
+    return result;
+}
+
 void SExpressionNode::transform()
 {
-    if (fList != NULL) {
-        fList->transform();
+    // Transform all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->transform();
     }
 }
 
 void SExpressionNode::semantics(QLinkedList<QString> * errorList) const
 {
-    // Only lists need to be checked.
-    switch (fSubType) {
-    case S_EXPR_TYPE_INT:
-    case S_EXPR_TYPE_CHAR:
-    case S_EXPR_TYPE_STRING:
-    case S_EXPR_TYPE_BOOL:
-    case S_EXPR_TYPE_ID:
-        break;
-    case S_EXPR_TYPE_LIST:
-        fList->semantics(errorList);
-        break;
-    default:
-        errorList->append("Unknown s-expression subtype: " + QString::number(fSubType));
-        break;
+    // Analyse all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->semantics(errorList);
     }
 }
 
@@ -212,13 +214,6 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
 SlotDefinitionNode::SlotDefinitionNode() : AttributedNode()
 {
     fType = ATTR_TYPE_SLOT_DEF;
-}
-
-SlotDefinitionNode::~SlotDefinitionNode()
-{
-    if (fInitform != NULL) {
-        delete fInitform;
-    }
 }
 
 QString SlotDefinitionNode::dotCode(QString parent, QString label) const
@@ -247,15 +242,29 @@ bool SlotDefinitionNode::isCalculable() const
     return false;
 }
 
+QLinkedList<AttributedNode *> SlotDefinitionNode::childNodes() const
+{
+    QLinkedList<AttributedNode *> result;
+    if (fInitform != NULL) {
+        result << fInitform;
+    }
+    return result;
+}
+
 void SlotDefinitionNode::transform()
 {
-    if (fInitform != NULL) {
-        fInitform->transform();
+    // Transform all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->transform();
     }
 }
 
 void SlotDefinitionNode::semantics(QLinkedList<QString> * errorList) const
 {
+    // Analyse all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->semantics(errorList);
+    }
     // The only thing to check is calculability of the initform.
     if (fSubType == SLOT_DEF_INITFORM) {
         if (!fInitform->isCalculable()) {
@@ -282,34 +291,6 @@ SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(const slot_def_struct * 
 ListNode::ListNode() : AttributedNode()
 {
     fType = ATTR_TYPE_LIST;
-}
-
-ListNode::~ListNode()
-{
-    foreach (SExpressionNode * op, fOperands) {
-        delete op;
-    }
-    if (fCondition != NULL) {
-        delete fCondition;
-    }
-    if (fContainer != NULL) {
-        delete fContainer;
-    }
-    if (fFrom != NULL) {
-        delete fFrom;
-    }
-    if (fTo != NULL) {
-        delete fTo;
-    }
-    if (fBody1 != NULL) {
-        delete fBody1;
-    }
-    if (fBody2 != NULL) {
-        delete fBody2;
-    }
-    foreach (SlotDefinitionNode * slotdef, fSlotDefs) {
-        delete slotdef;
-    }
 }
 
 QString ListNode::dotCode(QString parent, QString label) const
@@ -414,32 +395,41 @@ bool ListNode::isCalculable() const
     return result;
 }
 
-void ListNode::transform()
+QLinkedList<AttributedNode *> ListNode::childNodes() const
 {
-    // First, transform the subtree.
+    QLinkedList<AttributedNode *> result;
     foreach (SExpressionNode * op, fOperands) {
-        op->transform();
+        result << op;
     }
     if (fCondition != NULL) {
-        fCondition->transform();
+        result << fCondition;
     }
     if (fContainer != NULL) {
-        fContainer->transform();
+        result << fContainer;
     }
     if (fFrom != NULL) {
-        fFrom->transform();
+        result << fFrom;
     }
     if (fTo != NULL) {
-        fTo->transform();
+        result << fTo;
     }
     if (fBody1 != NULL) {
-        fBody1->transform();
+        result << fBody1;
     }
     if (fBody2 != NULL) {
-        fBody2->transform();
+        result << fBody2;
     }
     foreach (SlotDefinitionNode * slotdef, fSlotDefs) {
-        slotdef->transform();
+        result << slotdef;
+    }
+    return result;
+}
+
+void ListNode::transform()
+{
+    // Transform all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->transform();
     }
 
     // Now transform this node.
@@ -493,30 +483,9 @@ void ListNode::transform()
 
 void ListNode::semantics(QLinkedList<QString> * errorList) const
 {
-    // First, check the subtree.
-    foreach (SExpressionNode * op, fOperands) {
-        op->semantics(errorList);
-    }
-    if (fCondition != NULL) {
-        fCondition->semantics(errorList);
-    }
-    if (fContainer != NULL) {
-        fContainer->semantics(errorList);
-    }
-    if (fFrom != NULL) {
-        fFrom->semantics(errorList);
-    }
-    if (fTo != NULL) {
-        fTo->semantics(errorList);
-    }
-    if (fBody1 != NULL) {
-        fBody1->semantics(errorList);
-    }
-    if (fBody2 != NULL) {
-        fBody2->semantics(errorList);
-    }
-    foreach (SlotDefinitionNode * slotdef, fSlotDefs) {
-        slotdef->semantics(errorList);
+    // Analyse all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->semantics(errorList);
     }
 
     // Now check this node.

@@ -68,7 +68,7 @@ public:
     /**
      * @brief Destructor should be implemented in child classes for memory deallocation.
      */
-    virtual ~AttributedNode();
+    ~AttributedNode();
 
     /**
      * @brief Generates dot code for this node.
@@ -79,6 +79,11 @@ public:
      * @brief Checks if this s-expression is calculable, e.g. can be used as a condition, initform etc.
      */
     virtual bool isCalculable() const = 0;
+
+    /**
+     * @brief Returns all child nodes of this node.
+     */
+    virtual QLinkedList<AttributedNode *> childNodes() const;
 
     /**
      * @brief Transforms the subtree of this node.
@@ -96,10 +101,10 @@ class ProgramNode : public AttributedNode
 public:
     QLinkedList<SExpressionNode *> fExpressions;
     ProgramNode();
-    ~ProgramNode();
     QString dotCode(QString parent, QString label) const;
     void semantics(QLinkedList<QString> * errorList) const;
     bool isCalculable() const;
+    QLinkedList<AttributedNode *> childNodes() const;
     void transform();
 
     /**
@@ -119,10 +124,10 @@ public:
     QString     fId;
     ListNode  * fList;
     SExpressionNode();
-    ~SExpressionNode();
     QString dotCode(QString parent, QString label) const;
     void semantics(QLinkedList<QString> * errorList) const;
     bool isCalculable() const;
+    QLinkedList<AttributedNode *> childNodes() const;
     void transform();
 
     /**
@@ -139,10 +144,10 @@ public:
     QString           fId;
     slot_alloc_type   fAllocType;
     SlotDefinitionNode();
-    ~SlotDefinitionNode();
     QString dotCode(QString parent, QString label) const;
     void semantics(QLinkedList<QString> * errorList) const;
     bool isCalculable() const;
+    QLinkedList<AttributedNode *> childNodes() const;
     void transform();
 
     /**
@@ -166,10 +171,10 @@ public:
     QLinkedList<SlotDefinitionNode *> fSlotDefs;
     QString                           fParent;
     ListNode();
-    ~ListNode();
     QString dotCode(QString parent, QString label) const;
     void semantics(QLinkedList<QString> * errorList) const;
     bool isCalculable() const;
+    QLinkedList<AttributedNode *> childNodes() const;
     void transform();
 
     /**
