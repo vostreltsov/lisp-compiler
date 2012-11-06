@@ -7,7 +7,6 @@
 #include "parser_funcs.h"
 #include "errors.h"
 #include "syntaxdotcode.h"
-#include "attrnodes.h"
 #include "semanticanalyzer.h"
 
 extern int yyparse();
@@ -71,7 +70,7 @@ int main(int argc, char *argv[])
         switch (errorCode) {
         case ERROR_NO_ERROR: {
             SemanticAnalyzer * sem = new SemanticAnalyzer(root);
-            if (sem->doCheck()) {
+            if (sem->doSemantics()) {
                 // Semantic check passed, transform the tree.
                 sem->doTransform();
             } else {

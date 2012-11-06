@@ -10,7 +10,6 @@ SOURCES += \
     main.cpp \
     lexer.cpp \
     parser_funcs.cpp \
-    attrnodes.cpp \
     syntaxdotcode.cpp \
     semanticanalyzer.cpp \
     errors.cpp
@@ -19,7 +18,6 @@ HEADERS += \
     parser.hpp \
     parser_structs.h \
     parser_funcs.h \
-    attrnodes.h \
     syntaxdotcode.h \
     nodetypes.h \
     semanticanalyzer.h \
