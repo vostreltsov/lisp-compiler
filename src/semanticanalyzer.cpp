@@ -1,25 +1,55 @@
 #include "semanticanalyzer.h"
 
+SemanticConstant::SemanticConstant()
+{
+    fId = -1;
+    fType = CONSTANT_Utf8;
+    fUtf8 = "";
+    fInteger = 0;
+    fRef1 = NULL;
+    fRef2 = NULL;
+}
+
+SemanticProgram::SemanticProgram()
+{
+}
+
+SemanticClass::SemanticClass()
+{
+}
+
+SemanticField::SemanticField()
+{
+}
+
+SemanticMethod::SemanticMethod()
+{
+}
+
+SemanticLocalVariable::SemanticLocalVariable()
+{
+}
+
 SemanticAnalyzer::SemanticAnalyzer()
 {
-    program = NULL;
+    root = NULL;
 }
 
 SemanticAnalyzer::SemanticAnalyzer(const program_struct * root)
 {
-    program = ProgramNode::fromSyntaxNode(root);
+    this->root = ProgramNode::fromSyntaxNode(root);
 }
 
 SemanticAnalyzer::~SemanticAnalyzer()
 {
-    if (program != NULL) {
-        delete program;
+    if (root != NULL) {
+        delete root;
     }
 }
 
 ProgramNode * SemanticAnalyzer::getRoot() const
 {
-    return program;
+    return root;
 }
 
 QLinkedList<QString> SemanticAnalyzer::getErrors() const
@@ -30,16 +60,16 @@ QLinkedList<QString> SemanticAnalyzer::getErrors() const
 bool SemanticAnalyzer::doSemantics()
 {
     errors.clear();
-    if (program != NULL) {
-        program->semantics(&errors);
+    if (root != NULL) {
+        root->semantics(&errors);
     }
     return errors.empty();
 }
 
 void SemanticAnalyzer::doTransform()
 {
-    if (program != NULL) {
-        program->transform();
+    if (root != NULL) {
+        root->transform();
     }
 }
 
@@ -436,9 +466,9 @@ void ListNode::transform()
     switch (fSubType) {
     case LIST_TYPE_FCALL: {
         SExpressionNode * op1 = fOperands.first();
-        if (fId == FUNC_NAME_SETF) {
+        if (fId == NAME_FUNC_SETF) {
             // Convert to ternary operator.
-            if (op1->fSubType == S_EXPR_TYPE_LIST && op1->fList->fSubType == LIST_TYPE_FCALL && op1->fList->fId == FUNC_NAME_ELT) {
+            if (op1->fSubType == S_EXPR_TYPE_LIST && op1->fList->fSubType == LIST_TYPE_FCALL && op1->fList->fId == NAME_FUNC_ELT) {
                 fSubType = LIST_TYPE_ASSIGN_ELT;
                 // Remove the first element and concatenate the rest to the ELT's operands list.
                 fOperands.removeFirst();
@@ -502,7 +532,7 @@ void ListNode::semantics(QLinkedList<QString> * errorList) const
     }
     case LIST_TYPE_LOOP_IN: {
         bool result = (fContainer->fSubType == S_EXPR_TYPE_ID) ||
-                      (fContainer->fSubType == S_EXPR_TYPE_LIST && (fContainer->fList->fId == FUNC_NAME_VECTOR || fContainer->fList->fId == FUNC_NAME_LIST));
+                      (fContainer->fSubType == S_EXPR_TYPE_LIST && (fContainer->fList->fId == NAME_FUNC_VECTOR || fContainer->fList->fId == NAME_FUNC_LIST));
         if (!result) {
             errorList->append("Wrong container specified for the loop.");
         }
