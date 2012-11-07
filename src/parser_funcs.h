@@ -32,6 +32,7 @@ struct list_struct * create_list(int nodeId, enum list_type type, char * id, str
                                                                              struct s_expr_struct * container,
                                                                              struct s_expr_struct * from,
                                                                              struct s_expr_struct * to,
+                                                                             struct s_expr_seq_struct * body,
                                                                              struct s_expr_struct * body1,
                                                                              struct s_expr_struct * body2,
                                                                              struct slot_def_seq_struct * slotdefs,

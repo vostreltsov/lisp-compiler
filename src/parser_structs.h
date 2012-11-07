@@ -50,6 +50,7 @@ struct list_struct {
     struct s_expr_struct         * container; // Container to iterate over in case of "LOOP".
     struct s_expr_struct         * from;      // "FROM" value in case of "LOOP".
     struct s_expr_struct         * to;        // "TO" value in case of "LOOP".
+    struct s_expr_seq_struct     * body;      // List of s-expressions in case of "DEFUN".
     struct s_expr_struct         * body1;     // Positive branch in case of "IF" or a body in case of "LOOP".
     struct s_expr_struct         * body2;     // Negative branch in case of "IF".
     struct slot_def_seq_struct   * slotdefs;  // Slot definitions in case of a class definition.

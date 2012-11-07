@@ -23,7 +23,6 @@ SemanticField::SemanticField()
 SemanticMethod::SemanticMethod()
 {
     fConstMethodref = NULL;
-    fNode = NULL;
 }
 
 SemanticLocalVar::SemanticLocalVar()
@@ -63,8 +62,9 @@ bool SemanticAnalyzer::doSemantics()
     fClassTable.clear();
     fErrors.clear();
     if (fRoot != NULL) {
-        fRoot->semantics(&fClassTable,  &fErrors);
+        fRoot->semantics(&fClassTable,  &fErrors, NULL, NULL);
     }
+    // TODO: check for main method?
 
     return fErrors.empty();
 }
@@ -130,12 +130,34 @@ void ProgramNode::transform()
     }
 }
 
-void ProgramNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const
+void ProgramNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
-    // Check every single operand.
+    // Create the main class.
+    SemanticClass * mainClass = NULL;
+
+    // TODO: universal class?
+
+    // Process every single operand.
     foreach (SExpressionNode * node, fExpressions) {
-        node->semantics(classTable, errorList);
+        node->semantics(classTable, errorList, mainClass, NULL);
     }
+}
+
+SemanticClass * ProgramNode::createMainClass(QMap<QString, SemanticClass *> * classTable)
+{
+    SemanticClass * mainClass = new SemanticClass();
+    mainClass->fConstClass = NULL;  // TODO
+    mainClass->fConstParent = NULL; // TODO
+
+    // Add main method.
+    SemanticMethod * mainMethod = new SemanticMethod();
+    mainMethod->fIsStatic = true;
+    mainMethod->fExpressions = fExpressions;
+
+    // Add constants to deal with RTL.
+
+    classTable->insert(NAME_JAVA_CLASS_MAINCLASS, mainClass);
+    return mainClass;
 }
 
 ProgramNode * ProgramNode::fromSyntaxNode(const program_struct * syntaxNode)
@@ -163,25 +185,34 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
 {
     QString tmp = "\"id" + QString::number(fNodeId) + "\\ns_expr:";
     switch (fSubType) {
-    case S_EXPR_TYPE_INT:
+    case S_EXPR_TYPE_INT: {
         tmp += "int\\n" + QString::number(fInteger) + "\"";
         return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
-    case S_EXPR_TYPE_CHAR:
+    }
+    case S_EXPR_TYPE_CHAR: {
         tmp += "char\\n" + QString(fCharacter) + "\"";
         return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
-    case S_EXPR_TYPE_STRING:
+    }
+    case S_EXPR_TYPE_STRING: {
         tmp += "string\\n" + fString + "\"";
         return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
-    case S_EXPR_TYPE_BOOL:
+    }
+    case S_EXPR_TYPE_BOOL: {
         tmp += "bool\\n" + QString(fBoolean ? "TRUE" : "FALSE") + "\"";
         return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
-    case S_EXPR_TYPE_ID:
+    }
+    case S_EXPR_TYPE_ID: {
         tmp += "id\\n" + fId + "\"";
         return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
-    case S_EXPR_TYPE_LIST:
+    }
+    case S_EXPR_TYPE_LIST: {
         tmp += "list\"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         return result + fList->dotCode(tmp, "");
+    }
+    default: {
+        return "";
+    }
     }
 }
 
@@ -218,11 +249,11 @@ void SExpressionNode::transform()
     }
 }
 
-void SExpressionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const
+void SExpressionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
-        child->semantics(classTable, errorList);
+        child->semantics(classTable, errorList, curClass, curMethod);
     }
 }
 
@@ -292,11 +323,11 @@ void SlotDefinitionNode::transform()
     }
 }
 
-void SlotDefinitionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const
+void SlotDefinitionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
-        child->semantics(classTable, errorList);
+        child->semantics(classTable, errorList, curClass, curMethod);
     }
     // The only thing to check is calculability of the initform.
     if (fSubType == SLOT_DEF_INITFORM) {
@@ -387,7 +418,10 @@ QString ListNode::dotCode(QString parent, QString label) const
         foreach (SExpressionNode * op, fOperands) {
             result += op->dotCode(tmp, "argument " + QString::number(cnt++));
         }
-        result += fBody1->dotCode(tmp, "body");
+        cnt = 0;
+        foreach (SExpressionNode * body, fBody) {
+            result += body->dotCode(tmp, "body expr " + QString::number(cnt++));
+        }
         return result;
     }
     case LIST_TYPE_DEFCLASS: {
@@ -413,7 +447,7 @@ QString ListNode::dotCode(QString parent, QString label) const
         return result;
     }
     default: {
-        break;
+        return "";
     }
     }
 }
@@ -445,6 +479,9 @@ QLinkedList<AttributedNode *> ListNode::childNodes() const
     }
     if (fTo != NULL) {
         result << fTo;
+    }
+    foreach (SExpressionNode * body, fBody) {
+        result << body;
     }
     if (fBody1 != NULL) {
         result << fBody1;
@@ -514,11 +551,11 @@ void ListNode::transform()
     }
 }
 
-void ListNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const
+void ListNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
-        child->semantics(classTable, errorList);
+        child->semantics(classTable, errorList, curClass, curMethod);
     }
 
     // Now check this node.
@@ -606,6 +643,11 @@ ListNode * ListNode::fromSyntaxNode(const list_struct * syntaxNode)
         result->fContainer = SExpressionNode::fromSyntaxNode(syntaxNode->container);
         result->fFrom = SExpressionNode::fromSyntaxNode(syntaxNode->from);
         result->fTo = SExpressionNode::fromSyntaxNode(syntaxNode->to);
+        expr = (syntaxNode->body != NULL ? syntaxNode->body->first : NULL);
+        while (expr != NULL) {
+            result->fBody.append(SExpressionNode::fromSyntaxNode(expr));
+            expr = expr->next;
+        }
         result->fBody1 = SExpressionNode::fromSyntaxNode(syntaxNode->body1);
         result->fBody2 = SExpressionNode::fromSyntaxNode(syntaxNode->body2);
         slot_def_struct * slotdef = (syntaxNode->slotdefs != NULL ? syntaxNode->slotdefs->first : NULL);

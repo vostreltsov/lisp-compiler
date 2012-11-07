@@ -14,7 +14,8 @@
             (if (> (elt v i) (elt v j))
                 (progn (setf tmp (elt v j))
                        (setf(elt v j) (elt v i))
-                       (setf(elt v i) tmp))))))
+                       (setf(elt v i) tmp)))))
+    (print "bubble sort done"))
 
 
 (setf |{0,0}| (vector 7 15 1))

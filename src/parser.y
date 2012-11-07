@@ -102,18 +102,18 @@ slot_def_seq : slot_def                 {$$ = create_slot_def_seq(++idCounter, $
              | slot_def_seq slot_def    {$$ = add_to_slot_def_seq($1, $2);}
              ;
 
-list : '(' ')'                                              {$$ = create_list(++idCounter, LIST_TYPE_EMPTY,         NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL);}
-     | '(' ID s_expr_seq ')'                                {$$ = create_list(++idCounter, LIST_TYPE_FCALL,         $2,    $3,    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL);}
-     | '(' LOOP FOR ID IN s_expr DO s_expr ')'              {$$ = create_list(++idCounter, LIST_TYPE_LOOP_IN,       $4,    NULL,  NULL,  $6,    NULL,  NULL,  $8,    NULL,  NULL,  NULL);}
-     | '(' LOOP FOR ID FROM s_expr TO s_expr DO s_expr ')'  {$$ = create_list(++idCounter, LIST_TYPE_LOOP_FROM_TO,  $4,    NULL,  NULL,  NULL,  $6,    $8,    $10,   NULL,  NULL,  NULL);}
-     | '(' PROGN s_expr_seq ')'                             {$$ = create_list(++idCounter, LIST_TYPE_PROGN,         NULL,  $3,    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL);}
-     | '(' IF s_expr s_expr ')'                             {$$ = create_list(++idCounter, LIST_TYPE_IF,            NULL,  NULL,  $3,    NULL,  NULL,  NULL,  $4,    NULL,  NULL,  NULL);}
-     | '(' IF s_expr s_expr s_expr ')'                      {$$ = create_list(++idCounter, LIST_TYPE_IF,            NULL,  NULL,  $3,    NULL,  NULL,  NULL,  $4,    $5,    NULL,  NULL);}
-     | '(' ID slot_def_seq ')'                              {$$ = create_list(++idCounter, LIST_TYPE_SLOTDEF,       $2,    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  $3,    NULL);}
-     | '(' DEFUN ID '(' ')' s_expr ')'                      {$$ = create_list(++idCounter, LIST_TYPE_DEFUN,         $3,    NULL,  NULL,  NULL,  NULL,  NULL,  $6,    NULL,  NULL,  NULL);}
-     | '(' DEFUN ID '(' s_expr_seq ')' s_expr ')'           {$$ = create_list(++idCounter, LIST_TYPE_DEFUN,         $3,    $5,    NULL,  NULL,  NULL,  NULL,  $7,    NULL,  NULL,  NULL);}
-     | '(' DEFCLASS ID '(' ')' '(' s_expr_seq ')' ')'       {$$ = create_list(++idCounter, LIST_TYPE_DEFCLASS,      $3,    $7,    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL);}
-     | '(' DEFCLASS ID '(' ID ')' '(' s_expr_seq ')' ')'    {$$ = create_list(++idCounter, LIST_TYPE_DEFCLASS,      $3,    $8,    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  $5);}
+list : '(' ')'                                              {$$ = create_list(++idCounter, LIST_TYPE_EMPTY,         NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL, NULL,  NULL,  NULL,  NULL);}
+     | '(' ID s_expr_seq ')'                                {$$ = create_list(++idCounter, LIST_TYPE_FCALL,         $2,    $3,    NULL,  NULL,  NULL,  NULL,  NULL, NULL,  NULL,  NULL,  NULL);}
+     | '(' LOOP FOR ID IN s_expr DO s_expr ')'              {$$ = create_list(++idCounter, LIST_TYPE_LOOP_IN,       $4,    NULL,  NULL,  $6,    NULL,  NULL,  NULL, $8,    NULL,  NULL,  NULL);}
+     | '(' LOOP FOR ID FROM s_expr TO s_expr DO s_expr ')'  {$$ = create_list(++idCounter, LIST_TYPE_LOOP_FROM_TO,  $4,    NULL,  NULL,  NULL,  $6,    $8,    NULL, $10,   NULL,  NULL,  NULL);}
+     | '(' PROGN s_expr_seq ')'                             {$$ = create_list(++idCounter, LIST_TYPE_PROGN,         NULL,  $3,    NULL,  NULL,  NULL,  NULL,  NULL, NULL,  NULL,  NULL,  NULL);}
+     | '(' IF s_expr s_expr ')'                             {$$ = create_list(++idCounter, LIST_TYPE_IF,            NULL,  NULL,  $3,    NULL,  NULL,  NULL,  NULL, $4,    NULL,  NULL,  NULL);}
+     | '(' IF s_expr s_expr s_expr ')'                      {$$ = create_list(++idCounter, LIST_TYPE_IF,            NULL,  NULL,  $3,    NULL,  NULL,  NULL,  NULL, $4,    $5,    NULL,  NULL);}
+     | '(' ID slot_def_seq ')'                              {$$ = create_list(++idCounter, LIST_TYPE_SLOTDEF,       $2,    NULL,  NULL,  NULL,  NULL,  NULL,  NULL, NULL,  NULL,  $3,    NULL);}
+     | '(' DEFUN ID '(' ')' s_expr_seq ')'                  {$$ = create_list(++idCounter, LIST_TYPE_DEFUN,         $3,    NULL,  NULL,  NULL,  NULL,  NULL,  $6,   NULL,  NULL,  NULL,  NULL);}
+     | '(' DEFUN ID '(' s_expr_seq ')' s_expr_seq ')'       {$$ = create_list(++idCounter, LIST_TYPE_DEFUN,         $3,    $5,    NULL,  NULL,  NULL,  NULL,  $7,   NULL,  NULL,  NULL,  NULL);}
+     | '(' DEFCLASS ID '(' ')' '(' s_expr_seq ')' ')'       {$$ = create_list(++idCounter, LIST_TYPE_DEFCLASS,      $3,    $7,    NULL,  NULL,  NULL,  NULL,  NULL, NULL,  NULL,  NULL,  NULL);}
+     | '(' DEFCLASS ID '(' ID ')' '(' s_expr_seq ')' ')'    {$$ = create_list(++idCounter, LIST_TYPE_DEFCLASS,      $3,    $8,    NULL,  NULL,  NULL,  NULL,  NULL, NULL,  NULL,  NULL,  $5);}
      ;
 
 %%

@@ -1,12 +1,14 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QTextStream>
+#include <QString>
+#include <QStringList>
+#include <QProcess>
 #include <stdio.h>
 #include <stdlib.h>
 #include "parser_structs.h"
 #include "parser_funcs.h"
 #include "errors.h"
-#include "syntaxdotcode.h"
 #include "semanticanalyzer.h"
 
 extern int yyparse();
@@ -18,24 +20,6 @@ void exec_dot(const QString & dotBinFileName, const QString & dotFileName, const
     QStringList args;
     args << QString("-Tpng") << QString("-o") + pngFileName << dotFileName;
     QProcess::execute(dotBinFileName, args);
-}
-
-void run_dot_on_syntax_node(struct program_struct * program, QString fileName) {
-    QString dotFN = "tmp.dot";
-    QFile dot(dotFN);
-    if (dot.open(QFile::WriteOnly)) {
-        QTextStream out(&dot);
-        SyntaxDotCode::dot_for_program(out, program);
-        dot.close();
-        exec_dot("dot", dotFN, fileName);
-        // Run image viewer automatically.
-        QStringList args;
-        args << fileName;
-        QProcess::execute("ristretto", args);
-        QFile::remove(dotFN);
-    } else {
-        // Error occured, don't tell anybody about it!
-    }
 }
 
 void run_don_on_attr_node(ProgramNode * program, QString fileName) {

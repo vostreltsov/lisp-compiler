@@ -74,6 +74,7 @@ struct list_struct * create_list(int nodeId, enum list_type type, char * id, str
                                                                              struct s_expr_struct * container,
                                                                              struct s_expr_struct * from,
                                                                              struct s_expr_struct * to,
+                                                                             struct s_expr_seq_struct * body,
                                                                              struct s_expr_struct * body1,
                                                                              struct s_expr_struct * body2,
                                                                              struct slot_def_seq_struct * slotdefs,
@@ -88,6 +89,7 @@ struct list_struct * create_list(int nodeId, enum list_type type, char * id, str
     result->container = container;
     result->from = from;
     result->to = to;
+    result->body = body;
     result->body1 = body1;
     result->body2 = body2;
     result->slotdefs = slotdefs;
@@ -159,6 +161,7 @@ void free_list(struct list_struct * list) {
         free_s_expr(list->container);
         free_s_expr(list->from);
         free_s_expr(list->to);
+        free_s_expr_seq(list->body);
         free_s_expr(list->body1);
         free_s_expr(list->body2);
         free_slot_def_seq(list->slotdefs);

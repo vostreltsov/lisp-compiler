@@ -158,7 +158,7 @@ public:
     SemanticConstant                  * fConstMethodref; // CONSTANT_Methodref constant.
     QMap<QString, SemanticLocalVar *>   fLocalVarsTable; // Local variables table.
     bool                                fIsStatic;       // Is this method static?
-    ListNode                          * fNode;           // Corresponding tree node.
+    QLinkedList<SExpressionNode *>      fExpressions;    // Corresponding tree nodes.
 
     SemanticMethod();
 };
@@ -210,7 +210,7 @@ public:
     /**
      * @brief Destructor should be implemented in child classes for memory deallocation.
      */
-    ~AttributedNode();
+    virtual ~AttributedNode();
 
     /**
      * @brief Generates dot code for this node.
@@ -235,7 +235,7 @@ public:
     /**
      * @brief Does the semantic analysis of the node: checks, tables, etc.
      */
-    virtual void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const = 0;
+    virtual void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const = 0;
 };
 
 /**
@@ -247,10 +247,12 @@ public:
     QLinkedList<SExpressionNode *> fExpressions;
     ProgramNode();
     QString dotCode(QString parent, QString label) const;
-    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
+
+    SemanticClass * createMainClass(QMap<QString, SemanticClass *> * classTable);
 
     /**
      * @brief Creates an instance of ProgramNode from a program_struct node.
@@ -273,7 +275,7 @@ public:
     ListNode  * fList;
     SExpressionNode();
     QString dotCode(QString parent, QString label) const;
-    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
@@ -296,7 +298,7 @@ public:
     slot_alloc_type   fAllocType;
     SlotDefinitionNode();
     QString dotCode(QString parent, QString label) const;
-    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
@@ -320,13 +322,14 @@ public:
     SExpressionNode                 * fContainer;
     SExpressionNode                 * fFrom;
     SExpressionNode                 * fTo;
+    QLinkedList<SExpressionNode *>    fBody;
     SExpressionNode                 * fBody1;
     SExpressionNode                 * fBody2;
     QLinkedList<SlotDefinitionNode *> fSlotDefs;
     QString                           fParent;
     ListNode();
     QString dotCode(QString parent, QString label) const;
-    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
