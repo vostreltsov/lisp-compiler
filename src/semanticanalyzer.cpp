@@ -9,10 +9,6 @@ SemanticConstant::SemanticConstant()
     fRef2 = NULL;
 }
 
-SemanticProgram::SemanticProgram()
-{
-}
-
 SemanticClass::SemanticClass()
 {
     fConstClass = NULL;
@@ -27,53 +23,56 @@ SemanticField::SemanticField()
 SemanticMethod::SemanticMethod()
 {
     fConstMethodref = NULL;
+    fNode = NULL;
 }
 
-SemanticLocalVariable::SemanticLocalVariable()
+SemanticLocalVar::SemanticLocalVar()
 {
     fId = -1;
 }
 
 SemanticAnalyzer::SemanticAnalyzer()
 {
-    root = NULL;
+    fRoot = NULL;
 }
 
 SemanticAnalyzer::SemanticAnalyzer(const program_struct * root)
 {
-    this->root = ProgramNode::fromSyntaxNode(root);
+    fRoot = ProgramNode::fromSyntaxNode(root);
 }
 
 SemanticAnalyzer::~SemanticAnalyzer()
 {
-    if (root != NULL) {
-        delete root;
+    if (fRoot != NULL) {
+        delete fRoot;
     }
 }
 
 ProgramNode * SemanticAnalyzer::getRoot() const
 {
-    return root;
+    return fRoot;
 }
 
 QLinkedList<QString> SemanticAnalyzer::getErrors() const
 {
-    return errors;
+    return fErrors;
 }
 
 bool SemanticAnalyzer::doSemantics()
 {
-    errors.clear();
-    if (root != NULL) {
-        root->semantics(&errors);
+    fClassTable.clear();
+    fErrors.clear();
+    if (fRoot != NULL) {
+        fRoot->semantics(&fClassTable,  &fErrors);
     }
-    return errors.empty();
+
+    return fErrors.empty();
 }
 
 void SemanticAnalyzer::doTransform()
 {
-    if (root != NULL) {
-        root->transform();
+    if (fRoot != NULL) {
+        fRoot->transform();
     }
 }
 
@@ -131,11 +130,11 @@ void ProgramNode::transform()
     }
 }
 
-void ProgramNode::semantics(QLinkedList<QString> * errorList) const
+void ProgramNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const
 {
     // Check every single operand.
     foreach (SExpressionNode * node, fExpressions) {
-        node->semantics(errorList);
+        node->semantics(classTable, errorList);
     }
 }
 
@@ -219,11 +218,11 @@ void SExpressionNode::transform()
     }
 }
 
-void SExpressionNode::semantics(QLinkedList<QString> * errorList) const
+void SExpressionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
-        child->semantics(errorList);
+        child->semantics(classTable, errorList);
     }
 }
 
@@ -293,11 +292,11 @@ void SlotDefinitionNode::transform()
     }
 }
 
-void SlotDefinitionNode::semantics(QLinkedList<QString> * errorList) const
+void SlotDefinitionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
-        child->semantics(errorList);
+        child->semantics(classTable, errorList);
     }
     // The only thing to check is calculability of the initform.
     if (fSubType == SLOT_DEF_INITFORM) {
@@ -515,11 +514,11 @@ void ListNode::transform()
     }
 }
 
-void ListNode::semantics(QLinkedList<QString> * errorList) const
+void ListNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
-        child->semantics(errorList);
+        child->semantics(classTable, errorList);
     }
 
     // Now check this node.

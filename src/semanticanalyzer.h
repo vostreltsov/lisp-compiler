@@ -12,7 +12,7 @@ class SemanticProgram;
 class SemanticClass;
 class SemanticField;
 class SemanticMethod;
-class SemanticLocalVariable;
+class SemanticLocalVar;
 class SemanticAnalyzer;
 class AttributedNode;
 class ProgramNode;
@@ -123,26 +123,16 @@ public:
 };
 
 /**
- * @brief Represents a program.
- */
-class SemanticProgram
-{
-public:
-    QMap<QString, SemanticClass *> fClassTable; // Class table.
-
-    SemanticProgram();
-};
-
-/**
  * @brief Represents a class.
  */
 class SemanticClass
 {
 public:
-    SemanticConstant               * fConstClass;   // Name of the class (CONSTANT_Class).
-    SemanticConstant               * fConstParent;  // Name of the parent class (CONSTANT_Class).
-    QMap<QString, SemanticField *>   fFieldsTable;  // Fields table.
-    QMap<QString, SemanticMethod *>  fMethodsTable; // Methods table.
+    SemanticConstant               * fConstClass;     // Name of the class (CONSTANT_Class).
+    SemanticConstant               * fConstParent;    // Name of the parent class (CONSTANT_Class).
+    QLinkedList<SemanticConstant *>  fConstantsTable; // Constants table.
+    QMap<QString, SemanticField *>   fFieldsTable;    // Fields table.
+    QMap<QString, SemanticMethod *>  fMethodsTable;   // Methods table.
 
     SemanticClass();
 };
@@ -165,8 +155,10 @@ public:
 class SemanticMethod
 {
 public:
-    SemanticConstant * fConstMethodref;  // CONSTANT_Methodref constant.
-    bool               fIsStatic;        // Is this method static?
+    SemanticConstant                  * fConstMethodref; // CONSTANT_Methodref constant.
+    QMap<QString, SemanticLocalVar *>   fLocalVarsTable; // Local variables table.
+    bool                                fIsStatic;       // Is this method static?
+    ListNode                          * fNode;           // Corresponding tree node.
 
     SemanticMethod();
 };
@@ -174,12 +166,12 @@ public:
 /**
  * @brief Represents a local variable.
  */
-class SemanticLocalVariable
+class SemanticLocalVar
 {
 public:
     int      fId;   // Identifier of the variable.
     QString  fName; // Name of the variable.
-    SemanticLocalVariable();
+    SemanticLocalVar();
 };
 
 /**
@@ -196,8 +188,9 @@ public:
     bool doSemantics();
     void doTransform();
 private:
-    ProgramNode * root;
-    QLinkedList<QString> errors;
+    ProgramNode                    * fRoot;       // Root of the attributed tree.
+    QMap<QString, SemanticClass *>   fClassTable; // Class table.
+    QLinkedList<QString>             fErrors;     // Semantic errors messages.
 };
 
 /**
@@ -242,7 +235,7 @@ public:
     /**
      * @brief Does the semantic analysis of the node: checks, tables, etc.
      */
-    virtual void semantics(QLinkedList<QString> * errorList) const = 0;
+    virtual void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const = 0;
 };
 
 /**
@@ -254,7 +247,7 @@ public:
     QLinkedList<SExpressionNode *> fExpressions;
     ProgramNode();
     QString dotCode(QString parent, QString label) const;
-    void semantics(QLinkedList<QString> * errorList) const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
@@ -280,7 +273,7 @@ public:
     ListNode  * fList;
     SExpressionNode();
     QString dotCode(QString parent, QString label) const;
-    void semantics(QLinkedList<QString> * errorList) const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
@@ -303,7 +296,7 @@ public:
     slot_alloc_type   fAllocType;
     SlotDefinitionNode();
     QString dotCode(QString parent, QString label) const;
-    void semantics(QLinkedList<QString> * errorList) const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
@@ -333,7 +326,7 @@ public:
     QString                           fParent;
     ListNode();
     QString dotCode(QString parent, QString label) const;
-    void semantics(QLinkedList<QString> * errorList) const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
