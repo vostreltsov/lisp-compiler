@@ -1,18 +1,68 @@
 #include "semanticanalyzer.h"
 
-SemanticConstant::SemanticConstant()
+SemanticConstant::SemanticConstant(int id, JavaConstantsTypes type, QString utf8, int integer, SemanticConstant * ref1, SemanticConstant * ref2)
 {
-    fId = -1;
-    fType = CONSTANT_Utf8;
-    fInteger = 0;
-    fRef1 = NULL;
-    fRef2 = NULL;
+    fId = id;
+    fType = type;
+    fUtf8 = utf8;
+    fInteger = integer;
+    fRef1 = ref1;
+    fRef2 = ref2;
 }
 
 SemanticClass::SemanticClass()
 {
     fConstClass = NULL;
     fConstParent = NULL;
+}
+
+SemanticConstant * SemanticClass::addUtf8Constant(QString value)
+{
+    // Does it already exist?
+    foreach (SemanticConstant * existed, fConstantsTable) {
+        if (existed->fType == CONSTANT_Utf8 && existed->fUtf8 == value) {
+            return existed;
+        }
+    }
+    // Add the new constant.
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_Utf8, value);
+    return result;
+}
+
+SemanticConstant * SemanticClass::addIntegerConstant(int value)
+{
+    // TODO
+    return NULL;
+}
+
+SemanticConstant * SemanticClass::addClassConstant(SemanticClass * value)
+{
+    // TODO
+    return NULL;
+}
+
+SemanticConstant * SemanticClass::addStringConstant(QString value)
+{
+    // TODO
+    return NULL;
+}
+
+SemanticConstant * SemanticClass::addFieldConstant(SemanticField * value)
+{
+    // TODO
+    return NULL;
+}
+
+SemanticConstant * SemanticClass::addMethodConstant(SemanticMethod * value)
+{
+    // TODO
+    return NULL;
+}
+
+SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString type)
+{
+    // TODO
+    return NULL;
 }
 
 SemanticField::SemanticField()
@@ -23,6 +73,12 @@ SemanticField::SemanticField()
 SemanticMethod::SemanticMethod()
 {
     fConstMethodref = NULL;
+}
+
+SemanticConstant * SemanticMethod::addLocalVarConstant()
+{
+    // TODO
+    return NULL;
 }
 
 SemanticLocalVar::SemanticLocalVar()
@@ -62,10 +118,14 @@ bool SemanticAnalyzer::doSemantics()
     fClassTable.clear();
     fErrors.clear();
     if (fRoot != NULL) {
-        fRoot->semantics(&fClassTable,  &fErrors, NULL, NULL);
-    }
-    // TODO: check for main method?
+        // Create main class and method.
+        SemanticClass * mainClass = createMainClassAndMethod();
+        fClassTable.insert(NAME_JAVA_CLASS_MAINCLASS, mainClass);
 
+        // TODO: universal class?
+
+        fRoot->semantics(&fClassTable,  &fErrors, mainClass, NULL);
+    }
     return fErrors.empty();
 }
 
@@ -74,6 +134,23 @@ void SemanticAnalyzer::doTransform()
     if (fRoot != NULL) {
         fRoot->transform();
     }
+}
+
+SemanticClass * SemanticAnalyzer::createMainClassAndMethod()
+{
+    // Create the main class itself.
+    SemanticClass * mainClass = new SemanticClass();
+    //mainClass->fConstClass = NAME_JAVA_CLASS_MAINCLASS;  // TODO
+   // mainClass->fConstParent = NAME_JAVA_CLASS_OBJECT; // TODO
+
+    // Add main method.
+    SemanticMethod * mainMethod = new SemanticMethod();
+    mainMethod->fIsStatic = true;
+
+    // Add constants to deal with RTL.
+
+
+    return mainClass;
 }
 
 AttributedNode::AttributedNode()
@@ -132,32 +209,10 @@ void ProgramNode::transform()
 
 void ProgramNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
-    // Create the main class.
-    SemanticClass * mainClass = NULL;
-
-    // TODO: universal class?
-
     // Process every single operand.
     foreach (SExpressionNode * node, fExpressions) {
-        node->semantics(classTable, errorList, mainClass, NULL);
+        node->semantics(classTable, errorList, curClass, curMethod);
     }
-}
-
-SemanticClass * ProgramNode::createMainClass(QMap<QString, SemanticClass *> * classTable)
-{
-    SemanticClass * mainClass = new SemanticClass();
-    mainClass->fConstClass = NULL;  // TODO
-    mainClass->fConstParent = NULL; // TODO
-
-    // Add main method.
-    SemanticMethod * mainMethod = new SemanticMethod();
-    mainMethod->fIsStatic = true;
-    mainMethod->fExpressions = fExpressions;
-
-    // Add constants to deal with RTL.
-
-    classTable->insert(NAME_JAVA_CLASS_MAINCLASS, mainClass);
-    return mainClass;
 }
 
 ProgramNode * ProgramNode::fromSyntaxNode(const program_struct * syntaxNode)

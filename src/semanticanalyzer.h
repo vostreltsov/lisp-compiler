@@ -87,7 +87,7 @@ enum JavaConstantsTypes
     CONSTANT_Float = 4,
     CONSTANT_Long = 5,
     CONSTANT_Double = 6,
-    CONSTANT_Class = 7 ,
+    CONSTANT_Class = 7,
     CONSTANT_String = 8,
     CONSTANT_Fieldref = 9,
     CONSTANT_Methodref = 10,
@@ -119,7 +119,8 @@ public:
     SemanticConstant * fRef1;     // Pointer to another constant if required.
     SemanticConstant * fRef2;     // Pointer to another constant if required.
 
-    SemanticConstant();
+    SemanticConstant(int id = -1, JavaConstantsTypes type = CONSTANT_Utf8, QString utf8 = "",
+                     int integer = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
 };
 
 /**
@@ -135,6 +136,13 @@ public:
     QMap<QString, SemanticMethod *>  fMethodsTable;   // Methods table.
 
     SemanticClass();
+    SemanticConstant * addUtf8Constant(QString value);
+    SemanticConstant * addIntegerConstant(int value);
+    SemanticConstant * addClassConstant(SemanticClass * value);
+    SemanticConstant * addStringConstant(QString value);
+    SemanticConstant * addFieldConstant(SemanticField * value);
+    SemanticConstant * addMethodConstant(SemanticMethod * value);
+    SemanticConstant * addNameAndTypeConstant(QString name, QString type);
 };
 
 /**
@@ -158,9 +166,10 @@ public:
     SemanticConstant                  * fConstMethodref; // CONSTANT_Methodref constant.
     QMap<QString, SemanticLocalVar *>   fLocalVarsTable; // Local variables table.
     bool                                fIsStatic;       // Is this method static?
-    QLinkedList<SExpressionNode *>      fExpressions;    // Corresponding tree nodes.
+    //QLinkedList<SExpressionNode *>      fExpressions;    // Corresponding tree nodes.
 
     SemanticMethod();
+    SemanticConstant * addLocalVarConstant();
 };
 
 /**
@@ -191,6 +200,8 @@ private:
     ProgramNode                    * fRoot;       // Root of the attributed tree.
     QMap<QString, SemanticClass *>   fClassTable; // Class table.
     QLinkedList<QString>             fErrors;     // Semantic errors messages.
+
+    SemanticClass * createMainClassAndMethod();
 };
 
 /**
@@ -251,8 +262,6 @@ public:
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-
-    SemanticClass * createMainClass(QMap<QString, SemanticClass *> * classTable);
 
     /**
      * @brief Creates an instance of ProgramNode from a program_struct node.
