@@ -24,45 +24,88 @@ SemanticConstant * SemanticClass::addUtf8Constant(QString value)
             return existed;
         }
     }
-    // Add the new constant.
-    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_Utf8, value);
-    return result;
+    // Create the new constant.
+    return new SemanticConstant(fConstantsTable.size(), CONSTANT_Utf8, value);
 }
 
 SemanticConstant * SemanticClass::addIntegerConstant(int value)
 {
-    // TODO
-    return NULL;
+    // Does it already exist?
+    foreach (SemanticConstant * existed, fConstantsTable) {
+        if (existed->fType == CONSTANT_Integer && existed->fInteger == value) {
+            return existed;
+        }
+    }
+    // Create the new constant.
+    return new SemanticConstant(fConstantsTable.size(), CONSTANT_Integer, "", value);
 }
 
-SemanticConstant * SemanticClass::addClassConstant(SemanticClass * value)
+SemanticConstant * SemanticClass::addClassConstant(QString name)
 {
-    // TODO
-    return NULL;
+    SemanticConstant * utf8const = addUtf8Constant(name);
+    // Does it already exist? Check by the pointer to the utf8 constant.
+    foreach (SemanticConstant * existed, fConstantsTable) {
+        if (existed->fType == CONSTANT_Class && existed->fRef1 == utf8const) {
+            return existed;
+        }
+    }
+    // Create the new constant.
+    return new SemanticConstant(fConstantsTable.size(), CONSTANT_Class, "", 0, utf8const);
 }
 
 SemanticConstant * SemanticClass::addStringConstant(QString value)
 {
-    // TODO
-    return NULL;
+    SemanticConstant * utf8const = addUtf8Constant(value);
+    // Does it already exist? Check by the pointer to utf8 constant.
+    foreach (SemanticConstant * existed, fConstantsTable) {
+        if (existed->fType == CONSTANT_String && existed->fRef1 == utf8const) {
+            return existed;
+        }
+    }
+    // Create the new constant.
+    return new SemanticConstant(fConstantsTable.size(), CONSTANT_String, "", 0, utf8const);
 }
 
-SemanticConstant * SemanticClass::addFieldConstant(SemanticField * value)
+SemanticConstant * SemanticClass::addFieldrefConstant(QString className, QString fieldName, QString descriptor)
 {
-    // TODO
-    return NULL;
+   SemanticConstant * classConst = addClassConstant(className);
+   SemanticConstant * nameAndTypeConst = addNameAndTypeConstant(fieldName, descriptor);
+   // Does it already exist? Check by the pointers to the class and nameAndType constants.
+   foreach (SemanticConstant * existed, fConstantsTable) {
+       if (existed->fType == CONSTANT_Fieldref && existed->fRef1 == classConst && existed->fRef2 == nameAndTypeConst) {
+           return existed;
+       }
+   }
+   // Create the new constant.
+   return new SemanticConstant(fConstantsTable.size(), CONSTANT_Fieldref, "", 0, classConst, nameAndTypeConst);
 }
 
-SemanticConstant * SemanticClass::addMethodConstant(SemanticMethod * value)
+SemanticConstant * SemanticClass::addMethodrefConstant(QString className, QString methodName, QString descriptor)
 {
-    // TODO
-    return NULL;
+    SemanticConstant * classConst = addClassConstant(className);
+    SemanticConstant * nameAndTypeConst = addNameAndTypeConstant(methodName, descriptor);
+    // Does it already exist? Check by the pointers to the class and nameAndType constants.
+    foreach (SemanticConstant * existed, fConstantsTable) {
+        if (existed->fType == CONSTANT_Methodref && existed->fRef1 == classConst && existed->fRef2 == nameAndTypeConst) {
+            return existed;
+        }
+    }
+    // Create the new constant.
+    return new SemanticConstant(fConstantsTable.size(), CONSTANT_Methodref, "", 0, classConst, nameAndTypeConst);
 }
 
 SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString type)
 {
-    // TODO
-    return NULL;
+    SemanticConstant * nameConst = addUtf8Constant(name);
+    SemanticConstant * typeConst = addUtf8Constant(type);
+    // Does it already exist? Check by the pointers to the utf8 constants.
+    foreach (SemanticConstant * existed, fConstantsTable) {
+        if (existed->fType == CONSTANT_NameAndType && existed->fRef1 == nameConst && existed->fRef2 == typeConst) {
+            return existed;
+        }
+    }
+    // Create the new constant.
+    return new SemanticConstant(fConstantsTable.size(), CONSTANT_NameAndType, "", 0, nameConst, typeConst);
 }
 
 SemanticField::SemanticField()
@@ -75,15 +118,20 @@ SemanticMethod::SemanticMethod()
     fConstMethodref = NULL;
 }
 
-SemanticConstant * SemanticMethod::addLocalVarConstant()
+SemanticLocalVar * SemanticMethod::addLocalVarConstant(QString name)
 {
-    // TODO
-    return NULL;
+    // Does it already exist?
+    if (fLocalVarsTable.contains(name)) {
+        return fLocalVarsTable[name];
+    }
+    // Create the new variable.
+    return new SemanticLocalVar(fLocalVarsTable.size(), name);
 }
 
-SemanticLocalVar::SemanticLocalVar()
+SemanticLocalVar::SemanticLocalVar(int id, QString name)
 {
-    fId = -1;
+    fId = id;
+    fName = name;
 }
 
 SemanticAnalyzer::SemanticAnalyzer()

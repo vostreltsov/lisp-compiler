@@ -138,10 +138,10 @@ public:
     SemanticClass();
     SemanticConstant * addUtf8Constant(QString value);
     SemanticConstant * addIntegerConstant(int value);
-    SemanticConstant * addClassConstant(SemanticClass * value);
+    SemanticConstant * addClassConstant(QString name);
     SemanticConstant * addStringConstant(QString value);
-    SemanticConstant * addFieldConstant(SemanticField * value);
-    SemanticConstant * addMethodConstant(SemanticMethod * value);
+    SemanticConstant * addFieldrefConstant(QString className, QString fieldName, QString descriptor);
+    SemanticConstant * addMethodrefConstant(QString className, QString methodName, QString descriptor);
     SemanticConstant * addNameAndTypeConstant(QString name, QString type);
 };
 
@@ -169,7 +169,7 @@ public:
     //QLinkedList<SExpressionNode *>      fExpressions;    // Corresponding tree nodes.
 
     SemanticMethod();
-    SemanticConstant * addLocalVarConstant();
+    SemanticLocalVar * addLocalVarConstant(QString name);
 };
 
 /**
@@ -180,7 +180,7 @@ class SemanticLocalVar
 public:
     int      fId;   // Identifier of the variable.
     QString  fName; // Name of the variable.
-    SemanticLocalVar();
+    SemanticLocalVar(int id = -1, QString name = "");
 };
 
 /**
