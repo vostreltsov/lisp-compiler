@@ -202,6 +202,7 @@ private:
     QLinkedList<QString>             fErrors;     // Semantic errors messages.
 
     SemanticClass * createMainClassAndMethod();
+    SemanticClass * addClass(ListNode * nodeDefclass);
 };
 
 /**

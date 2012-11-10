@@ -25,7 +25,9 @@ SemanticConstant * SemanticClass::addUtf8Constant(QString value)
         }
     }
     // Create the new constant.
-    return new SemanticConstant(fConstantsTable.size(), CONSTANT_Utf8, value);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Utf8, value);
+    fConstantsTable << result;
+    return result;
 }
 
 SemanticConstant * SemanticClass::addIntegerConstant(int value)
@@ -37,7 +39,9 @@ SemanticConstant * SemanticClass::addIntegerConstant(int value)
         }
     }
     // Create the new constant.
-    return new SemanticConstant(fConstantsTable.size(), CONSTANT_Integer, "", value);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Integer, "", value);
+    fConstantsTable << result;
+    return result;
 }
 
 SemanticConstant * SemanticClass::addClassConstant(QString name)
@@ -50,7 +54,9 @@ SemanticConstant * SemanticClass::addClassConstant(QString name)
         }
     }
     // Create the new constant.
-    return new SemanticConstant(fConstantsTable.size(), CONSTANT_Class, "", 0, utf8const);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Class, "", 0, utf8const);
+    fConstantsTable << result;
+    return result;
 }
 
 SemanticConstant * SemanticClass::addStringConstant(QString value)
@@ -63,7 +69,9 @@ SemanticConstant * SemanticClass::addStringConstant(QString value)
         }
     }
     // Create the new constant.
-    return new SemanticConstant(fConstantsTable.size(), CONSTANT_String, "", 0, utf8const);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_String, "", 0, utf8const);
+    fConstantsTable << result;
+    return result;
 }
 
 SemanticConstant * SemanticClass::addFieldrefConstant(QString className, QString fieldName, QString descriptor)
@@ -77,7 +85,9 @@ SemanticConstant * SemanticClass::addFieldrefConstant(QString className, QString
        }
    }
    // Create the new constant.
-   return new SemanticConstant(fConstantsTable.size(), CONSTANT_Fieldref, "", 0, classConst, nameAndTypeConst);
+   SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Fieldref, "", 0, classConst, nameAndTypeConst);
+   fConstantsTable << result;
+   return result;
 }
 
 SemanticConstant * SemanticClass::addMethodrefConstant(QString className, QString methodName, QString descriptor)
@@ -91,7 +101,9 @@ SemanticConstant * SemanticClass::addMethodrefConstant(QString className, QStrin
         }
     }
     // Create the new constant.
-    return new SemanticConstant(fConstantsTable.size(), CONSTANT_Methodref, "", 0, classConst, nameAndTypeConst);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Methodref, "", 0, classConst, nameAndTypeConst);
+    fConstantsTable << result;
+    return result;
 }
 
 SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString type)
@@ -105,7 +117,9 @@ SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString t
         }
     }
     // Create the new constant.
-    return new SemanticConstant(fConstantsTable.size(), CONSTANT_NameAndType, "", 0, nameConst, typeConst);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_NameAndType, "", 0, nameConst, typeConst);
+    fConstantsTable << result;
+    return result;
 }
 
 SemanticField::SemanticField()
@@ -125,7 +139,9 @@ SemanticLocalVar * SemanticMethod::addLocalVarConstant(QString name)
         return fLocalVarsTable[name];
     }
     // Create the new variable.
-    return new SemanticLocalVar(fLocalVarsTable.size(), name);
+    SemanticLocalVar * result = new SemanticLocalVar(fLocalVarsTable.size(), name);
+    fLocalVarsTable.insert(name, result);
+    return result;
 }
 
 SemanticLocalVar::SemanticLocalVar(int id, QString name)
@@ -201,6 +217,21 @@ SemanticClass * SemanticAnalyzer::createMainClassAndMethod()
     return mainClass;
 }
 
+SemanticClass * SemanticAnalyzer::addClass(ListNode * nodeDefclass)
+{
+    QString className = nodeDefclass->fId;
+
+    if (fClassTable.contains(className)) {
+        SemanticClass * result = new SemanticClass();
+        // TODO: add constants, check inheritance, etc.
+
+        fClassTable.insert(className, result);
+        return result;
+    } else {
+        // Error: the class already exists.
+    }
+}
+
 AttributedNode::AttributedNode()
 {
 }
@@ -270,7 +301,7 @@ ProgramNode * ProgramNode::fromSyntaxNode(const program_struct * syntaxNode)
         result->fNodeId = syntaxNode->nodeId;
         s_expr_struct * expr = (syntaxNode->s_expr_seq != NULL ? syntaxNode->s_expr_seq->first : NULL);
         while (expr != NULL) {
-            result->fExpressions.append(SExpressionNode::fromSyntaxNode(expr));
+            result->fExpressions << SExpressionNode::fromSyntaxNode(expr);
             expr = expr->next;
         }
         return result;
@@ -435,7 +466,7 @@ void SlotDefinitionNode::semantics(QMap<QString, SemanticClass *> * classTable, 
     // The only thing to check is calculability of the initform.
     if (fSubType == SLOT_DEF_INITFORM) {
         if (!fInitform->isCalculable()) {
-            errorList->append("Only calculable expressions can be used for :initform.");
+            *errorList << "Only calculable expressions can be used for :initform.";
         }
     }
 }
@@ -667,7 +698,7 @@ void ListNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedLis
         // Operands should be calculable.
         foreach (SExpressionNode * op, fOperands) {
             if (!op->isCalculable()) {
-                errorList->append("Only calculable expressions can be passed as arguments.");
+                *errorList << "Only calculable expressions can be passed as arguments.";
             }
         }
 
@@ -677,14 +708,14 @@ void ListNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedLis
         bool result = (fContainer->fSubType == S_EXPR_TYPE_ID) ||
                       (fContainer->fSubType == S_EXPR_TYPE_LIST && (fContainer->fList->fId == NAME_FUNC_VECTOR || fContainer->fList->fId == NAME_FUNC_LIST));
         if (!result) {
-            errorList->append("Wrong container specified for the loop.");
+            *errorList << "Wrong container specified for the loop.";
         }
         break;
     }
     case LIST_TYPE_LOOP_FROM_TO: {
         // Check if conditions are calculable.
         if (!fFrom->isCalculable() || !fTo->isCalculable()) {
-            errorList->append("Only calculable expressions can be used as loop conditions.");
+            *errorList << "Only calculable expressions can be used as loop conditions.";
         }
         break;
     }
@@ -695,7 +726,7 @@ void ListNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedLis
     case LIST_TYPE_IF: {
         // Check if the condition is calculable.
         if (!fCondition->isCalculable()) {
-            errorList->append("Only calculable expressions can be used as conditions.");
+            *errorList << "Only calculable expressions can be used as conditions.";
         }
         break;
     }
@@ -707,7 +738,7 @@ void ListNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedLis
         // Function parameters are identifiers.
         foreach (SExpressionNode * op, fOperands) {
             if (op->fSubType != S_EXPR_TYPE_ID) {
-                errorList->append("Invalid function parameter name.");
+                *errorList << "Invalid function parameter name.";
             }
         }
 
@@ -720,7 +751,7 @@ void ListNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedLis
     case LIST_TYPE_ASSIGN_ELT: {
         // Check if the assigned expression is calculable.
         if (!fOperands.last()->isCalculable()) {
-            errorList->append("Only calculable expressions can be assigned.");
+            *errorList << "Only calculable expressions can be assigned.";
         }
         break;
     }
@@ -739,7 +770,7 @@ ListNode * ListNode::fromSyntaxNode(const list_struct * syntaxNode)
         result->fId = syntaxNode->id;
         s_expr_struct * expr = (syntaxNode->ops != NULL ? syntaxNode->ops->first : NULL);
         while (expr != NULL) {
-            result->fOperands.append(SExpressionNode::fromSyntaxNode(expr));
+            result->fOperands << SExpressionNode::fromSyntaxNode(expr);
             expr = expr->next;
         }
         result->fCondition = SExpressionNode::fromSyntaxNode(syntaxNode->cond);
@@ -748,14 +779,14 @@ ListNode * ListNode::fromSyntaxNode(const list_struct * syntaxNode)
         result->fTo = SExpressionNode::fromSyntaxNode(syntaxNode->to);
         expr = (syntaxNode->body != NULL ? syntaxNode->body->first : NULL);
         while (expr != NULL) {
-            result->fBody.append(SExpressionNode::fromSyntaxNode(expr));
+            result->fBody << SExpressionNode::fromSyntaxNode(expr);
             expr = expr->next;
         }
         result->fBody1 = SExpressionNode::fromSyntaxNode(syntaxNode->body1);
         result->fBody2 = SExpressionNode::fromSyntaxNode(syntaxNode->body2);
         slot_def_struct * slotdef = (syntaxNode->slotdefs != NULL ? syntaxNode->slotdefs->first : NULL);
         while (slotdef != NULL) {
-            result->fSlotDefs.append(SlotDefinitionNode::fromSyntaxNode(slotdef));
+            result->fSlotDefs << SlotDefinitionNode::fromSyntaxNode(slotdef);
             slotdef = slotdef->next;
         }
         result->fParent = syntaxNode->parent;
