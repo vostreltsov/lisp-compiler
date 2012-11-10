@@ -1611,13 +1611,12 @@ case 68:
 YY_RULE_SETUP
 #line 361 "lexer.flex"
 {
-    store_function_id();
-    return ID;
+    return MAKEINSTANCE;
 }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 365 "lexer.flex"
+#line 364 "lexer.flex"
 {
     store_function_id();
     return ID;
@@ -1625,7 +1624,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 369 "lexer.flex"
+#line 368 "lexer.flex"
 {
     // User-defined symbol.
     store_function_id();
@@ -1634,7 +1633,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 374 "lexer.flex"
+#line 373 "lexer.flex"
 {
     // User-defined symbol.
     store_function_id();
@@ -1643,7 +1642,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 379 "lexer.flex"
+#line 378 "lexer.flex"
 {
     errorCode = ERROR_LEXICAL_UNEXPECTED_CHARACTER;
     yyterminate();
@@ -1651,14 +1650,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 383 "lexer.flex"
+#line 382 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 386 "lexer.flex"
+#line 385 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
@@ -1666,21 +1665,21 @@ YY_RULE_SETUP
 case 75:
 /* rule 75 can match eol */
 YY_RULE_SETUP
-#line 389 "lexer.flex"
+#line 388 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 392 "lexer.flex"
+#line 391 "lexer.flex"
 {
     // Multiline comment ending.
     BEGIN(INITIAL);
 }
 	YY_BREAK
 case YY_STATE_EOF(COMMENT_ML_ST):
-#line 396 "lexer.flex"
+#line 395 "lexer.flex"
 {
     errorCode = ERROR_LEXICAL_UNCLOSED_COMMENT;
     yyterminate();
@@ -1688,7 +1687,7 @@ case YY_STATE_EOF(COMMENT_ML_ST):
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 400 "lexer.flex"
+#line 399 "lexer.flex"
 {
     // String constant body: escaped quote character.
     buffer[buffer_length++] = '"';
@@ -1696,7 +1695,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 404 "lexer.flex"
+#line 403 "lexer.flex"
 {
     // String constant body: escaped slash character.
     buffer[buffer_length++] = '\\';
@@ -1705,7 +1704,7 @@ YY_RULE_SETUP
 case 79:
 /* rule 79 can match eol */
 YY_RULE_SETUP
-#line 408 "lexer.flex"
+#line 407 "lexer.flex"
 {
     // String constant body: non-quote, non-slash characters.
     for (int i = 0; i < yyleng; i++)
@@ -1714,7 +1713,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 413 "lexer.flex"
+#line 412 "lexer.flex"
 {
     // String constant body: unrecognized slash character.
     buffer[buffer_length++] = '\\';
@@ -1722,7 +1721,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 417 "lexer.flex"
+#line 416 "lexer.flex"
 {
     // String constant ending.
     buffer[buffer_length] = '\0';
@@ -1734,7 +1733,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING_ST):
-#line 426 "lexer.flex"
+#line 425 "lexer.flex"
 {
     errorCode = ERROR_LEXICAL_UNCLOSED_STRING;
     yyterminate();
@@ -1742,10 +1741,10 @@ case YY_STATE_EOF(STRING_ST):
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 431 "lexer.flex"
+#line 430 "lexer.flex"
 ECHO;
 	YY_BREAK
-#line 1749 "lexer.cpp"
+#line 1748 "lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2740,7 +2739,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 431 "lexer.flex"
+#line 430 "lexer.flex"
 
 
 

@@ -78,6 +78,7 @@ int idCounter = 0;
 %token ALLOCATION
 %token ALLOCINSTANCE
 %token ALLOCCLASS
+%token MAKEINSTANCE
 
 %start program
 
@@ -110,6 +111,8 @@ s_expr : INT                                                  {$$ = create_s_exp
 
        | '(' IF s_expr s_expr ')'                             {$$ = create_s_expr_if(++idCounter, S_EXPR_TYPE_IF, $3, $4, NULL);}
        | '(' IF s_expr s_expr s_expr ')'                      {$$ = create_s_expr_if(++idCounter, S_EXPR_TYPE_IF, $3, $4, $5);}
+
+       | '(' MAKEINSTANCE '\'' ID ')'                         {$$ = create_s_expr_makeinstance(++idCounter, S_EXPR_TYPE_MAKEINSTANCE, $4);}
        ;
 
 s_expr_seq : s_expr                        {$$ = create_s_expr_seq(++idCounter, $1);}

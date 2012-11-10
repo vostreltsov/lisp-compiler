@@ -359,8 +359,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     return ALLOCCLASS;
 }
 "make-instance" {
-    store_function_id();
-    return ID;
+    return MAKEINSTANCE;
 }
 ":"{SYMBOLID}+ {
     store_function_id();

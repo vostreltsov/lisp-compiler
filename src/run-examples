@@ -1,0 +1,5 @@
+#/bin/sh
+./qtproject --draw ../misc/example.defclass.cl ../misc/example.defclass.png
+./qtproject --draw ../misc/example.defun.cl ../misc/example.defun.png
+./qtproject --draw ../misc/example.if-else-progn.cl ../misc/example.if-else-progn.png
+./qtproject --draw ../misc/example.loops.cl ../misc/example.loops.png

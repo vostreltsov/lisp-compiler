@@ -1,4 +1,3 @@
-#include <QCoreApplication>
 #include <QFile>
 #include <QTextStream>
 #include <QString>
@@ -43,55 +42,39 @@ void run_don_on_attr_node(ProgramNode * program, QString fileName) {
     }
 }
 
-int main(int argc, char *argv[])
+void drawProgram(const char * program, const char * image)
 {
-    QCoreApplication a(argc, argv);
-    yyin = fopen("../misc/example.cl", "r");
+    yyin = fopen(program, "r");
     if (yyin == 0) {
-        printf("error opening example.cl\n");
+        printf("error opening %s\n", program);
     } else {
         yyparse();
-        switch (errorCode) {
-        case ERROR_NO_ERROR: {
+        if (errorCode == ERROR_NO_ERROR) {
             SemanticAnalyzer * sem = new SemanticAnalyzer(root);
-            // Transform the tree.
             sem->doTransform();
-            // Perform semantic checks, generate tables, etc.
-            if (sem->doSemantics()) {
-                // Semantics passed, generate java bytecode.
-                // TODO
-            } else {
-                // Display semantic errors.
-                foreach (QString str, sem->getErrors()) {
-                    QTextStream(stdout) << str << "\n";
-                }
-            }
-            run_don_on_attr_node(sem->getRoot(), "attr.res");
+            run_don_on_attr_node(sem->getRoot(), image);
             delete sem;
-            break;
-        }
-        case ERROR_LEXICAL_UNCLOSED_COMMENT: {
-            puts("lexical error: unclosed comment");
-            break;
-        }
-        case ERROR_LEXICAL_UNCLOSED_STRING: {
-            puts("lexical error: unclosed string constant");
-            break;
-        }
-        case ERROR_LEXICAL_UNEXPECTED_CHARACTER: {
-            puts("lexical error: unexpected character");
-            break;
-        }
-        case ERROR_SYNTAX: {
-            puts("syntax");
-            break;
-        }
-        default: {
-            break;
-        }
         }
         fclose(yyin);
         free_program(root);
     }
-    return /*a.exec()*/0;
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc > 1) {
+        if (strcmp(argv[1], "--draw") == 0) {
+            if (argc >= 4) {
+                drawProgram(argv[2], argv[3]);
+            } else {
+                puts("too few parameters");
+            }
+        } else {
+            puts("use --draw program.cl out.png for drawing");
+        }
+
+    } else if (argc == 1) {
+        drawProgram("../misc/example.cl", "attr.png");
+    }
+    return 0;
 }

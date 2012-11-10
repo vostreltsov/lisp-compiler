@@ -209,6 +209,16 @@ struct s_expr_struct * create_s_expr_if(int nodeId,
     return result;
 }
 
+struct s_expr_struct * create_s_expr_makeinstance(int nodeId,
+                                                  enum s_expr_type type,
+                                                  char * id) {
+    struct s_expr_struct * result = create_s_expr_empty();
+    result->nodeId = nodeId;
+    result->type = type;
+    result->id = id;
+    return result;
+}
+
 struct s_expr_seq_struct * create_s_expr_seq(int nodeId,
                                              struct s_expr_struct * first) {
     struct s_expr_seq_struct * result = create_s_expr_seq_empty();

@@ -61,6 +61,10 @@ struct s_expr_struct * create_s_expr_if(int nodeId,
                                         struct s_expr_struct * body1,
                                         struct s_expr_struct * body2);
 
+struct s_expr_struct * create_s_expr_makeinstance(int nodeId,
+	                                              enum s_expr_type type,
+                                                  char * id);
+
 struct s_expr_seq_struct * create_s_expr_seq(int nodeId,
 	                                         struct s_expr_struct * first);
 

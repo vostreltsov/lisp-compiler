@@ -449,6 +449,11 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         }
         return result;
     }
+    case S_EXPR_TYPE_MAKEINSTANCE: {
+        tmp += "makeinstance '" + fId + "\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        return result;
+    }
     case S_EXPR_TYPE_ASSIGN_ELT: {
         tmp += "[]= \"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
@@ -667,7 +672,7 @@ SlotDefinitionNode::SlotDefinitionNode() : AttributedNode()
 QString SlotDefinitionNode::dotCode(QString parent, QString label) const
 {
     QString tmp = "\"id" + QString::number(fNodeId) + "\\nslot " + fId + "\"";
-    QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n" + result;
+    QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
     foreach (AttributedNode * node, childNodes()) {
         result += node->dotCode(tmp);
     }
@@ -750,7 +755,7 @@ QString DefinitionNode::dotCode(QString parent, QString label) const
         }
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         int cnt = 0;
-        foreach (SExpressionNode * node, fArguments) {
+        foreach (SlotDefinitionNode * node, fSlotDefinitions) {
             result += node->dotCode(tmp, "slot " + QString::number(cnt++));
         }
         return result;
