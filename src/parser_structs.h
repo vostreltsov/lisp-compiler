@@ -4,57 +4,84 @@
 #include "nodetypes.h"
 
 struct program_struct {
-    int                        nodeId;        // Identifier of the node in the syntax tree.
-    struct s_expr_seq_struct * s_expr_seq;    // Program is an s-expression sequence.
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    struct program_part_seq_struct * parts;     // Program is an s-expression sequence.
+};
+
+struct program_part_struct {
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    enum program_part_type           type;      // Type of the program part.
+    struct s_expr_struct           * sexpr;     // S-expression.
+    struct def_struct              * def;       // Class or function definition.
+    struct program_part_struct     * next;      // Pointer to the next program_part_struct.
+};
+
+struct program_part_seq_struct {
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    struct program_part_struct     * first;     // First s-expression in the list.
+    struct program_part_struct     * last;      // Last s-expression in the list.
 };
 
 struct s_expr_struct {
-    int                    nodeId;            // Identifier of the node in the syntax tree.
-    enum s_expr_type       type;              // Type of the s-expression.
-    int                    integer;           // S-expression may be an integer constant.
-    char                   character;         // S-expression may be a character constant.
-    char                 * string;            // S-expression may be a string constant.
-    int                    boolean;           // S-expression may be an boolean constant.
-    char                 * id;                // S-expression may be an identifier.
-    struct list_struct   * list;              // S-expression may be a list.
-    struct s_expr_struct * next;              // Pointer to the next s_expr_struct.
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    enum s_expr_type                 type;      // Type of the s-expression.
+    int                              integer;   // An integer constant.
+    char                             character; // A character constant.
+    char                           * string;    // A string constant.
+    int                              boolean;   // A boolean constant.
+    char                           * id;        // An identifier (variable, class, function).
+    struct s_expr_seq_struct       * args;      // Arguments in case of "DEFUN".
+    struct s_expr_struct           * cond;      // Condition in case of "IF" or "LOOP WHILE".
+    struct s_expr_struct           * container; // Container to iterate over in case of "LOOP".
+    struct s_expr_struct           * from;      // "FROM" value in case of "LOOP".
+    struct s_expr_struct           * to;        // "TO" value in case of "LOOP".
+    struct s_expr_struct           * body1;     // Positive branch in case of "IF" or a body in case of "LOOP".
+    struct s_expr_struct           * body2;     // Negative branch in case of "IF".
+    struct s_expr_struct           * next;      // Pointer to the next s_expr_struct.
 };
 
 struct s_expr_seq_struct {
-    int                        nodeId;        // Identifier of the node in the syntax tree.
-    struct s_expr_struct     * first;         // First s-expression in the list.
-    struct s_expr_struct     * last;          // Last s-expression in the list.
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    struct s_expr_struct           * first;     // First s-expression in the list.
+    struct s_expr_struct           * last;      // Last s-expression in the list.
+};
+
+struct slot_prop_struct {
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    enum slot_prop_type              type;      // Type of the slot property.
+    struct s_expr_struct           * initform;  // Definition of an initial value.
+    char                           * id;        // Name of the reader, writer or accessor method.
+    enum slot_alloc_type             alloc;     // Allocation type.
+    struct slot_prop_struct        * next;      // Pointer to the next slot_prop_struct.
+};
+
+struct slot_prop_seq_struct {
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    struct slot_prop_struct        * first;     // First slot property in the list.
+    struct slot_prop_struct        * last;      // Last slot property in the list.
 };
 
 struct slot_def_struct {
-    int                        nodeId;        // Identifier of the node in the syntax tree.
-    enum slot_def_type         type;          // Type of the slot definition.
-    struct s_expr_struct     * initform;      // Definition of an initial value.
-    char                     * id;            // Definition of a reader, writer or accessor method.
-    enum slot_alloc_type       alloc;         // Allocation type.
-    struct slot_def_struct   * next;          // Pointer to the next slot_def_struct.
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    char                           * id;        // Id of the slot.
+    slot_prop_seq_struct           * props;     // Properties of the slot.
+    struct slot_def_struct         * next;      // Pointer to the next slot_def_struct.
 };
 
 struct slot_def_seq_struct {
-    int                        nodeId;        // Identifier of the node in the syntax tree.
-    struct slot_def_struct   * first;         // First slot definition in the list.
-    struct slot_def_struct   * last;          // Last slot definition in the list.
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    struct slot_def_struct         * first;     // First slot definition in the list.
+    struct slot_def_struct         * last;      // Last slot definition in the list.
 };
 
-struct list_struct {
-    int                            nodeId;    // Identifier of the node in the syntax tree.
-    enum list_type                 type;      // Type of the list.
-    char                         * id;        // Id of the function to call.
-    struct s_expr_seq_struct     * ops;       // List of arguments in case of a function definition/call or slots in case of a class definition.
-    struct s_expr_struct         * cond;      // Condition in case of "IF" or "LOOP WHILE".
-    struct s_expr_struct         * container; // Container to iterate over in case of "LOOP".
-    struct s_expr_struct         * from;      // "FROM" value in case of "LOOP".
-    struct s_expr_struct         * to;        // "TO" value in case of "LOOP".
-    struct s_expr_seq_struct     * body;      // List of s-expressions in case of "DEFUN".
-    struct s_expr_struct         * body1;     // Positive branch in case of "IF" or a body in case of "LOOP".
-    struct s_expr_struct         * body2;     // Negative branch in case of "IF".
-    struct slot_def_seq_struct   * slotdefs;  // Slot definitions in case of a class definition.
-    char                         * parent;    // Name of the parent class in case of a class definition.
+struct def_struct {
+    int                              nodeId;    // Identifier of the node in the syntax tree.
+    enum def_type                    type;      // Type of the definition.
+    char                           * id;        // Name of the class or function.
+    char                           * parent;    // Name of the parent class in case of "DEFCLASS".
+    struct s_expr_seq_struct       * args;      // Arguments in case of "DEFUN".
+    struct slot_def_seq_struct     * slotdefs;  // Slot definitions in case of "DEFCLASS".
+    struct s_expr_seq_struct       * body;      // S-expressions in case of "DEFUN".
 };
 
 #endif

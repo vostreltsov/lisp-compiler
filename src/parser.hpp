@@ -84,21 +84,25 @@ typedef union YYSTYPE
 /* Line 2077 of yacc.c  */
 #line 18 "parser.y"
 
-    int                          semantic_int;
-    char                         semantic_char;
-    char                       * semantic_string;
-    int                          semantic_bool;
-    char                       * semantic_id;
-    struct program_struct      * semantic_program;
-    struct s_expr_struct       * semantic_s_expr;
-    struct s_expr_seq_struct   * semantic_s_expr_seq;
-    struct slot_def_struct     * semantic_slot_def;
-    struct slot_def_seq_struct * semantic_slot_def_seq;
-    struct list_struct         * semantic_list;
+    int                              semantic_int;
+    char                             semantic_char;
+    char                           * semantic_string;
+    int                              semantic_bool;
+    char                           * semantic_id;
+    struct program_struct          * semantic_program;
+    struct program_part_struct     * semantic_program_part;
+    struct program_part_seq_struct * semantic_program_part_seq;
+    struct s_expr_struct           * semantic_s_expr;
+    struct s_expr_seq_struct       * semantic_s_expr_seq;
+    struct slot_prop_struct        * semantic_slot_prop;
+    struct slot_prop_seq_struct    * semantic_slot_prop_seq;
+    struct slot_def_struct         * semantic_slot_def;
+    struct slot_def_seq_struct     * semantic_slot_def_seq;
+    struct def_struct              * semantic_def;
 
 
 /* Line 2077 of yacc.c  */
-#line 102 "parser.hpp"
+#line 106 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

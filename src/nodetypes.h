@@ -2,46 +2,60 @@
 #define NODETYPES_H
 
 struct program_struct;
+struct program_part_struct;
+struct program_part_seq_struct;
 struct s_expr_struct;
 struct s_expr_seq_struct;
+struct slot_prop_struct;
+struct slot_prop_seq_struct;
 struct slot_def_struct;
-struct list_struct;
+struct slot_def_seq_struct;
+struct def_struct;
 
-enum s_expr_type {
-    S_EXPR_TYPE_INT,        // Scalar integer value.
-    S_EXPR_TYPE_CHAR,       // Scalar character value.
-    S_EXPR_TYPE_STRING,     // Scalar string value.
-    S_EXPR_TYPE_BOOL,       // Scalar boolean value.
-    S_EXPR_TYPE_ID,         // Scalar identifier.
-    S_EXPR_TYPE_LIST        // List.
+enum program_part_type {
+    PROGRAM_PART_TYPE_RESERVED, // Default invalid value.
+    PROGRAM_PART_TYPE_S_EXPR,   // S-expression.
+    PROGRAM_PART_TYPE_DEF       // Class or function definition.
 };
 
-enum slot_def_type {
-    SLOT_DEF_RESERVED,      // Default value.
-    SLOT_DEF_INITFORM,      // :initform.
-    SLOT_DEF_READER,        // :reader.
-    SLOT_DEF_WRITER,        // :writer.
-    SLOT_DEF_ACCESSOR,      // :accessor.
-    SLOT_DEF_ALLOCATION     // :allocation.
+enum s_expr_type {
+    S_EXPR_TYPE_RESERVED,       // Default invalid value.
+    S_EXPR_TYPE_INT,            // Integer value.
+    S_EXPR_TYPE_CHAR,           // Character value.
+    S_EXPR_TYPE_STRING,         // String value.
+    S_EXPR_TYPE_BOOL,           // Boolean value.
+    S_EXPR_TYPE_ID,             // Identifier.
+    S_EXPR_TYPE_FCALL,          // Function call.
+    S_EXPR_TYPE_LOOP_IN,        // Loop "loop for x in array do (print x)".
+    S_EXPR_TYPE_LOOP_FROM_TO,   // Loop "loop for x from 1 to 10 do (print x)".
+    S_EXPR_TYPE_PROGN,          // Uniting a couple of expressions to one expression.
+    S_EXPR_TYPE_IF,             // Conditional operator.
+    S_EXPR_TYPE_SLOTDEF,        // Slot definition.
+    S_EXPR_TYPE_DEFUN,          // Function definition.
+    S_EXPR_TYPE_DEFCLASS,       // Class definition.
+
+    S_EXPR_TYPE_ASSIGN_ELT      // Ternary operator []=
+};
+
+enum slot_prop_type {
+    SLOT_PROP_TYPE_RESERVED,    // Default invalid value.
+    SLOT_PROP_TYPE_INITFORM,    // :initform.
+    SLOT_PROP_TYPE_READER,      // :reader.
+    SLOT_PROP_TYPE_WRITER,      // :writer.
+    SLOT_PROP_TYPE_ACCESSOR,    // :accessor.
+    SLOT_PROP_TYPE_ALLOCATION   // :allocation.
 };
 
 enum slot_alloc_type {
-    SLOT_ALLOC_INSTANCE,    // Slot-per-instance.
-    SLOT_ALLOC_CLASS        // Slot-per-class.
+    SLOT_ALLOC_TYPE_RESERVED,   // Default invalid value.
+    SLOT_ALLOC_TYPE_INSTANCE,   // Slot-per-instance.
+    SLOT_ALLOC_TYPE_CLASS       // Slot-per-class.
 };
 
-enum list_type {
-    LIST_TYPE_EMPTY,        // Reserved value.
-    LIST_TYPE_FCALL,        // Function call.
-    LIST_TYPE_LOOP_IN,      // Loop "loop for x in array do (print x)".
-    LIST_TYPE_LOOP_FROM_TO, // Loop "loop for x from 1 to 10 do (print x)".
-    LIST_TYPE_PROGN,        // Uniting a couple of expressions to a one expression.
-    LIST_TYPE_IF,           // Conditional operator.
-    LIST_TYPE_SLOTDEF,      // Slot definition.
-    LIST_TYPE_DEFUN,        // Function definition.
-    LIST_TYPE_DEFCLASS,     // Class definition.
-
-    LIST_TYPE_ASSIGN_ELT    // Ternary operator []=
+enum def_type {
+    DEF_TYPE_RESERVED,          // Default invalid value.
+    DEF_TYPE_CLASS,             // Class definition.
+    DEF_TYPE_FUNC               // Function definition.
 };
 
 #endif // NODETYPES_H
