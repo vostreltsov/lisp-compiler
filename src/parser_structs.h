@@ -11,7 +11,7 @@ struct program_struct {
 struct program_part_struct {
     int                              nodeId;    // Identifier of the node in the syntax tree.
     enum program_part_type           type;      // Type of the program part.
-    struct s_expr_struct           * sexpr;     // S-expression.
+    struct s_expr_struct           * s_expr;    // S-expression.
     struct def_struct              * def;       // Class or function definition.
     struct program_part_struct     * next;      // Pointer to the next program_part_struct.
 };

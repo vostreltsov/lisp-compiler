@@ -16,8 +16,11 @@ class SemanticLocalVar;
 class SemanticAnalyzer;
 class AttributedNode;
 class ProgramNode;
+class ProgramPartNode;
 class SExpressionNode;
-class ListNode;
+class SlotPropertyNode;
+class SlotDefinitionNode;
+class DefinitionNode;
 
 #define TWOBYTES_MAX = 327687;
 #define TWOBYTES_MIN = -32768;
@@ -98,12 +101,14 @@ enum JavaConstantsTypes
 /**
  * @brief Attributed nodes types.
  */
-enum AttributedTypes
+enum AttributedNodeType
 {
-    ATTR_TYPE_PROGRAM,  // Program.
-    ATTR_TYPE_S_EXPR,   // S-expression.
-    ATTR_TYPE_SLOT_DEF, // Slot definition
-    ATTR_TYPE_LIST      // List.
+    ATTR_TYPE_PROGRAM,      // Program.
+    ATTR_TYPE_PROGRAM_PART, // Program part (s-expression or class/function definition).
+    ATTR_TYPE_S_EXPR,       // S-expression.
+    ATTR_TYPE_SLOT_PROP,    // Slot property.
+    ATTR_TYPE_SLOT_DEF,     // Slot definition.
+    ATTR_TYPE_DEFINITION    // Class or function definition.
 };
 
 /**
@@ -202,7 +207,7 @@ private:
     QLinkedList<QString>             fErrors;     // Semantic errors messages.
 
     SemanticClass * createMainClassAndMethod();
-    SemanticClass * addClass(ListNode * nodeDefclass);
+    SemanticClass * addClass(DefinitionNode * nodeDefclass);
 };
 
 /**
@@ -211,8 +216,8 @@ private:
 class AttributedNode
 {
 public:
-    int             fNodeId; // Id of the node.
-    AttributedTypes fType;   // Type of the node.
+    int                fNodeId; // Id of the node.
+    AttributedNodeType fType;   // Type of the node.
 
     /**
      * @brief Default constructor.
@@ -227,10 +232,10 @@ public:
     /**
      * @brief Generates dot code for this node.
      */
-    virtual QString dotCode(QString parent, QString label) const = 0;
+    virtual QString dotCode(QString parent, QString label = "") const = 0;
 
     /**
-     * @brief Checks if this s-expression is calculable, e.g. can be used as a condition, initform etc.
+     * @brief Checks if this node calculable, e.g. can be used as a condition, initform etc.
      */
     virtual bool isCalculable() const = 0;
 
@@ -256,18 +261,33 @@ public:
 class ProgramNode : public AttributedNode
 {
 public:
-    QLinkedList<SExpressionNode *> fExpressions;
+    QLinkedList<ProgramPartNode *> fParts;
     ProgramNode();
-    QString dotCode(QString parent, QString label) const;
+    QString dotCode(QString parent, QString label = "") const;
     void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-
-    /**
-     * @brief Creates an instance of ProgramNode from a program_struct node.
-     */
     static ProgramNode * fromSyntaxNode(const program_struct * syntaxNode);
+};
+
+/**
+ * @brief Represents an attributed program part node.
+ */
+class ProgramPartNode : public AttributedNode
+{
+public:
+    program_part_type fSubType;
+    SExpressionNode * fSExpression;
+    DefinitionNode  * fDefinition;
+
+    ProgramPartNode();
+    QString dotCode(QString parent, QString label = "") const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
+    bool isCalculable() const;
+    QLinkedList<AttributedNode *> childNodes() const;
+    void transform();
+    static ProgramPartNode * fromSyntaxNode(const program_part_struct * syntaxNode);
 };
 
 /**
@@ -276,24 +296,47 @@ public:
 class SExpressionNode : public AttributedNode
 {
 public:
-    s_expr_type fSubType;
-    int         fInteger;
-    char        fCharacter;
-    QString     fString;
-    int         fBoolean;
-    QString     fId;
-    ListNode  * fList;
+    s_expr_type                       fSubType;
+    int                               fInteger;
+    char                              fCharacter;
+    QString                           fString;
+    int                               fBoolean;
+    QString                           fId;
+    QLinkedList<SExpressionNode *>    fArguments;
+    SExpressionNode                 * fCondition;
+    SExpressionNode                 * fContainer;
+    SExpressionNode                 * fFrom;
+    SExpressionNode                 * fTo;
+    SExpressionNode                 * fBody1;
+    SExpressionNode                 * fBody2;
+
     SExpressionNode();
-    QString dotCode(QString parent, QString label) const;
+    QString dotCode(QString parent, QString label = "") const;
     void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-
-    /**
-     * @brief Creates an instance of SExpressionNode from a s_expr_struct node.
-     */
     static SExpressionNode * fromSyntaxNode(const s_expr_struct * syntaxNode);
+};
+
+/**
+ * @brief Represents an attributed slot property node.
+ */
+class SlotPropertyNode : public AttributedNode
+{
+public:
+    slot_prop_type    fSubType;
+    SExpressionNode * fInitform;
+    QString           fId;
+    slot_alloc_type   fAllocationType;
+
+    SlotPropertyNode();
+    QString dotCode(QString parent, QString label = "") const;
+    void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
+    bool isCalculable() const;
+    QLinkedList<AttributedNode *> childNodes() const;
+    void transform();
+    static SlotPropertyNode * fromSyntaxNode(const slot_prop_struct * syntaxNode);
 };
 
 /**
@@ -302,52 +345,38 @@ public:
 class SlotDefinitionNode : public AttributedNode
 {
 public:
-    slot_def_type     fSubType;
-    SExpressionNode * fInitform;
-    QString           fId;
-    slot_alloc_type   fAllocType;
+    QString                         fId;
+    QLinkedList<SlotPropertyNode *> fProperties;
+
     SlotDefinitionNode();
-    QString dotCode(QString parent, QString label) const;
+    QString dotCode(QString parent, QString label = "") const;
     void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-
-    /**
-     * @brief Creates an instance of SlotDefinitionNode from a slot_def_struct node.
-     */
     static SlotDefinitionNode * fromSyntaxNode(const slot_def_struct * syntaxNode);
 };
 
 /**
  * @brief Represents an attributed list node.
  */
-class ListNode : public AttributedNode
+class DefinitionNode : public AttributedNode
 {
 public:
-    list_type                         fSubType;
+    def_type                          fSubType;
     QString                           fId;
-    QLinkedList<SExpressionNode *>    fOperands;
-    SExpressionNode                 * fCondition;
-    SExpressionNode                 * fContainer;
-    SExpressionNode                 * fFrom;
-    SExpressionNode                 * fTo;
-    QLinkedList<SExpressionNode *>    fBody;
-    SExpressionNode                 * fBody1;
-    SExpressionNode                 * fBody2;
-    QLinkedList<SlotDefinitionNode *> fSlotDefs;
     QString                           fParent;
-    ListNode();
-    QString dotCode(QString parent, QString label) const;
+    QLinkedList<SExpressionNode *>    fArguments;
+    QLinkedList<SlotDefinitionNode *> fSlotDefinitions;
+    QLinkedList<SExpressionNode *>    fBody;
+
+    DefinitionNode();
+    QString dotCode(QString parent, QString label = "") const;
     void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-
-    /**
-     * @brief Creates an instance of ListNode from a list_struct node.
-     */
-    static ListNode * fromSyntaxNode(const list_struct * syntaxNode);
+    static DefinitionNode * fromSyntaxNode(const def_struct * syntaxNode);
 };
 
 #endif // SEMANTICANALYZER_H

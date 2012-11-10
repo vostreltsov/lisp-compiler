@@ -21,7 +21,7 @@ struct program_struct * create_program(int nodeId,
 
 struct program_part_struct * create_program_part(int nodeId,
 	                                             enum program_part_type type,
-	                                             struct s_expr_struct * sexpr,
+	                                             struct s_expr_struct * s_expr,
 	                                             struct def_struct * def);
 
 struct program_part_seq_struct * create_program_part_seq(int nodeId,

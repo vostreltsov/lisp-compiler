@@ -11,7 +11,7 @@ struct program_part_struct * create_program_part_empty() {
     struct program_part_struct * result = (struct program_part_struct *)malloc(sizeof(struct program_part_struct));
     result->nodeId = 0;
     result->type = PROGRAM_PART_TYPE_RESERVED;
-    result->sexpr = NULL;
+    result->s_expr = NULL;
     result->def = NULL;
     result->next = NULL;
     return result;
@@ -111,12 +111,12 @@ struct program_struct * create_program(int nodeId,
 
 struct program_part_struct * create_program_part(int nodeId,
                                                  enum program_part_type type,
-                                                 struct s_expr_struct * sexpr,
+                                                 struct s_expr_struct * s_expr,
                                                  struct def_struct * def) {
     struct program_part_struct * result = create_program_part_empty();
     result->nodeId = nodeId;
     result->type = type;
-    result->sexpr = sexpr;
+    result->s_expr = s_expr;
     result->def = def;
     return result;
 }
@@ -315,7 +315,7 @@ void free_program(struct program_struct * program) {
 
 void free_program_part(struct program_part_struct * program_part) {
     if (program_part != NULL) {
-        free_s_expr(program_part->sexpr);
+        free_s_expr(program_part->s_expr);
         free_def(program_part->def);
         free(program_part);
     }

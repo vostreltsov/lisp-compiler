@@ -30,9 +30,6 @@ enum s_expr_type {
     S_EXPR_TYPE_LOOP_FROM_TO,   // Loop "loop for x from 1 to 10 do (print x)".
     S_EXPR_TYPE_PROGN,          // Uniting a couple of expressions to one expression.
     S_EXPR_TYPE_IF,             // Conditional operator.
-    S_EXPR_TYPE_SLOTDEF,        // Slot definition.
-    S_EXPR_TYPE_DEFUN,          // Function definition.
-    S_EXPR_TYPE_DEFCLASS,       // Class definition.
 
     S_EXPR_TYPE_ASSIGN_ELT      // Ternary operator []=
 };
