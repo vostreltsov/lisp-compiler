@@ -521,8 +521,8 @@ void SExpressionNode::transform()
     // Transform this node.
     switch (fSubType) {
     case S_EXPR_TYPE_FCALL: {
-        SExpressionNode * op1 = fArguments.first();
-        if (fId == NAME_FUNC_SETF) {
+        SExpressionNode * op1 = fArguments.isEmpty() ? NULL : fArguments.first();
+        if (op1 != NULL && fId == NAME_FUNC_SETF) {
             // Convert to ternary operator.
             if (op1->fSubType == S_EXPR_TYPE_FCALL && op1->fId == NAME_FUNC_ELT) {
                 fSubType = S_EXPR_TYPE_ASSIGN_ELT;

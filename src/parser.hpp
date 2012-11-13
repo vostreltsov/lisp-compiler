@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 2.6.4.  */
+/* A Bison parser, made by GNU Bison 2.6.5.  */
 
 /* Bison interface for Yacc-like parsers in C
    
@@ -82,7 +82,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-/* Line 2077 of yacc.c  */
+/* Line 2042 of yacc.c  */
 #line 18 "parser.y"
 
     int                              semantic_int;
@@ -102,7 +102,7 @@ typedef union YYSTYPE
     struct def_struct              * semantic_def;
 
 
-/* Line 2077 of yacc.c  */
+/* Line 2042 of yacc.c  */
 #line 107 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1

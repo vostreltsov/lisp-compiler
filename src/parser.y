@@ -102,6 +102,7 @@ s_expr : INT                                                  {$$ = create_s_exp
        | ID                                                   {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_ID,       0,  '\0',  NULL,  0,  $1);}
        | '(' ')'                                              {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_RESERVED, 0,  '\0',  NULL,  0,  NULL);}
 
+       | '(' ID ')'                                           {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, NULL);}
        | '(' ID s_expr_seq ')'                                {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, $3);}
 
        | '(' LOOP FOR ID IN s_expr DO s_expr ')'              {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_IN,      $4, $6,   NULL, NULL, $8);}
