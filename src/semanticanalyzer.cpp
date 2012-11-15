@@ -284,6 +284,43 @@ void ProgramNode::transform()
     foreach (AttributedNode * node, childNodes()) {
         node->transform();
     }
+
+    // Create main method definition node,
+    DefinitionNode * mainMethod = new DefinitionNode();
+    mainMethod->fNodeId = 100500;
+    mainMethod->fSubType = DEF_TYPE_FUNC;
+    mainMethod->fId = NAME_JAVA_METHOD_MAIN;
+    // No need to add arguments I hope, handle it on the code generation stage.
+    // Move all global operators to the main method.
+    QLinkedList<ProgramPartNode *>::iterator iter = fParts.begin();
+    while (iter != fParts.end()) {
+        ProgramPartNode * curNode = *iter;
+        if (curNode->fSubType == PROGRAM_PART_TYPE_S_EXPR) {
+            mainMethod->fBody << curNode->fSExpression;
+            curNode->fSExpression = NULL;
+            iter = fParts.erase(iter);
+        } else {
+            ++iter;
+        }
+
+    }
+
+    // Main method is done, create main class definition node, add the main method definition node.
+    DefinitionNode * mainClass = new DefinitionNode();
+    mainClass->fNodeId = 100501;
+    mainClass->fSubType = DEF_TYPE_CLASS;
+    mainClass->fId = NAME_JAVA_CLASS_MAINCLASS;
+    mainClass->fParent = NAME_JAVA_CLASS_OBJECT;
+    mainClass->fClassMethods << mainMethod;
+    // fSlotDefinitions???
+
+    // Finally, create a new program part node which contains main class.
+    ProgramPartNode * mainPart = new ProgramPartNode();
+    mainPart->fNodeId = 100502;
+    mainPart->fSubType = PROGRAM_PART_TYPE_DEF;
+    mainPart->fDefinition = mainClass;
+
+    fParts << mainPart;
 }
 
 void ProgramNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
@@ -754,9 +791,11 @@ QString DefinitionNode::dotCode(QString parent, QString label) const
             tmp += "defclass " + fId + "\\nparent:" + fParent + "\"";
         }
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
-        int cnt = 0;
-        foreach (SlotDefinitionNode * node, fSlotDefinitions) {
-            result += node->dotCode(tmp, "slot " + QString::number(cnt++));
+        foreach (SlotDefinitionNode * node, fClassFields) {
+            result += node->dotCode(tmp, "field");
+        }
+        foreach (DefinitionNode * node, fClassMethods) {
+            result += node->dotCode(tmp, "method");
         }
         return result;
     }    
@@ -777,7 +816,10 @@ QLinkedList<AttributedNode *> DefinitionNode::childNodes() const
     foreach (SExpressionNode * node, fArguments) {
         result << node;
     }
-    foreach (SlotDefinitionNode * node, fSlotDefinitions) {
+    foreach (SlotDefinitionNode * node, fClassFields) {
+        result << node;
+    }
+    foreach (DefinitionNode * node, fClassMethods) {
         result << node;
     }
     foreach (SExpressionNode * node, fBody) {
@@ -878,14 +920,19 @@ DefinitionNode * DefinitionNode::fromSyntaxNode(const def_struct * syntaxNode)
         result->fSubType = syntaxNode->type;
         result->fId = syntaxNode->id;
         result->fParent = syntaxNode->parent;
+        if (result->fSubType == DEF_TYPE_CLASS && result->fParent.isEmpty()) {
+            result->fParent = NAME_JAVA_CLASS_OBJECT;
+        }
         s_expr_struct * expr = (syntaxNode->args != NULL ? syntaxNode->args->first : NULL);
         while (expr != NULL) {
             result->fArguments << SExpressionNode::fromSyntaxNode(expr);
             expr = expr->next;
         }
+        // Decide what slots are fields and what slots are methods.
         slot_def_struct * slotdef = (syntaxNode->slotdefs != NULL ? syntaxNode->slotdefs->first : NULL);
         while (slotdef != NULL) {
-            result->fSlotDefinitions << SlotDefinitionNode::fromSyntaxNode(slotdef);
+            // TODO!!!
+            result->fClassFields << SlotDefinitionNode::fromSyntaxNode(slotdef);
             slotdef = slotdef->next;
         }
         expr = (syntaxNode->body != NULL ? syntaxNode->body->first : NULL);

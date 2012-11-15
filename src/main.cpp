@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         }
 
     } else if (argc == 1) {
-        drawProgram("../misc/example.cl", "attr.png");
+        drawProgram("../misc/example.defclass.cl", "attr.png");
     }
     return 0;
 }

@@ -367,7 +367,8 @@ public:
     QString                           fId;
     QString                           fParent;
     QLinkedList<SExpressionNode *>    fArguments;
-    QLinkedList<SlotDefinitionNode *> fSlotDefinitions;
+    QLinkedList<SlotDefinitionNode *> fClassFields;
+    QLinkedList<DefinitionNode *>     fClassMethods;
     QLinkedList<SExpressionNode *>    fBody;
 
     DefinitionNode();
