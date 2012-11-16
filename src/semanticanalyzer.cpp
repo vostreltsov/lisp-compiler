@@ -122,6 +122,22 @@ SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString t
     return result;
 }
 
+void SemanticClass::addDefaultAndParentConstructor()
+{
+    // Add constructor name and descriptor.
+    addUtf8Constant(NAME_JAVA_CONSTRUCTOR);
+    addUtf8Constant(DESC_JAVA_CONSTRUCTOR_VOID);
+
+    // Add constructor to the methods table.
+    SemanticMethod * constructorThis = new SemanticMethod();
+    //SemanticMethod * constructorParent = new SemanticMethod();
+    constructorThis->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_CONSTRUCTOR_VOID);
+    /*constructorParent->fConstMethodref =*/ addMethodrefConstant(fConstParent->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_CONSTRUCTOR_VOID);
+
+    // Add methods to the table.
+    fMethodsTable.insert(NAME_JAVA_CONSTRUCTOR, constructorThis);
+}
+
 SemanticField::SemanticField()
 {
     fConstFieldref = NULL;
@@ -182,13 +198,7 @@ bool SemanticAnalyzer::doSemantics()
     fClassTable.clear();
     fErrors.clear();
     if (fRoot != NULL) {
-        // Create main class and method.
-        SemanticClass * mainClass = createMainClassAndMethod();
-        fClassTable.insert(NAME_JAVA_CLASS_MAINCLASS, mainClass);
-
-        // TODO: universal class?
-
-        fRoot->semantics(&fClassTable,  &fErrors, mainClass, NULL);
+        fRoot->semantics(&fClassTable,  &fErrors, NULL, NULL);
     }
     return fErrors.empty();
 }
@@ -198,23 +208,6 @@ void SemanticAnalyzer::doTransform()
     if (fRoot != NULL) {
         fRoot->transform();
     }
-}
-
-SemanticClass * SemanticAnalyzer::createMainClassAndMethod()
-{
-    // Create the main class itself.
-    SemanticClass * mainClass = new SemanticClass();
-    //mainClass->fConstClass = NAME_JAVA_CLASS_MAINCLASS;  // TODO
-   // mainClass->fConstParent = NAME_JAVA_CLASS_OBJECT; // TODO
-
-    // Add main method.
-    SemanticMethod * mainMethod = new SemanticMethod();
-    mainMethod->fIsStatic = true;
-
-    // Add constants to deal with RTL.
-
-
-    return mainClass;
 }
 
 SemanticClass * SemanticAnalyzer::addClass(DefinitionNode * nodeDefclass)
@@ -312,7 +305,6 @@ void ProgramNode::transform()
     mainClass->fId = NAME_JAVA_CLASS_MAINCLASS;
     mainClass->fParent = NAME_JAVA_CLASS_OBJECT;
     mainClass->fClassMethods << mainMethod;
-    // fSlotDefinitions???
 
     // Finally, create a new program part node which contains main class.
     ProgramPartNode * mainPart = new ProgramPartNode();
@@ -325,10 +317,16 @@ void ProgramNode::transform()
 
 void ProgramNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
-    // Process all parts.
+    // Create tables and check all child nodes.
     foreach (AttributedNode * node, childNodes()) {
         node->semantics(classTable, errorList, curClass, curMethod);
     }
+
+    // Main class is added in the above call since it's added as a node during transformation. Add the base class to constants.
+    SemanticClass * baseClass = new SemanticClass();
+    baseClass->fConstClass = baseClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
+    baseClass->fConstParent = baseClass->addClassConstant(NAME_JAVA_CLASS_OBJECT);
+    baseClass->addDefaultAndParentConstructor();
 }
 
 ProgramNode * ProgramNode::fromSyntaxNode(const program_struct * syntaxNode)
@@ -742,7 +740,7 @@ void SlotDefinitionNode::semantics(QMap<QString, SemanticClass *> * classTable, 
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
         child->semantics(classTable, errorList, curClass, curMethod);
-    }    
+    }
 }
 
 SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(const slot_def_struct * syntaxNode)
@@ -798,7 +796,7 @@ QString DefinitionNode::dotCode(QString parent, QString label) const
             result += node->dotCode(tmp, "method");
         }
         return result;
-    }    
+    }
     default: {
         return "";
     }

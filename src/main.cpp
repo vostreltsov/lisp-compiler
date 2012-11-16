@@ -52,6 +52,7 @@ void drawProgram(const char * program, const char * image)
         if (errorCode == ERROR_NO_ERROR) {
             SemanticAnalyzer * sem = new SemanticAnalyzer(root);
             sem->doTransform();
+            sem->doSemantics();
             run_don_on_attr_node(sem->getRoot(), image);
             delete sem;
         }
