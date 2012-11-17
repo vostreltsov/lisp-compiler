@@ -54,7 +54,6 @@ class DefinitionNode;
 #define NAME_FUNC_REMOVE             "remove"
 #define NAME_FUNC_SUBSTITUTE         "substitute"
 #define NAME_FUNC_CONCATENATE        "concatenate"
-#define NAME_FUNC_SLOT_VALUE         "slot-value"
 #define NAME_FUNC_OPEN               "open"
 #define NAME_FUNC_CLOSE              "close"
 #define NAME_FUNC_WITH_OPEN_FILE     "with-open-file"
@@ -325,6 +324,8 @@ public:
     QString                           fString;
     int                               fBoolean;
     QString                           fId;
+    QString                           fSlotValueObject;
+    QString                           fSlotValueSlot;
     QLinkedList<SExpressionNode *>    fArguments;
     SExpressionNode                 * fCondition;
     SExpressionNode                 * fContainer;

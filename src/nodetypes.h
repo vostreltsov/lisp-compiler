@@ -31,6 +31,7 @@ enum s_expr_type {
     S_EXPR_TYPE_PROGN,          // Uniting a couple of expressions to one expression.
     S_EXPR_TYPE_IF,             // Conditional operator.
     S_EXPR_TYPE_MAKEINSTANCE,   // Making an instance of a class.
+    S_EXPR_TYPE_SLOTVALUE,      // Getting value of an object slot.
 
     S_EXPR_TYPE_ASSIGN_ELT,     // Ternary operator array[index] = value.
     S_EXPR_TYPE_ASSIGN_FIELD    // Ternary operator object.field = value.

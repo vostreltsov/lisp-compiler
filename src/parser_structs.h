@@ -30,6 +30,8 @@ struct s_expr_struct {
     char                           * string;    // A string constant.
     int                              boolean;   // A boolean constant.
     char                           * id;        // An identifier (variable, class, function).
+    char                           * slvalobj;  // Object name in case of slot-value.
+    char                           * slvalslot; // Slot name in case of slot-value.
     struct s_expr_seq_struct       * args;      // Arguments in case of "DEFUN".
     struct s_expr_struct           * cond;      // Condition in case of "IF" or "LOOP WHILE".
     struct s_expr_struct           * container; // Container to iterate over in case of "LOOP".

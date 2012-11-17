@@ -489,6 +489,11 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         return result;
     }
+    case S_EXPR_TYPE_SLOTVALUE: {
+        tmp += "slotvalue " + fSlotValueObject + " '" + fSlotValueSlot + "\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        return result;
+    }
     case S_EXPR_TYPE_ASSIGN_ELT: {
         tmp += "[]= \"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
@@ -499,11 +504,11 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         return result;
     }
     case S_EXPR_TYPE_ASSIGN_FIELD: {
-        tmp += "obj.field = \"";
+        tmp += fSlotValueObject + "." + fSlotValueSlot + " = \"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         int cnt = 0;
         foreach (SExpressionNode * node, fArguments) {
-            result += node->dotCode(tmp, "arg " + QString::number(cnt++));
+            result += node->dotCode(tmp, "value " + QString::number(cnt++));
         }
         return result;
     }
@@ -568,14 +573,24 @@ void SExpressionNode::transform()
         SExpressionNode * op1 = fArguments.isEmpty() ? NULL : fArguments.first();
         // Convert to ternary operators.
         if (op1 != NULL && fId == NAME_FUNC_SETF) {
-            // Convert "arr[i] = value" and "obj.field = value" to ternary operator.
-            if (op1->fSubType == S_EXPR_TYPE_FCALL && (op1->fId == NAME_FUNC_ELT || op1->fId == NAME_FUNC_SLOT_VALUE)) {
-                fSubType = op1->fId == NAME_FUNC_ELT ? S_EXPR_TYPE_ASSIGN_ELT : S_EXPR_TYPE_ASSIGN_FIELD;
+            if (op1->fSubType == S_EXPR_TYPE_FCALL && op1->fId == NAME_FUNC_ELT) {
+                // Convert "arr[i] = value" to ternary operator.
+                fSubType = S_EXPR_TYPE_ASSIGN_ELT;
                 // Remove the first element and concatenate the rest to the ELT's operands list.
                 fArguments.removeFirst();
                 op1->fArguments << fArguments;
                 fArguments = op1->fArguments;
                 // Clear the ELT's operands list and delete it.
+                op1->fArguments.clear();
+                delete op1;
+            } else if (op1->fSubType == S_EXPR_TYPE_SLOTVALUE) {
+                // Convert "obj.field = value" to ternary operator.
+                fSubType = S_EXPR_TYPE_ASSIGN_FIELD;
+                // Remove the first element and concatenate the rest to the ELT's operands list.
+                fArguments.removeFirst();
+                fSlotValueObject = op1->fSlotValueObject;
+                fSlotValueSlot = op1->fSlotValueSlot;
+                // Clear the SLOTVALUE's operands list and delete it.
                 op1->fArguments.clear();
                 delete op1;
             }
@@ -607,6 +622,8 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
         result->fString = syntaxNode->string;
         result->fBoolean = syntaxNode->boolean;
         result->fId = syntaxNode->id;
+        result->fSlotValueObject = syntaxNode->slvalobj;
+        result->fSlotValueSlot = syntaxNode->slvalslot;
         s_expr_struct * cur = (syntaxNode->args != NULL ? syntaxNode->args->first : NULL);
         while (cur != NULL) {
             result->fArguments << SExpressionNode::fromSyntaxNode(cur);

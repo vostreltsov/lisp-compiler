@@ -73,6 +73,7 @@ int idCounter = 0;
 %token ALLOCINSTANCE
 %token ALLOCCLASS
 %token MAKEINSTANCE
+%token SLOTVALUE
 
 %start program
 
@@ -108,6 +109,7 @@ s_expr : INT                                                  {$$ = create_s_exp
        | '(' IF s_expr s_expr s_expr ')'                      {$$ = create_s_expr_if(++idCounter, S_EXPR_TYPE_IF, $3, $4, $5);}
 
        | '(' MAKEINSTANCE '\'' ID ')'                         {$$ = create_s_expr_makeinstance(++idCounter, S_EXPR_TYPE_MAKEINSTANCE, $4);}
+       | '(' SLOTVALUE ID '\'' ID ')'                         {$$ = create_s_expr_slotvalue(++idCounter, S_EXPR_TYPE_SLOTVALUE, $3, $5);}
        ;
 
 s_expr_seq : s_expr                        {$$ = create_s_expr_seq(++idCounter, $1);}

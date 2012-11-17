@@ -377,41 +377,41 @@ static yyconst flex_int16_t yy_accept[335] =
     {   0,
         0,    0,    0,    0,    0,    0,   83,   72,    4,    4,
         2,   72,   70,    5,    6,    7,   10,    8,    9,   11,
-       45,   72,    3,   14,   16,   12,   70,   70,   70,   70,
-       70,   70,   70,   70,   70,   70,   70,   70,   70,   41,
+       44,   72,    3,   14,   16,   12,   70,   70,   70,   70,
+       70,   70,   70,   70,   70,   70,   70,   70,   70,   40,
        70,   70,   72,   75,   74,   73,   79,   81,   80,    4,
-        0,    0,    0,    0,    1,   70,   45,   45,   69,   69,
+        0,    0,    0,    0,    1,   70,   44,   44,   69,   69,
        69,   69,   69,   69,    3,   15,   13,   70,   70,   70,
-       70,   52,   70,   70,   70,   70,   70,   57,   51,   70,
+       70,   51,   70,   70,   70,   70,   70,   56,   50,   70,
        70,   70,   70,   70,   70,   70,   18,   70,   70,   70,
-       70,   70,   70,   54,   70,   70,   70,    0,   75,   76,
+       70,   70,   70,   53,   70,   70,   70,    0,   75,   76,
 
-       79,   77,   78,   43,   44,   46,   47,   47,   47,   47,
-       47,   47,   47,   47,   69,   69,   69,   69,   69,   69,
-       17,   70,   70,   70,   27,   70,   50,   70,   70,   70,
-       23,   70,   70,   70,   42,   19,   70,   70,   70,   70,
+       79,   77,   78,   42,   43,   45,   46,   46,   46,   46,
+       46,   46,   46,   46,   69,   69,   69,   69,   69,   69,
+       17,   70,   70,   70,   27,   70,   49,   70,   70,   70,
+       23,   70,   70,   70,   41,   19,   70,   70,   70,   70,
        70,   70,   70,   70,   70,   70,   70,   71,    0,    0,
         0,    0,    0,    0,    0,    0,   69,   69,   69,   69,
        69,   69,   69,   70,   70,   70,   70,   70,   70,   31,
-       53,   70,   70,   28,   49,   70,   37,   70,   70,   70,
+       52,   70,   70,   28,   48,   70,   36,   70,   70,   70,
        70,   22,   70,   70,   70,   70,   70,    0,    0,    0,
-        0,    0,    0,    0,   48,   69,   69,   69,   69,   69,
+        0,    0,    0,    0,   47,   69,   69,   69,   69,   69,
 
-       69,   69,   38,   70,   70,   70,   59,   70,   70,   70,
-       70,   70,   70,   40,   56,   70,   70,   70,   70,   55,
-       70,    0,    0,    0,   48,    0,    0,    0,   69,   69,
-       67,   69,   69,   69,   69,   70,   70,   70,   21,   70,
+       69,   69,   37,   70,   70,   70,   58,   70,   70,   70,
+       70,   70,   70,   39,   55,   70,   70,   70,   70,   54,
+       70,    0,    0,    0,   47,    0,    0,    0,   69,   69,
+       66,   69,   69,   69,   69,   70,   70,   70,   21,   70,
        30,   70,   70,   70,   33,   70,   70,   24,   70,    0,
-        0,    0,    0,    0,   48,   69,   69,   69,   69,   62,
-       63,   70,   70,   70,   60,   70,   70,   70,   70,   70,
-       70,   70,    0,    0,    0,   48,   48,   69,   69,   69,
-       69,   70,   58,   70,   70,   70,   32,   70,   70,   70,
-       70,    0,    0,   48,   64,   69,   61,   66,   70,   70,
+        0,    0,    0,    0,   47,   69,   69,   69,   69,   61,
+       62,   70,   70,   70,   59,   70,   70,   70,   70,   70,
+       70,   70,    0,    0,    0,   47,   47,   69,   69,   69,
+       69,   70,   57,   70,   70,   70,   32,   70,   70,   70,
+       70,    0,    0,   47,   63,   69,   60,   65,   70,   70,
 
-       70,   70,   70,   70,   70,   70,   70,    0,   48,   69,
-       70,   70,   70,   70,   36,   34,   26,   70,   70,   48,
-       65,   35,   70,   29,   70,   25,   70,   20,   70,   70,
-       68,   70,   39,    0
+       70,   70,   70,   70,   70,   70,   70,    0,   47,   69,
+       70,   70,   70,   70,   68,   34,   26,   70,   70,   47,
+       64,   35,   70,   29,   70,   25,   70,   20,   70,   70,
+       67,   70,   38,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -1400,49 +1400,41 @@ case 40:
 YY_RULE_SETUP
 #line 262 "lexer.flex"
 {
-    store_function_id();
-    return ID;
-}
-	YY_BREAK
-case 41:
-YY_RULE_SETUP
-#line 266 "lexer.flex"
-{
     // Boolean constant - true.
     yylval.semantic_bool = 1;
     return BOOL;
 }
 	YY_BREAK
-case 42:
+case 41:
 YY_RULE_SETUP
-#line 271 "lexer.flex"
+#line 267 "lexer.flex"
 {
     // Boolean constant - false.
     yylval.semantic_bool = 0;
     return BOOL;
 }
 	YY_BREAK
-case 43:
+case 42:
 YY_RULE_SETUP
-#line 276 "lexer.flex"
+#line 272 "lexer.flex"
 {
     // Numeric constant - binary.
     yylval.semantic_int = nondec2dec(yytext + 2, 2);
     return INT;
 }
 	YY_BREAK
-case 44:
+case 43:
 YY_RULE_SETUP
-#line 281 "lexer.flex"
+#line 277 "lexer.flex"
 {
     // Numeric constant - octal.
     yylval.semantic_int = nondec2dec(yytext + 2, 8);
     return INT;
 }
 	YY_BREAK
-case 45:
+case 44:
 YY_RULE_SETUP
-#line 286 "lexer.flex"
+#line 282 "lexer.flex"
 {
     // Numeric constant.
     if (yytext[yyleng - 1] == '.')
@@ -1451,176 +1443,183 @@ YY_RULE_SETUP
     return INT;
 }
 	YY_BREAK
-case 46:
+case 45:
 YY_RULE_SETUP
-#line 293 "lexer.flex"
+#line 289 "lexer.flex"
 {
     // Numeric constant - hexadecimal.
     yylval.semantic_int = nondec2dec(yytext + 2, 16);
     return INT;
 }
 	YY_BREAK
-case 47:
+case 46:
 YY_RULE_SETUP
-#line 298 "lexer.flex"
+#line 294 "lexer.flex"
 {
     // Character constant.
     yylval.semantic_char = yytext[2];
     return CHAR;
 }
 	YY_BREAK
-case 48:
+case 47:
 YY_RULE_SETUP
-#line 303 "lexer.flex"
+#line 299 "lexer.flex"
 {
     // Character constant - whitespace.
     yylval.semantic_char = 'q'; // TODO: convert to a real character.
     return CHAR;
 }
 	YY_BREAK
-case 49:
+case 48:
 YY_RULE_SETUP
-#line 308 "lexer.flex"
+#line 304 "lexer.flex"
 {
     return LOOP;
 }
 	YY_BREAK
-case 50:
+case 49:
 YY_RULE_SETUP
-#line 311 "lexer.flex"
+#line 307 "lexer.flex"
 {
     return FOR;
 }
 	YY_BREAK
-case 51:
+case 50:
 YY_RULE_SETUP
-#line 314 "lexer.flex"
+#line 310 "lexer.flex"
 {
     return IN;
 }
 	YY_BREAK
-case 52:
+case 51:
 YY_RULE_SETUP
-#line 317 "lexer.flex"
+#line 313 "lexer.flex"
 {
     return DO;
 }
 	YY_BREAK
-case 53:
+case 52:
 YY_RULE_SETUP
-#line 320 "lexer.flex"
+#line 316 "lexer.flex"
 {
     return FROM;
 }
 	YY_BREAK
-case 54:
+case 53:
 YY_RULE_SETUP
-#line 323 "lexer.flex"
+#line 319 "lexer.flex"
 {
     return TO;
 }
 	YY_BREAK
-case 55:
+case 54:
 YY_RULE_SETUP
-#line 326 "lexer.flex"
+#line 322 "lexer.flex"
 {
     return WHILE;
 }
 	YY_BREAK
-case 56:
+case 55:
 YY_RULE_SETUP
-#line 329 "lexer.flex"
+#line 325 "lexer.flex"
 {
     return PROGN;
 }
 	YY_BREAK
-case 57:
+case 56:
 YY_RULE_SETUP
-#line 332 "lexer.flex"
+#line 328 "lexer.flex"
 {
     return IF;
 }
 	YY_BREAK
-case 58:
+case 57:
 YY_RULE_SETUP
-#line 335 "lexer.flex"
+#line 331 "lexer.flex"
 {
     return DEFCLASS;
 }
 	YY_BREAK
-case 59:
+case 58:
 YY_RULE_SETUP
-#line 338 "lexer.flex"
+#line 334 "lexer.flex"
 {
     return DEFUN;
 }
 	YY_BREAK
-case 60:
+case 59:
 YY_RULE_SETUP
-#line 341 "lexer.flex"
+#line 337 "lexer.flex"
 {
     return FUNCALL;
 }
 	YY_BREAK
-case 61:
+case 60:
 YY_RULE_SETUP
-#line 344 "lexer.flex"
+#line 340 "lexer.flex"
 {
     return INITFORM;
 }
 	YY_BREAK
-case 62:
+case 61:
 YY_RULE_SETUP
-#line 347 "lexer.flex"
+#line 343 "lexer.flex"
 {
     return READER;
 }
 	YY_BREAK
-case 63:
+case 62:
 YY_RULE_SETUP
-#line 350 "lexer.flex"
+#line 346 "lexer.flex"
 {
     return WRITER;
 }
 	YY_BREAK
-case 64:
+case 63:
 YY_RULE_SETUP
-#line 353 "lexer.flex"
+#line 349 "lexer.flex"
 {
     return ACCESSOR;
 }
 	YY_BREAK
-case 65:
+case 64:
 YY_RULE_SETUP
-#line 356 "lexer.flex"
+#line 352 "lexer.flex"
 {
     return ALLOCATION;
 }
 	YY_BREAK
-case 66:
+case 65:
 YY_RULE_SETUP
-#line 359 "lexer.flex"
+#line 355 "lexer.flex"
 {
     return ALLOCINSTANCE;
 }
 	YY_BREAK
-case 67:
+case 66:
 YY_RULE_SETUP
-#line 362 "lexer.flex"
+#line 358 "lexer.flex"
 {
     return ALLOCCLASS;
 }
 	YY_BREAK
-case 68:
+case 67:
 YY_RULE_SETUP
-#line 365 "lexer.flex"
+#line 361 "lexer.flex"
 {
     return MAKEINSTANCE;
 }
 	YY_BREAK
+case 68:
+YY_RULE_SETUP
+#line 364 "lexer.flex"
+{
+    return SLOTVALUE;
+}
+	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 368 "lexer.flex"
+#line 367 "lexer.flex"
 {
     store_function_id();
     return ID;
@@ -1628,7 +1627,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 372 "lexer.flex"
+#line 371 "lexer.flex"
 {
     // User-defined symbol.
     store_function_id();
@@ -1637,7 +1636,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 377 "lexer.flex"
+#line 376 "lexer.flex"
 {
     // User-defined symbol.
     store_function_id();
@@ -1646,7 +1645,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 382 "lexer.flex"
+#line 381 "lexer.flex"
 {
     errorCode = ERROR_LEXICAL_UNEXPECTED_CHARACTER;
     yyterminate();
@@ -1654,14 +1653,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 386 "lexer.flex"
+#line 385 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 389 "lexer.flex"
+#line 388 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
@@ -1669,21 +1668,21 @@ YY_RULE_SETUP
 case 75:
 /* rule 75 can match eol */
 YY_RULE_SETUP
-#line 392 "lexer.flex"
+#line 391 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 395 "lexer.flex"
+#line 394 "lexer.flex"
 {
     // Multiline comment ending.
     BEGIN(INITIAL);
 }
 	YY_BREAK
 case YY_STATE_EOF(COMMENT_ML_ST):
-#line 399 "lexer.flex"
+#line 398 "lexer.flex"
 {
     errorCode = ERROR_LEXICAL_UNCLOSED_COMMENT;
     yyterminate();
@@ -1691,7 +1690,7 @@ case YY_STATE_EOF(COMMENT_ML_ST):
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 403 "lexer.flex"
+#line 402 "lexer.flex"
 {
     // String constant body: escaped quote character.
     buffer[buffer_length++] = '"';
@@ -1699,7 +1698,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 407 "lexer.flex"
+#line 406 "lexer.flex"
 {
     // String constant body: escaped slash character.
     buffer[buffer_length++] = '\\';
@@ -1708,7 +1707,7 @@ YY_RULE_SETUP
 case 79:
 /* rule 79 can match eol */
 YY_RULE_SETUP
-#line 411 "lexer.flex"
+#line 410 "lexer.flex"
 {
     // String constant body: non-quote, non-slash characters.
     for (int i = 0; i < yyleng; i++)
@@ -1717,7 +1716,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 416 "lexer.flex"
+#line 415 "lexer.flex"
 {
     // String constant body: unrecognized slash character.
     buffer[buffer_length++] = '\\';
@@ -1725,7 +1724,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 420 "lexer.flex"
+#line 419 "lexer.flex"
 {
     // String constant ending.
     buffer[buffer_length] = '\0';
@@ -1737,7 +1736,7 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING_ST):
-#line 429 "lexer.flex"
+#line 428 "lexer.flex"
 {
     errorCode = ERROR_LEXICAL_UNCLOSED_STRING;
     yyterminate();
@@ -1745,10 +1744,10 @@ case YY_STATE_EOF(STRING_ST):
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 434 "lexer.flex"
+#line 433 "lexer.flex"
 ECHO;
 	YY_BREAK
-#line 1752 "lexer.cpp"
+#line 1751 "lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2743,7 +2742,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 434 "lexer.flex"
+#line 433 "lexer.flex"
 
 
 

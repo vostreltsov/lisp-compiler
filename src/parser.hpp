@@ -70,7 +70,8 @@ extern int yydebug;
      ALLOCATION = 279,
      ALLOCINSTANCE = 280,
      ALLOCCLASS = 281,
-     MAKEINSTANCE = 282
+     MAKEINSTANCE = 282,
+     SLOTVALUE = 283
    };
 #endif
 
@@ -99,7 +100,7 @@ typedef union YYSTYPE
 
 
 /* Line 2042 of yacc.c  */
-#line 103 "parser.hpp"
+#line 104 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

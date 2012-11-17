@@ -34,6 +34,8 @@ struct s_expr_struct * create_s_expr_empty() {
     result->string = NULL;
     result->boolean = 0;
     result->id = NULL;
+    result->slvalobj = NULL;
+    result->slvalslot = NULL;
     result->args = NULL;
     result->cond = NULL;
     result->container = NULL;
@@ -216,6 +218,18 @@ struct s_expr_struct * create_s_expr_makeinstance(int nodeId,
     result->nodeId = nodeId;
     result->type = type;
     result->id = id;
+    return result;
+}
+
+struct s_expr_struct * create_s_expr_slotvalue(int nodeId,
+                                               enum s_expr_type type,
+                                               char * slvalobj,
+                                               char * slvalslot) {
+    struct s_expr_struct * result = create_s_expr_empty();
+    result->nodeId = nodeId;
+    result->type = type;
+    result->slvalobj = slvalobj;
+    result->slvalslot = slvalslot;
     return result;
 }
 

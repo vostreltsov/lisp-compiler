@@ -243,10 +243,6 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     store_function_id();
     return ID;
 }
-"slot-value" {
-    store_function_id();
-    return ID;
-}
 "open" {
     store_function_id();
     return ID;
@@ -364,6 +360,9 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 "make-instance" {
     return MAKEINSTANCE;
+}
+"slot-value" {
+    return SLOTVALUE;
 }
 ":"{SYMBOLID}+ {
     store_function_id();
