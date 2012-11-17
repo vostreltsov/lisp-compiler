@@ -60,21 +60,17 @@ extern int yydebug;
      WHILE = 269,
      PROGN = 270,
      IF = 271,
-     DEFUN = 272,
-     SLOTVALUE = 273,
-     OPEN = 274,
-     CLOSE = 275,
-     WITHOPENFILE = 276,
-     FUNCALL = 277,
-     DEFCLASS = 278,
-     INITFORM = 279,
-     READER = 280,
-     WRITER = 281,
-     ACCESSOR = 282,
-     ALLOCATION = 283,
-     ALLOCINSTANCE = 284,
-     ALLOCCLASS = 285,
-     MAKEINSTANCE = 286
+     DEFCLASS = 272,
+     DEFUN = 273,
+     FUNCALL = 274,
+     INITFORM = 275,
+     READER = 276,
+     WRITER = 277,
+     ACCESSOR = 278,
+     ALLOCATION = 279,
+     ALLOCINSTANCE = 280,
+     ALLOCCLASS = 281,
+     MAKEINSTANCE = 282
    };
 #endif
 
@@ -103,7 +99,7 @@ typedef union YYSTYPE
 
 
 /* Line 2042 of yacc.c  */
-#line 107 "parser.hpp"
+#line 103 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

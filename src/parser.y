@@ -62,15 +62,9 @@ int idCounter = 0;
 %token WHILE
 %token PROGN
 %token IF
-
-%token DEFUN
-%token SLOTVALUE
-%token OPEN
-%token CLOSE
-%token WITHOPENFILE
-%token FUNCALL
 %token DEFCLASS
-
+%token DEFUN
+%token FUNCALL
 %token INITFORM
 %token READER
 %token WRITER

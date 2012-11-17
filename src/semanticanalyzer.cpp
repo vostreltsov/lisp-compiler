@@ -498,6 +498,15 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         }
         return result;
     }
+    case S_EXPR_TYPE_ASSIGN_FIELD: {
+        tmp += "obj.field = \"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        int cnt = 0;
+        foreach (SExpressionNode * node, fArguments) {
+            result += node->dotCode(tmp, "arg " + QString::number(cnt++));
+        }
+        return result;
+    }
     default: {
         return "";
     }
@@ -557,10 +566,11 @@ void SExpressionNode::transform()
     switch (fSubType) {
     case S_EXPR_TYPE_FCALL: {
         SExpressionNode * op1 = fArguments.isEmpty() ? NULL : fArguments.first();
+        // Convert to ternary operators.
         if (op1 != NULL && fId == NAME_FUNC_SETF) {
-            // Convert to ternary operator.
-            if (op1->fSubType == S_EXPR_TYPE_FCALL && op1->fId == NAME_FUNC_ELT) {
-                fSubType = S_EXPR_TYPE_ASSIGN_ELT;
+            // Convert "arr[i] = value" and "obj.field = value" to ternary operator.
+            if (op1->fSubType == S_EXPR_TYPE_FCALL && (op1->fId == NAME_FUNC_ELT || op1->fId == NAME_FUNC_SLOT_VALUE)) {
+                fSubType = op1->fId == NAME_FUNC_ELT ? S_EXPR_TYPE_ASSIGN_ELT : S_EXPR_TYPE_ASSIGN_FIELD;
                 // Remove the first element and concatenate the rest to the ELT's operands list.
                 fArguments.removeFirst();
                 op1->fArguments << fArguments;
