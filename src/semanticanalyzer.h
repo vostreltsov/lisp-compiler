@@ -138,14 +138,14 @@ enum AttributedNodeType
 class SemanticConstant
 {
 public:
-    int                fId;       // Number in the constants table.
+    int                fNumber;   // Number in the constants table, counts from 0.
     JavaConstantsTypes fType;     // Type of the constant.
     QString            fUtf8;     // UTF-8 string.
     int                fInteger;  // Integer value.
     SemanticConstant * fRef1;     // Pointer to another constant if required.
     SemanticConstant * fRef2;     // Pointer to another constant if required.
 
-    SemanticConstant(int id = -1, JavaConstantsTypes type = CONSTANT_Utf8, QString utf8 = "",
+    SemanticConstant(int number = -1, JavaConstantsTypes type = CONSTANT_Utf8, QString utf8 = "",
                      int integer = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
 };
 
@@ -158,13 +158,17 @@ public:
     SemanticProgram();
     SemanticProgram(const program_struct * root);
     ~SemanticProgram();
-    ProgramNode * getRoot() const;
-    QLinkedList<QString> getErrors() const;
+
     bool doSemantics();
     void doTransform();
+    ProgramNode * root() const;
+    QLinkedList<QString> errors() const;
+
+    bool hasClass(QString name) const;
+    SemanticClass * getClass(QString name) const;
     SemanticClass * addClass(const DefinitionNode * node);
 
-//private:
+private:
     ProgramNode                    * fRoot;       // Root of the attributed tree.
     QMap<QString, SemanticClass *>   fClassTable; // Class table.
     QLinkedList<QString>             fErrors;     // Semantic errors messages.
@@ -178,9 +182,6 @@ class SemanticClass
 public:
     SemanticConstant               * fConstClass;     // Name of the class (CONSTANT_Class).
     SemanticConstant               * fConstParent;    // Name of the parent class (CONSTANT_Class).
-    QLinkedList<SemanticConstant *>  fConstantsTable; // Constants table.
-    QMap<QString, SemanticField *>   fFieldsTable;    // Fields table.
-    QMap<QString, SemanticMethod *>  fMethodsTable;   // Methods table.
     DefinitionNode const           * fNode;           // Corresponding tree node.
 
     SemanticClass();
@@ -195,10 +196,17 @@ public:
     void addDefaultAndParentConstructor();
     void addRTLConstants();
 
+    bool hasField(QString name) const;
+    bool hasMethod(QString name) const;
+    SemanticField * getField(QString name) const;
+    SemanticMethod * getMethod(QString name) const;
     SemanticField * addField(const DefinitionNode * node);
     SemanticMethod * addMethod(const DefinitionNode * node);
 
 private:
+    QLinkedList<SemanticConstant *>  fConstantsTable; // Constants table.
+    QMap<QString, SemanticField *>   fFieldsTable;    // Fields table.
+    QMap<QString, SemanticMethod *>  fMethodsTable;   // Methods table.
     static QString createMethodDesc(int numberOfArguments);
 };
 
@@ -220,13 +228,15 @@ public:
 class SemanticMethod
 {
 public:
-    SemanticConstant                  * fConstMethodref; // CONSTANT_Methodref constant.
-    QMap<QString, SemanticLocalVar *>   fLocalVarsTable; // Local variables table.
-    bool                                fIsStatic;       // Is this method static?
-    DefinitionNode const              * fNode;           // Corresponding tree node.
+    SemanticConstant     * fConstMethodref; // CONSTANT_Methodref constant.
+    bool                   fIsStatic;       // Is this method static?
+    DefinitionNode const * fNode;           // Corresponding tree node.
 
     SemanticMethod();
     SemanticLocalVar * addLocalVarConstant(QString name);
+
+private:
+    QMap<QString, SemanticLocalVar *> fLocalVarsTable; // Local variables table.
 };
 
 /**

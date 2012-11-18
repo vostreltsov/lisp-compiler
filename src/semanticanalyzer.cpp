@@ -1,8 +1,8 @@
 #include "semanticanalyzer.h"
 
-SemanticConstant::SemanticConstant(int id, JavaConstantsTypes type, QString utf8, int integer, SemanticConstant * ref1, SemanticConstant * ref2)
+SemanticConstant::SemanticConstant(int number, JavaConstantsTypes type, QString utf8, int integer, SemanticConstant * ref1, SemanticConstant * ref2)
 {
-    fId = id;
+    fNumber = number;
     fType = type;
     fUtf8 = utf8;
     fInteger = integer;
@@ -27,16 +27,6 @@ SemanticProgram::~SemanticProgram()
     }
 }
 
-ProgramNode * SemanticProgram::getRoot() const
-{
-    return fRoot;
-}
-
-QLinkedList<QString> SemanticProgram::getErrors() const
-{
-    return fErrors;
-}
-
 bool SemanticProgram::doSemantics()
 {
     fClassTable.clear();
@@ -54,9 +44,30 @@ void SemanticProgram::doTransform()
     }
 }
 
+ProgramNode * SemanticProgram::root() const
+{
+    return fRoot;
+}
+
+QLinkedList<QString> SemanticProgram::errors() const
+{
+    return fErrors;
+}
+
+bool SemanticProgram::hasClass(QString name) const
+{
+    return fClassTable.contains(name);
+}
+
+SemanticClass * SemanticProgram::getClass(QString name) const
+{
+    return fClassTable[name];
+}
+
 SemanticClass * SemanticProgram::addClass(const DefinitionNode * node)
 {
     SemanticClass * newClass = new SemanticClass();
+    newClass->addUtf8Constant("Code");
     newClass->fConstClass = newClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
     newClass->fConstParent = newClass->addClassConstant(node->fParent);
     newClass->fNode = node;
@@ -200,9 +211,30 @@ void SemanticClass::addRTLConstants()
     // TODO
 }
 
+bool SemanticClass::hasField(QString name) const
+{
+    return fFieldsTable.contains(name);
+}
+
+bool SemanticClass::hasMethod(QString name) const
+{
+    return fMethodsTable.contains(name);
+}
+
+SemanticField * SemanticClass::getField(QString name) const
+{
+    return fFieldsTable[name];
+}
+
+SemanticMethod * SemanticClass::getMethod(QString name) const
+{
+    return fMethodsTable[name];
+}
+
+
 SemanticField * SemanticClass::addField(const DefinitionNode * node)
 {
-
+    // TODO
 }
 
 SemanticMethod * SemanticClass::addMethod(const DefinitionNode * node)
@@ -252,7 +284,7 @@ SemanticLocalVar * SemanticMethod::addLocalVarConstant(QString name)
         return fLocalVarsTable[name];
     }
     // Create the new variable.
-    SemanticLocalVar * result = new SemanticLocalVar(fLocalVarsTable.size(), name);
+    SemanticLocalVar * result = new SemanticLocalVar(fLocalVarsTable.size(), name); // Numbers start from 0.
     fLocalVarsTable.insert(name, result);
     return result;
 }
@@ -358,11 +390,12 @@ void ProgramNode::semantics(SemanticProgram * program, QLinkedList<QString> * er
 {
     // Add main class and method.
     fMainPart->semantics(program, errorList, curClass, curMethod);
-    curClass = program->fClassTable[NAME_JAVA_CLASS_MAINCLASS];
-    curMethod = curClass->fMethodsTable[NAME_JAVA_METHOD_MAIN];
+    curClass = program->getClass(NAME_JAVA_CLASS_MAINCLASS);
+    curMethod = curClass->getMethod(NAME_JAVA_METHOD_MAIN);
 
     // Main class is added in the above call since it's added as a node during transformation. Add the base class to constants.
     SemanticClass * baseClass = new SemanticClass();
+    baseClass->addUtf8Constant("Code");
     baseClass->fConstClass = baseClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
     baseClass->fConstParent = baseClass->addClassConstant(NAME_JAVA_CLASS_OBJECT);
     baseClass->addDefaultAndParentConstructor();
@@ -1004,7 +1037,7 @@ void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> *
     // Analyse this node.
     switch (fSubType) {
     case DEF_TYPE_CLASS: {        
-        if (program->fClassTable.contains(fId)) {
+        if (program->hasClass(fId)) {
             // Check if there's no class with same name yet.
             *errorList << "Class " + fId + " is already defined.";
         } else {
@@ -1014,7 +1047,7 @@ void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> *
         break;
     }
     case DEF_TYPE_FUNC: {
-        if (curClass->fMethodsTable.contains(fId)) {
+        if (curClass->hasMethod(fId)) {
             // Check if there's no function with same name yet.
             *errorList << "Function " + fId + " is already defined.";
         } else {

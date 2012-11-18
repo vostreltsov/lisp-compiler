@@ -54,10 +54,10 @@ void drawProgram(const char * program, const char * image)
             SemanticProgram * sem = new SemanticProgram(root);
             sem->doTransform();
             sem->doSemantics();
-            foreach (QString error, sem->getErrors()) {
+            foreach (QString error, sem->errors()) {
                 QTextStream(stdout) << error << "\n";
             }
-            run_don_on_attr_node(sem->getRoot(), image);
+            run_don_on_attr_node(sem->root(), image);
             delete sem;
         } else {
             QTextStream(stdout) << errorMessage << "\n";
