@@ -5,88 +5,89 @@ public class LispRTL {
 
     // TODO: parameters of functions
 
-    public static BaseClass plus() {
+    public static BaseClass plus(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass minus() {
+    public static BaseClass minus(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass mult() {
+    public static BaseClass mult(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass div() {
+    public static BaseClass div(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass greater() {
+    public static BaseClass greater(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass greater_eq() {
+    public static BaseClass greater_eq(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass less() {
+    public static BaseClass less(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass less_eq() {
+    public static BaseClass less_eq(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass eq() {
+    public static BaseClass eq(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass and() {
+    public static BaseClass and(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass or() {
+    public static BaseClass or(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass not() {
+    public static BaseClass not(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass setf() {
+    public static BaseClass setf(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass vector() {
+    public static BaseClass vector(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass elt() {
+    public static BaseClass elt(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static BaseClass list() {
+    public static BaseClass list(BaseClass [] args) {
         BaseClass result = new BaseClass();
         return result;
     }
 
-    public static void print(BaseClass obj) {
-        switch(obj.type) {
+    public static void print(BaseClass [] args) {
+        // TODO
+        /*switch(obj.type) {
         case BaseClass.TYPE_INT:
             System.out.println(obj.valueInt);
             break;
@@ -102,6 +103,6 @@ public class LispRTL {
         default:
             // Don't tell anybody about the error!!!
             break;
-        }
+        }*/
     }
 }

@@ -27,7 +27,7 @@ class DefinitionNode;
 
 // Names of supported Lisp functions.
 #define NAME_FUNC_PLUS               "+"
-#define NAME_FUNC_MINUS              "="
+#define NAME_FUNC_MINUS              "-"
 #define NAME_FUNC_MULT               "*"
 #define NAME_FUNC_DIV                "/"
 #define NAME_FUNC_GREATER            ">"
@@ -62,20 +62,30 @@ class DefinitionNode;
 // Constants to deal with Java and RTL.
 #define NAME_JAVA_CLASS_OBJECT       "java/lang/Object"
 #define NAME_JAVA_CLASS_BASECLASS    "BaseClass"
+#define NAME_JAVA_CLASS_LISPRTL      "LispRTL"
 #define NAME_JAVA_CLASS_MAINCLASS    "MainClass"
 #define NAME_JAVA_METHOD_MAIN        "main"
 #define NAME_JAVA_CONSTRUCTOR        "<init>"
+
+#define NAME_JAVA_FIELD_BASECLASS_TYPE         "type"
+#define NAME_JAVA_FIELD_BASECLASS_VALUEINT     "valueInt"
+#define NAME_JAVA_FIELD_BASECLASS_VALUECHAR    "valueChar"
+#define NAME_JAVA_FIELD_BASECLASS_VALUESTRING  "valueString"
+#define NAME_JAVA_FIELD_BASECLASS_VALUEBOOLEAN "valueBoolean"
+#define NAME_JAVA_FIELD_BASECLASS_VALUEARRAY   "valueArray"
 
 #define DESC_JAVA_VOID                      "V"
 #define DESC_JAVA_INTEGER                   "I"
 #define DESC_JAVA_STRING                    "Ljava/lang/String;"
 #define DESC_JAVA_CLASS_BASECLASS           "L"NAME_JAVA_CLASS_BASECLASS";"
-#define DESC_JAVA_ARRAY                     "["DESC_JAVA_CLASS_BASECLASS
+#define DESC_JAVA_ARRAY_BASECLASS           "["DESC_JAVA_CLASS_BASECLASS
 #define DESC_JAVA_CONSTRUCTOR_VOID          "()V"
 #define DESC_JAVA_CONSTRUCTOR_INT           "("DESC_JAVA_STRING")V"
 #define DESC_JAVA_CONSTRUCTOR_STRING        "("DESC_JAVA_STRING")V"
 #define DESC_JAVA_CONSTRUCTOR_ARRAY_STRING  "(["DESC_JAVA_STRING")V"
 #define DESC_JAVA_CONSTRUCTOR_BASE          "("NAME_JAVA_CLASS_BASECLASS")V"
+#define DESC_JAVA_RTL_METHOD_VOID           "("DESC_JAVA_ARRAY_BASECLASS")V"
+#define DESC_JAVA_RTL_METHOD_BASECLASS      "("DESC_JAVA_ARRAY_BASECLASS")"DESC_JAVA_CLASS_BASECLASS
 
 #define RTL_BASECLASS_TYPE_DAFUQ     0
 #define RTL_BASECLASS_TYPE_INT       1
@@ -83,6 +93,7 @@ class DefinitionNode;
 #define RTL_BASECLASS_TYPE_STRING    3
 #define RTL_BASECLASS_TYPE_BOOLEAN   4
 #define RTL_BASECLASS_TYPE_ARRAY     5
+
 #define RTL_METHOD_PLUS              "plus"
 #define RTL_METHOD_MINUS             "minus"
 #define RTL_METHOD_MULT              "mult"
@@ -363,6 +374,9 @@ public:
     void transform();
     void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
     static SExpressionNode * fromSyntaxNode(const s_expr_struct * syntaxNode);
+
+private:
+    static QString translateMethodNameToRTLName(QString originalName);
 };
 
 /**

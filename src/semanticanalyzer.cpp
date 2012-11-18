@@ -208,7 +208,30 @@ void SemanticClass::addDefaultAndParentConstructor()
 
 void SemanticClass::addRTLConstants()
 {
-    // TODO
+    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_TYPE,         DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUEINT,     DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUECHAR,    DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUESTRING,  DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUEBOOLEAN, DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUEARRAY,   DESC_JAVA_INTEGER);
+
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PLUS,       DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MINUS,      DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MULT,       DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_DIV,        DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_GREATER,    DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_GREATER_EQ, DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LESS,       DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LESS_EQ,    DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_EQ,         DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_AND,        DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_OR,         DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_NOT,        DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_SETF,       DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_VECTOR,     DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_ELT,        DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LIST,       DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PRINT,      DESC_JAVA_RTL_METHOD_BASECLASS);
 }
 
 bool SemanticClass::hasField(QString name) const
@@ -218,7 +241,12 @@ bool SemanticClass::hasField(QString name) const
 
 bool SemanticClass::hasMethod(QString name) const
 {
-    return fMethodsTable.contains(name);
+    foreach (SemanticConstant * constant, fConstantsTable) {
+        if (constant->fType == CONSTANT_Methodref && constant->fRef2->fRef1->fUtf8 == name) {
+            return true;
+        }
+    }
+    return false;   //fMethodsTable.contains(name);
 }
 
 SemanticField * SemanticClass::getField(QString name) const
@@ -844,9 +872,37 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
         result->fTo = SExpressionNode::fromSyntaxNode(syntaxNode->to);
         result->fBody1 = SExpressionNode::fromSyntaxNode(syntaxNode->body1);
         result->fBody2 = SExpressionNode::fromSyntaxNode(syntaxNode->body2);
+        if (result->fSubType == S_EXPR_TYPE_FCALL) {
+            result->fId = translateMethodNameToRTLName(result->fId);
+        }
         return result;
     } else {
         return NULL;
+    }
+}
+
+QString SExpressionNode::translateMethodNameToRTLName(QString originalName)
+{
+    if (originalName == NAME_FUNC_PLUS) {
+        return RTL_METHOD_PLUS;
+    } else if (originalName == NAME_FUNC_MINUS) {
+        return RTL_METHOD_MINUS;
+    } else if (originalName == NAME_FUNC_MULT) {
+        return RTL_METHOD_MULT;
+    } else if (originalName ==  NAME_FUNC_DIV) {
+        return RTL_METHOD_DIV;
+    } else if (originalName ==  NAME_FUNC_GREATER) {
+        return RTL_METHOD_GREATER;
+    } else if (originalName ==  NAME_FUNC_GREATER_EQ) {
+        return RTL_METHOD_GREATER_EQ;
+    } else if (originalName ==  NAME_FUNC_LESS) {
+        return RTL_METHOD_LESS;
+    } else if (originalName ==  NAME_FUNC_LESS_EQ) {
+        return RTL_METHOD_LESS_EQ;
+    } else if (originalName ==  NAME_FUNC_EQ) {
+        return RTL_METHOD_EQ;
+    } else {
+        return originalName;
     }
 }
 
