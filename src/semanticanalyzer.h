@@ -233,7 +233,8 @@ public:
     DefinitionNode const * fNode;           // Corresponding tree node.
 
     SemanticMethod();
-    SemanticLocalVar * addLocalVarConstant(QString name);
+    bool hasLocalVar(QString name) const;
+    SemanticLocalVar * addLocalVar(QString name);
 
 private:
     QMap<QString, SemanticLocalVar *> fLocalVarsTable; // Local variables table.
@@ -247,6 +248,7 @@ class SemanticLocalVar
 public:
     int      fNumber; // Number of the variable.
     QString  fName;   // Name of the variable.
+
     SemanticLocalVar(int number = -1, QString name = "");
 };
 
@@ -292,7 +294,7 @@ public:
     /**
      * @brief Does the semantic analysis of the node: checks, tables, etc.
      */
-    virtual void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const = 0;
+    virtual void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const = 0;
 };
 
 /**
@@ -303,9 +305,10 @@ class ProgramNode : public AttributedNode
 public:
     ProgramPartNode                * fMainPart; // Main class and method definition.
     QLinkedList<ProgramPartNode *>   fParts;    // All other parts.
+
     ProgramNode();
     QString dotCode(QString parent, QString label = "") const;
-    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
+    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
@@ -324,10 +327,10 @@ public:
 
     ProgramPartNode();
     QString dotCode(QString parent, QString label = "") const;
-    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
+    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
     static ProgramPartNode * fromSyntaxNode(const program_part_struct * syntaxNode);
 };
 
@@ -355,10 +358,10 @@ public:
 
     SExpressionNode();
     QString dotCode(QString parent, QString label = "") const;
-    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
+    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
     static SExpressionNode * fromSyntaxNode(const s_expr_struct * syntaxNode);
 };
 
@@ -375,10 +378,10 @@ public:
 
     SlotPropertyNode();
     QString dotCode(QString parent, QString label = "") const;
-    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
+    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
     static SlotPropertyNode * fromSyntaxNode(const slot_prop_struct * syntaxNode);
 };
 
@@ -393,10 +396,10 @@ public:
 
     SlotDefinitionNode();
     QString dotCode(QString parent, QString label = "") const;
-    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
+    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
     static SlotDefinitionNode * fromSyntaxNode(const slot_def_struct * syntaxNode);
 };
 
@@ -416,10 +419,10 @@ public:
 
     DefinitionNode();
     QString dotCode(QString parent, QString label = "") const;
-    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
+    void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
     static DefinitionNode * fromSyntaxNode(const def_struct * syntaxNode);
 };
 

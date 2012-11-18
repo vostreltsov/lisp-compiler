@@ -68,7 +68,7 @@ SemanticClass * SemanticProgram::addClass(const DefinitionNode * node)
 {
     SemanticClass * newClass = new SemanticClass();
     newClass->addUtf8Constant("Code");
-    newClass->fConstClass = newClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
+    newClass->fConstClass = newClass->addClassConstant(node->fId);
     newClass->fConstParent = newClass->addClassConstant(node->fParent);
     newClass->fNode = node;
     newClass->addDefaultAndParentConstructor();
@@ -234,7 +234,10 @@ SemanticMethod * SemanticClass::getMethod(QString name) const
 
 SemanticField * SemanticClass::addField(const DefinitionNode * node)
 {
-    // TODO
+    SemanticField * newField = new SemanticField();
+    // TODO: Fieldref?
+    //fFieldsTable.insert(node->fId, newField);
+    return newField;
 }
 
 SemanticMethod * SemanticClass::addMethod(const DefinitionNode * node)
@@ -254,6 +257,7 @@ SemanticMethod * SemanticClass::addMethod(const DefinitionNode * node)
     newMethod->fIsStatic = (fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS);
     newMethod->fNode = node;
     fMethodsTable.insert(node->fId, newMethod);
+    return newMethod;
 }
 
 QString SemanticClass::createMethodDesc(int numberOfArguments)
@@ -274,10 +278,16 @@ SemanticField::SemanticField()
 SemanticMethod::SemanticMethod()
 {
     fConstMethodref = NULL;
+    fIsStatic = false;
     fNode = NULL;
 }
 
-SemanticLocalVar * SemanticMethod::addLocalVarConstant(QString name)
+bool SemanticMethod::hasLocalVar(QString name) const
+{
+    return fLocalVarsTable.contains(name);
+}
+
+SemanticLocalVar * SemanticMethod::addLocalVar(QString name)
 {
     // Does it already exist?
     if (fLocalVarsTable.contains(name)) {
@@ -386,10 +396,15 @@ void ProgramNode::transform()
     fMainPart->fDefinition = mainClass;
 }
 
-void ProgramNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
+void ProgramNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
+    // Achtung! @BADCODE! Something weird here!
+    // First check the main class without its main method,
+    // Second - check all other classes with their methods,
+    // Third - check the main class's main method.
+
     // Add main class and method.
-    fMainPart->semantics(program, errorList, curClass, curMethod);
+    fMainPart->semantics(program, errorList, curClass, curMethod, false);
     curClass = program->getClass(NAME_JAVA_CLASS_MAINCLASS);
     curMethod = curClass->getMethod(NAME_JAVA_METHOD_MAIN);
 
@@ -406,6 +421,11 @@ void ProgramNode::semantics(SemanticProgram * program, QLinkedList<QString> * er
         if (node != fMainPart) {
             node->semantics(program, errorList, curClass, curMethod);
         }
+    }
+
+    // Process the main method.
+    foreach (AttributedNode * node, fMainPart->fDefinition->childNodes()) {
+        node->semantics(program, errorList, curClass, curMethod);
     }
 }
 
@@ -475,10 +495,10 @@ void ProgramPartNode::transform()
     }
 }
 
-void ProgramPartNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
+void ProgramPartNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     foreach (AttributedNode * node, childNodes()) {
-        node->semantics(program, errorList, curClass, curMethod);
+        node->semantics(program, errorList, curClass, curMethod, processInner);
     }
 }
 
@@ -687,13 +707,8 @@ void SExpressionNode::transform()
     }
 }
 
-void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
+void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
-    // Analyse all child nodes.
-    foreach (AttributedNode * child, childNodes()) {
-        child->semantics(program, errorList, curClass, curMethod);
-    }
-
     // Analyse this node.
     switch (fSubType) {
     case S_EXPR_TYPE_INT:
@@ -708,7 +723,10 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
         break;
     }
     case S_EXPR_TYPE_FCALL: {
-        // Check if the function exists. TODO
+        // Check if the function exists.
+        if (!curClass->hasMethod(fId)) {
+            *errorList << "Calling undefined function: \"" + fId + "\".";
+        }
 
         // Check if number of arguments is the same as in the function definition. TODO
 
@@ -722,8 +740,17 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
         // Check if ID's are known.
         foreach (SExpressionNode * arg, fArguments) {
             // Function existance checked before this switch-case since it's a child node.
-            if (arg->fSubType == S_EXPR_TYPE_ID) {
-                // TODO.
+            if (arg->fSubType == S_EXPR_TYPE_ID && !curMethod->hasLocalVar(arg->fId) && !(fId == NAME_FUNC_SETF && arg == fArguments.first())) {
+                *errorList << "Passing undefined variable: \"" + arg->fId + "\".";
+            }
+        }
+
+        // Check if assigning to an identifier.
+        if (fId == NAME_FUNC_SETF) {
+            if (!fArguments.isEmpty() && fArguments.first()->fSubType == S_EXPR_TYPE_ID) {
+                curMethod->addLocalVar(fArguments.first()->fId);
+            } else {
+                *errorList << "Can't call SETF with given parameters.";
             }
         }
         break;
@@ -734,6 +761,8 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
                       (fContainer->fSubType == S_EXPR_TYPE_FCALL && (fContainer->fId == NAME_FUNC_VECTOR || fContainer->fId == NAME_FUNC_LIST));
         if (!correct) {
             *errorList << "Wrong container specified for the loop.";
+        } else {
+            curMethod->addLocalVar(fId);
         }
         break;
     }
@@ -741,6 +770,8 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
         // Check if borders are calculable.
         if (!fFrom->isCalculable() || !fTo->isCalculable()) {
             *errorList << "Only calculable expressions can be used as loop borders.";
+        } else {
+            curMethod->addLocalVar(fId);
         }
         break;
     }
@@ -777,6 +808,15 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
     default: {
         break;
     }
+    }
+
+    if (!processInner) {
+        return;
+    }
+
+    // Analyse all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->semantics(program, errorList, curClass, curMethod);
     }
 }
 
@@ -871,7 +911,7 @@ void SlotPropertyNode::transform()
     }
 }
 
-void SlotPropertyNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
+void SlotPropertyNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     // The only thing to check is calculability of the initform.
     if (fSubType == SLOT_PROP_TYPE_INITFORM) {
@@ -931,11 +971,11 @@ void SlotDefinitionNode::transform()
     }
 }
 
-void SlotDefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
+void SlotDefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
-        child->semantics(program, errorList, curClass, curMethod);
+        child->semantics(program, errorList, curClass, curMethod, processInner);
     }
 }
 
@@ -1029,7 +1069,7 @@ void DefinitionNode::transform()
     }
 }
 
-void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
+void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     SemanticClass * curClassForChildNodes = curClass;
     SemanticMethod * curMethodForChildNodes = curMethod;
@@ -1043,6 +1083,7 @@ void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> *
         } else {
             // Add this class to the class table.            
             curClassForChildNodes = program->addClass(this);
+            // TODO: add fields to the class.
         }
         break;
     }
@@ -1053,12 +1094,26 @@ void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> *
         } else {
             // Add this class to the class table.
             curMethodForChildNodes = curClass->addMethod(this);
-        }
+            // Add arguments as local variables.
+            // TODO: Add "this".
+            foreach (SExpressionNode * arg, fArguments) {
+                if (arg->fSubType == S_EXPR_TYPE_ID) {
+                    curMethodForChildNodes->addLocalVar(arg->fId);
+                } else {
+                    *errorList << "Formal arguments should be identifiers.";
+                }
+            }
+            curClass->addMethod(this);
+        }        
         break;
     }
     default: {
         break;
     }
+    }
+
+    if (!processInner) {
+        return;
     }
 
     // Analyse all child nodes.
