@@ -66,16 +66,16 @@ class DefinitionNode;
 #define NAME_JAVA_METHOD_MAIN        "main"
 #define NAME_JAVA_CONSTRUCTOR        "<init>"
 
-#define DESC_JAVA_VOID               "V"
-#define DESC_JAVA_INTEGER            "I"
-#define DESC_JAVA_STRING             "Ljava/lang/String;"
-#define DESC_JAVA_CLASS_BASECLASS    "L"NAME_JAVA_CLASS_BASECLASS";"
-#define DESC_JAVA_ARRAY              "["DESC_JAVA_CLASS_BASECLASS
-#define DESC_JAVA_CONSTRUCTOR_VOID   "()V"
-#define DESC_JAVA_CONSTRUCTOR_INT    "("DESC_JAVA_STRING")V"
-#define DESC_JAVA_CONSTRUCTOR_STRING "("DESC_JAVA_STRING")V"
-#define DESC_JAVA_CONSTRUCTOR_ARRAY  "(["DESC_JAVA_STRING")V"
-#define DESC_JAVA_CONSTRUCTOR_BASE   "("NAME_JAVA_CLASS_BASECLASS")V"
+#define DESC_JAVA_VOID                      "V"
+#define DESC_JAVA_INTEGER                   "I"
+#define DESC_JAVA_STRING                    "Ljava/lang/String;"
+#define DESC_JAVA_CLASS_BASECLASS           "L"NAME_JAVA_CLASS_BASECLASS";"
+#define DESC_JAVA_ARRAY                     "["DESC_JAVA_CLASS_BASECLASS
+#define DESC_JAVA_CONSTRUCTOR_VOID          "()V"
+#define DESC_JAVA_CONSTRUCTOR_INT           "("DESC_JAVA_STRING")V"
+#define DESC_JAVA_CONSTRUCTOR_STRING        "("DESC_JAVA_STRING")V"
+#define DESC_JAVA_CONSTRUCTOR_ARRAY_STRING  "(["DESC_JAVA_STRING")V"
+#define DESC_JAVA_CONSTRUCTOR_BASE          "("NAME_JAVA_CLASS_BASECLASS")V"
 
 #define RTL_BASECLASS_TYPE_DAFUQ     0
 #define RTL_BASECLASS_TYPE_INT       1
@@ -160,6 +160,7 @@ public:
     QLinkedList<SemanticConstant *>  fConstantsTable; // Constants table.
     QMap<QString, SemanticField *>   fFieldsTable;    // Fields table.
     QMap<QString, SemanticMethod *>  fMethodsTable;   // Methods table.
+    DefinitionNode const           * fNode;           // Corresponding tree node.
 
     SemanticClass();
     SemanticConstant * addUtf8Constant(QString value);
@@ -171,6 +172,7 @@ public:
     SemanticConstant * addNameAndTypeConstant(QString name, QString type);
 
     void addDefaultAndParentConstructor();
+    void addRTLConstants();
 };
 
 /**
@@ -194,7 +196,7 @@ public:
     SemanticConstant                  * fConstMethodref; // CONSTANT_Methodref constant.
     QMap<QString, SemanticLocalVar *>   fLocalVarsTable; // Local variables table.
     bool                                fIsStatic;       // Is this method static?
-    //QLinkedList<SExpressionNode *>      fExpressions;    // Corresponding tree nodes.
+    DefinitionNode const              * fNode;           // Corresponding tree node.
 
     SemanticMethod();
     SemanticLocalVar * addLocalVarConstant(QString name);
@@ -206,9 +208,9 @@ public:
 class SemanticLocalVar
 {
 public:
-    int      fId;   // Identifier of the variable.
-    QString  fName; // Name of the variable.
-    SemanticLocalVar(int id = -1, QString name = "");
+    int      fNumber; // Number of the variable.
+    QString  fName;   // Name of the variable.
+    SemanticLocalVar(int number = -1, QString name = "");
 };
 
 /**
@@ -228,8 +230,6 @@ private:
     ProgramNode                    * fRoot;       // Root of the attributed tree.
     QMap<QString, SemanticClass *>   fClassTable; // Class table.
     QLinkedList<QString>             fErrors;     // Semantic errors messages.
-
-    SemanticClass * addClass(DefinitionNode * nodeDefclass);
 };
 
 /**
@@ -283,7 +283,8 @@ public:
 class ProgramNode : public AttributedNode
 {
 public:
-    QLinkedList<ProgramPartNode *> fParts;
+    ProgramPartNode                * fMainPart; // Main class and method definition.
+    QLinkedList<ProgramPartNode *>   fParts;    // All other parts.
     ProgramNode();
     QString dotCode(QString parent, QString label = "") const;
     void semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const;
@@ -402,6 +403,8 @@ public:
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
     static DefinitionNode * fromSyntaxNode(const def_struct * syntaxNode);
+private:
+    static QString createMethodDesc(int numberOfArguments);
 };
 
 #endif // SEMANTICANALYZER_H

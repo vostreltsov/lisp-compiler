@@ -14,6 +14,7 @@ SemanticClass::SemanticClass()
 {
     fConstClass = NULL;
     fConstParent = NULL;
+    fNode = NULL;
 }
 
 SemanticConstant * SemanticClass::addUtf8Constant(QString value)
@@ -138,6 +139,11 @@ void SemanticClass::addDefaultAndParentConstructor()
     fMethodsTable.insert(NAME_JAVA_CONSTRUCTOR, constructorThis);
 }
 
+void SemanticClass::addRTLConstants()
+{
+    // TODO
+}
+
 SemanticField::SemanticField()
 {
     fConstFieldref = NULL;
@@ -146,6 +152,7 @@ SemanticField::SemanticField()
 SemanticMethod::SemanticMethod()
 {
     fConstMethodref = NULL;
+    fNode = NULL;
 }
 
 SemanticLocalVar * SemanticMethod::addLocalVarConstant(QString name)
@@ -160,9 +167,9 @@ SemanticLocalVar * SemanticMethod::addLocalVarConstant(QString name)
     return result;
 }
 
-SemanticLocalVar::SemanticLocalVar(int id, QString name)
+SemanticLocalVar::SemanticLocalVar(int number, QString name)
 {
-    fId = id;
+    fNumber = number;
     fName = name;
 }
 
@@ -210,21 +217,6 @@ void SemanticAnalyzer::doTransform()
     }
 }
 
-SemanticClass * SemanticAnalyzer::addClass(DefinitionNode * nodeDefclass)
-{
-    QString className = nodeDefclass->fId;
-
-    if (fClassTable.contains(className)) {
-        SemanticClass * result = new SemanticClass();
-        // TODO: add constants, check inheritance, etc.
-
-        fClassTable.insert(className, result);
-        return result;
-    } else {
-        // Error: the class already exists.
-    }
-}
-
 AttributedNode::AttributedNode()
 {
 }
@@ -244,6 +236,7 @@ QLinkedList<AttributedNode *> AttributedNode::childNodes() const
 ProgramNode::ProgramNode() : AttributedNode()
 {
     fType = ATTR_TYPE_PROGRAM;
+    fMainPart = NULL;
 }
 
 QString ProgramNode::dotCode(QString parent, QString label) const
@@ -265,6 +258,9 @@ bool ProgramNode::isCalculable() const
 QLinkedList<AttributedNode *> ProgramNode::childNodes() const
 {
     QLinkedList<AttributedNode *> result;
+    if (fMainPart != NULL) {
+        result << fMainPart;
+    }
     foreach (ProgramPartNode * node, fParts) {
         result << node;
     }
@@ -283,7 +279,6 @@ void ProgramNode::transform()
     mainMethod->fNodeId = 100500;
     mainMethod->fSubType = DEF_TYPE_FUNC;
     mainMethod->fId = NAME_JAVA_METHOD_MAIN;
-    // No need to add arguments I hope, handle it on the code generation stage.
     // Move all global operators to the main method.
     QLinkedList<ProgramPartNode *>::iterator iter = fParts.begin();
     while (iter != fParts.end()) {
@@ -306,27 +301,33 @@ void ProgramNode::transform()
     mainClass->fParent = NAME_JAVA_CLASS_OBJECT;
     mainClass->fClassMethods << mainMethod;
 
-    // Finally, create a new program part node which contains main class.
-    ProgramPartNode * mainPart = new ProgramPartNode();
-    mainPart->fNodeId = 100502;
-    mainPart->fSubType = PROGRAM_PART_TYPE_DEF;
-    mainPart->fDefinition = mainClass;
-
-    fParts << mainPart;
+    // Finally, create a new program part node which contains the main class.
+    fMainPart = new ProgramPartNode();
+    fMainPart->fNodeId = 100502;
+    fMainPart->fSubType = PROGRAM_PART_TYPE_DEF;
+    fMainPart->fDefinition = mainClass;
 }
 
 void ProgramNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
-    // Create tables and check all child nodes.
-    foreach (AttributedNode * node, childNodes()) {
-        node->semantics(classTable, errorList, curClass, curMethod);
-    }
+    // Add main class and method.
+    fMainPart->semantics(classTable, errorList, curClass, curMethod);
+    curClass = (*classTable)[NAME_JAVA_CLASS_MAINCLASS];
+    curMethod = curClass->fMethodsTable[NAME_JAVA_METHOD_MAIN];
 
     // Main class is added in the above call since it's added as a node during transformation. Add the base class to constants.
     SemanticClass * baseClass = new SemanticClass();
     baseClass->fConstClass = baseClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
     baseClass->fConstParent = baseClass->addClassConstant(NAME_JAVA_CLASS_OBJECT);
     baseClass->addDefaultAndParentConstructor();
+    baseClass->addRTLConstants();
+
+    // Create tables and check all child nodes.
+    foreach (AttributedNode * node, childNodes()) {
+        if (node != fMainPart) {
+            node->semantics(classTable, errorList, curClass, curMethod);
+        }
+    }
 }
 
 ProgramNode * ProgramNode::fromSyntaxNode(const program_struct * syntaxNode)
@@ -951,24 +952,56 @@ void DefinitionNode::transform()
 
 void DefinitionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
-    // Analyse all child nodes.
-    foreach (AttributedNode * child, childNodes()) {
-        child->semantics(classTable, errorList, curClass, curMethod);
-    }
+    SemanticClass * curClassForChildNodes = curClass;
+    SemanticMethod * curMethodForChildNodes = curMethod;
 
     // Analyse this node.
     switch (fSubType) {
     case DEF_TYPE_CLASS: {
         // Check if there's no class with same name yet. TODO
+
+        // Add this class to the class table.
+        SemanticClass * newClass = new SemanticClass();
+        newClass->fConstClass = newClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
+        newClass->fConstParent = newClass->addClassConstant(fParent);
+        newClass->fNode = this;
+        newClass->addDefaultAndParentConstructor();
+        newClass->addRTLConstants();
+        classTable->insert(fId, newClass);
+        curClassForChildNodes = newClass;
         break;
     }
     case DEF_TYPE_FUNC: {
         // Check if there's no function with same name yet. TODO
+
+        // Add this class to the class table.
+        SemanticMethod * newMethod = new SemanticMethod();
+        // Create the descriptor.
+        QString desc;
+        if (fId == NAME_JAVA_METHOD_MAIN) {
+            desc = DESC_JAVA_CONSTRUCTOR_ARRAY_STRING;
+        } else if (curClass->fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS) {
+            desc = createMethodDesc(fArguments.size() - 1); // Main class has only static members.
+        } else {
+            desc = createMethodDesc(fArguments.size());
+        }
+        // Add methodref constant.
+        newMethod->fConstMethodref = curClass->addMethodrefConstant(curClass->fConstClass->fRef1->fUtf8, fId, desc);
+        newMethod->fIsStatic = (curClass->fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS);
+        newMethod->fNode = this;
+        // TODO: local vars table?
+        curClass->fMethodsTable.insert(fId, newMethod);
+        curMethodForChildNodes = newMethod;
         break;
     }
     default: {
         break;
     }
+    }
+
+    // Analyse all child nodes.
+    foreach (AttributedNode * child, childNodes()) {
+        child->semantics(classTable, errorList, curClassForChildNodes, curMethodForChildNodes);
     }
 }
 
@@ -982,7 +1015,7 @@ DefinitionNode * DefinitionNode::fromSyntaxNode(const def_struct * syntaxNode)
         result->fId = syntaxNode->id;
         result->fParent = syntaxNode->parent;
         if (result->fSubType == DEF_TYPE_CLASS && result->fParent.isEmpty()) {
-            result->fParent = NAME_JAVA_CLASS_OBJECT;
+            result->fParent = NAME_JAVA_CLASS_BASECLASS;
         }
         s_expr_struct * expr = (syntaxNode->args != NULL ? syntaxNode->args->first : NULL);
         while (expr != NULL) {
@@ -1003,5 +1036,15 @@ DefinitionNode * DefinitionNode::fromSyntaxNode(const def_struct * syntaxNode)
         }
 
     }
+    return result;
+}
+
+QString DefinitionNode::createMethodDesc(int numberOfArguments)
+{
+    QString result = "(";
+    for (int i = 0; i < numberOfArguments; i++) {
+        result += DESC_JAVA_CLASS_BASECLASS;
+    }
+    result += QString(")") + DESC_JAVA_CLASS_BASECLASS;
     return result;
 }
