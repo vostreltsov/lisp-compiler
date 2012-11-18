@@ -71,7 +71,10 @@ extern int yydebug;
      ALLOCINSTANCE = 280,
      ALLOCCLASS = 281,
      MAKEINSTANCE = 282,
-     SLOTVALUE = 283
+     SLOTVALUE = 283,
+     ERROR_UNCLOSED_COMMENT = 284,
+     ERROR_UNCLOSED_STRING = 285,
+     ERROR_UNEXPECTED_CHARACTER = 286
    };
 #endif
 
@@ -80,7 +83,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2042 of yacc.c  */
-#line 18 "parser.y"
+#line 19 "parser.y"
 
     int                              semantic_int;
     char                             semantic_char;
@@ -100,7 +103,7 @@ typedef union YYSTYPE
 
 
 /* Line 2042 of yacc.c  */
-#line 104 "parser.hpp"
+#line 107 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

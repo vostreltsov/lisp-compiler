@@ -957,41 +957,47 @@ void DefinitionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLin
 
     // Analyse this node.
     switch (fSubType) {
-    case DEF_TYPE_CLASS: {
-        // Check if there's no class with same name yet. TODO
-
-        // Add this class to the class table.
-        SemanticClass * newClass = new SemanticClass();
-        newClass->fConstClass = newClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
-        newClass->fConstParent = newClass->addClassConstant(fParent);
-        newClass->fNode = this;
-        newClass->addDefaultAndParentConstructor();
-        newClass->addRTLConstants();
-        classTable->insert(fId, newClass);
-        curClassForChildNodes = newClass;
+    case DEF_TYPE_CLASS: {        
+        if (classTable->contains(fId)) {
+            // Check if there's no class with same name yet.
+            *errorList << "Class " + fId + " is already defined.";
+        } else {
+            // Add this class to the class table.
+            SemanticClass * newClass = new SemanticClass();
+            newClass->fConstClass = newClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
+            newClass->fConstParent = newClass->addClassConstant(fParent);
+            newClass->fNode = this;
+            newClass->addDefaultAndParentConstructor();
+            newClass->addRTLConstants();
+            classTable->insert(fId, newClass);
+            curClassForChildNodes = newClass;
+        }
         break;
     }
     case DEF_TYPE_FUNC: {
-        // Check if there's no function with same name yet. TODO
-
-        // Add this class to the class table.
-        SemanticMethod * newMethod = new SemanticMethod();
-        // Create the descriptor.
-        QString desc;
-        if (fId == NAME_JAVA_METHOD_MAIN) {
-            desc = DESC_JAVA_CONSTRUCTOR_ARRAY_STRING;
-        } else if (curClass->fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS) {
-            desc = createMethodDesc(fArguments.size() - 1); // Main class has only static members.
+        if (curClass->fMethodsTable.contains(fId)) {
+            // Check if there's no function with same name yet.
+            *errorList << "Function " + fId + " is already defined.";
         } else {
-            desc = createMethodDesc(fArguments.size());
+            // Add this class to the class table.
+            SemanticMethod * newMethod = new SemanticMethod();
+            // Create the descriptor.
+            QString desc;
+            if (fId == NAME_JAVA_METHOD_MAIN) {
+                desc = DESC_JAVA_CONSTRUCTOR_ARRAY_STRING;
+            } else if (curClass->fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS) {
+                desc = createMethodDesc(fArguments.size() - 1); // Main class has only static members.
+            } else {
+                desc = createMethodDesc(fArguments.size());
+            }
+            // Add methodref constant.
+            newMethod->fConstMethodref = curClass->addMethodrefConstant(curClass->fConstClass->fRef1->fUtf8, fId, desc);
+            newMethod->fIsStatic = (curClass->fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS);
+            newMethod->fNode = this;
+            // TODO: local vars table?
+            curClass->fMethodsTable.insert(fId, newMethod);
+            curMethodForChildNodes = newMethod;
         }
-        // Add methodref constant.
-        newMethod->fConstMethodref = curClass->addMethodrefConstant(curClass->fConstClass->fRef1->fUtf8, fId, desc);
-        newMethod->fIsStatic = (curClass->fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS);
-        newMethod->fNode = this;
-        // TODO: local vars table?
-        curClass->fMethodsTable.insert(fId, newMethod);
-        curMethodForChildNodes = newMethod;
         break;
     }
     default: {

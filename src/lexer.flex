@@ -5,8 +5,6 @@
 #include "parser.hpp"
 #include "errors.h"
 
-extern enum error_types errorCode;
-
 int my_powah(int base, int n)
 {
     int result = 1;
@@ -379,8 +377,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     return ID;
 }
 . {
-    errorCode = ERROR_LEXICAL_UNEXPECTED_CHARACTER;
-    yyterminate();
+    return ERROR_UNEXPECTED_CHARACTER;
 }
 <COMMENT_ML_ST>"|" {
     // Multiline comment body: any character.
@@ -396,8 +393,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     BEGIN(INITIAL);
 }
 <COMMENT_ML_ST><<EOF>> {
-    errorCode = ERROR_LEXICAL_UNCLOSED_COMMENT;
-    yyterminate();
+    return ERROR_UNCLOSED_COMMENT;
 }
 <STRING_ST>"\\\"" {
     // String constant body: escaped quote character.
@@ -426,8 +422,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     return STRING;
 }
 <STRING_ST><<EOF>> {
-    errorCode = ERROR_LEXICAL_UNCLOSED_STRING;
-    yyterminate();
+    return ERROR_UNCLOSED_STRING;
 }
 
 %%

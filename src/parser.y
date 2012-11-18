@@ -7,6 +7,7 @@
 
 extern int yylex(void);
 extern enum error_types errorCode;
+extern char errorMessage[256];
 
 void yyerror(const char * str);
 
@@ -74,13 +75,22 @@ int idCounter = 0;
 %token ALLOCCLASS
 %token MAKEINSTANCE
 %token SLOTVALUE
+%token ERROR_UNCLOSED_COMMENT
+%token ERROR_UNCLOSED_STRING
+%token ERROR_UNEXPECTED_CHARACTER
 
 %start program
 
 %%
 
 program : program_part_seq                        {root = $$ = create_program(++idCounter, $1);}
+        | /* empty */                             {root = $$ = NULL;}
         ;
+
+lexerror : ERROR_UNCLOSED_COMMENT                 {root = NULL; errorCode = ERROR_LEXICAL_UNCLOSED_COMMENT;     strcpy(errorMessage, "Unclosed comment");         YYABORT;}
+         | ERROR_UNCLOSED_STRING                  {root = NULL; errorCode = ERROR_LEXICAL_UNCLOSED_STRING;      strcpy(errorMessage, "Unclosed string constant"); YYABORT;}
+         | ERROR_UNEXPECTED_CHARACTER             {root = NULL; errorCode = ERROR_LEXICAL_UNEXPECTED_CHARACTER; strcpy(errorMessage, "Unexpected character");     YYABORT;}
+         ;
 
 program_part : s_expr                             {$$ = create_program_part(++idCounter, PROGRAM_PART_TYPE_S_EXPR, $1,   NULL);}
              | def                                {$$ = create_program_part(++idCounter, PROGRAM_PART_TYPE_DEF,    NULL, $1);}
@@ -110,6 +120,7 @@ s_expr : INT                                                  {$$ = create_s_exp
 
        | '(' MAKEINSTANCE '\'' ID ')'                         {$$ = create_s_expr_makeinstance(++idCounter, S_EXPR_TYPE_MAKEINSTANCE, $4);}
        | '(' SLOTVALUE ID '\'' ID ')'                         {$$ = create_s_expr_slotvalue(++idCounter, S_EXPR_TYPE_SLOTVALUE, $3, $5);}
+       | lexerror                                             {}
        ;
 
 s_expr_seq : s_expr                        {$$ = create_s_expr_seq(++idCounter, $1);}
@@ -122,6 +133,7 @@ slot_prop : INITFORM s_expr                {$$ = create_slot_prop(++idCounter,  
           | ACCESSOR ID                    {$$ = create_slot_prop(++idCounter,  SLOT_PROP_TYPE_ACCESSOR,   NULL,  $2,    SLOT_ALLOC_TYPE_INSTANCE);}
           | ALLOCATION ALLOCINSTANCE       {$$ = create_slot_prop(++idCounter,  SLOT_PROP_TYPE_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_TYPE_INSTANCE);}
           | ALLOCATION ALLOCCLASS          {$$ = create_slot_prop(++idCounter,  SLOT_PROP_TYPE_ALLOCATION, NULL,  NULL,  SLOT_ALLOC_TYPE_CLASS);}
+          | lexerror                       {}
           ;
 
 slot_prop_seq : slot_prop                  {$$ = create_slot_prop_seq(++idCounter, $1);}
@@ -129,6 +141,7 @@ slot_prop_seq : slot_prop                  {$$ = create_slot_prop_seq(++idCounte
               ;
 
 slot_def : '(' ID slot_prop_seq ')'        {$$ = create_slot_def(++idCounter, $2, $3);}
+         | lexerror                        {}
          ;
 
 slot_def_seq : slot_def                    {$$ = create_slot_def_seq(++idCounter, $1);}
@@ -145,5 +158,6 @@ def : '(' DEFUN ID '(' ')' s_expr_seq ')'                   {$$ = create_def(++i
 
 void yyerror(const char * str) {
     errorCode = ERROR_SYNTAX;
-    printf("error: %s\n", str);
+    strcpy(errorMessage, str);
+    //printf("error: %s\n", str);
 }

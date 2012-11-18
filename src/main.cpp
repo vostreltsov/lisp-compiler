@@ -12,6 +12,7 @@
 
 extern int yyparse();
 extern int errorCode;
+extern char errorMessage[256];
 extern FILE * yyin;
 extern struct program_struct * root;
 
@@ -53,8 +54,13 @@ void drawProgram(const char * program, const char * image)
             SemanticAnalyzer * sem = new SemanticAnalyzer(root);
             sem->doTransform();
             sem->doSemantics();
+            foreach (QString error, sem->getErrors()) {
+                QTextStream(stdout) << error << "\n";
+            }
             run_don_on_attr_node(sem->getRoot(), image);
             delete sem;
+        } else {
+            QTextStream(stdout) << errorMessage << "\n";
         }
         fclose(yyin);
         free_program(root);
