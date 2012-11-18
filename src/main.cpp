@@ -51,7 +51,7 @@ void drawProgram(const char * program, const char * image)
     } else {
         yyparse();
         if (errorCode == ERROR_NO_ERROR) {
-            SemanticAnalyzer * sem = new SemanticAnalyzer(root);
+            SemanticProgram * sem = new SemanticProgram(root);
             sem->doTransform();
             sem->doSemantics();
             foreach (QString error, sem->getErrors()) {
