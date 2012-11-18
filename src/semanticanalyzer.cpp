@@ -397,7 +397,9 @@ void ProgramPartNode::transform()
 
 void ProgramPartNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
-    // TODO
+    foreach (AttributedNode * node, childNodes()) {
+        node->semantics(classTable, errorList, curClass, curMethod);
+    }
 }
 
 ProgramPartNode * ProgramPartNode::fromSyntaxNode(const program_part_struct * syntaxNode)
@@ -527,6 +529,8 @@ bool SExpressionNode::isCalculable() const
     case S_EXPR_TYPE_BOOL:
     case S_EXPR_TYPE_ID:
     case S_EXPR_TYPE_FCALL:
+    case S_EXPR_TYPE_MAKEINSTANCE:
+    case S_EXPR_TYPE_SLOTVALUE:
         return true;
     default:
         return false;
@@ -608,6 +612,91 @@ void SExpressionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLi
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
         child->semantics(classTable, errorList, curClass, curMethod);
+    }
+
+    // Analyse this node.
+    switch (fSubType) {
+    case S_EXPR_TYPE_INT:
+    case S_EXPR_TYPE_CHAR:
+    case S_EXPR_TYPE_STRING:
+    case S_EXPR_TYPE_BOOL: {
+        // Nothing to check.
+        break;
+    }
+    case S_EXPR_TYPE_ID: {
+        // Nothing to check, add to vars table?
+        break;
+    }
+    case S_EXPR_TYPE_FCALL: {
+        // Check if the function exists. TODO
+
+        // Check if number of arguments is the same as in the function definition. TODO
+
+        // Check if arguments should be calculable. This also checks calculability of the assignment right side.
+        foreach (SExpressionNode * arg, fArguments) {
+            if (!arg->isCalculable()) {
+                *errorList << "Only calculable expressions can be passed as arguments.";
+                break;
+            }
+        }
+        // Check if ID's are known.
+        foreach (SExpressionNode * arg, fArguments) {
+            // Function existance checked before this switch-case since it's a child node.
+            if (arg->fSubType == S_EXPR_TYPE_ID) {
+                // TODO.
+            }
+        }
+        break;
+    }
+    case S_EXPR_TYPE_LOOP_IN: {
+        // Check correctness of the array.
+        bool correct = (fContainer->fSubType == S_EXPR_TYPE_ID /* && fContainer->fId exists */) ||
+                      (fContainer->fSubType == S_EXPR_TYPE_FCALL && (fContainer->fId == NAME_FUNC_VECTOR || fContainer->fId == NAME_FUNC_LIST));
+        if (!correct) {
+            *errorList << "Wrong container specified for the loop.";
+        }
+        break;
+    }
+    case S_EXPR_TYPE_LOOP_FROM_TO: {
+        // Check if borders are calculable.
+        if (!fFrom->isCalculable() || !fTo->isCalculable()) {
+            *errorList << "Only calculable expressions can be used as loop borders.";
+        }
+        break;
+    }
+    case S_EXPR_TYPE_PROGN: {
+        // Child nodes are checked before this switch-case.
+        break;
+    }
+    case S_EXPR_TYPE_IF: {
+        // Check if the condition is calculable.
+        if (!fCondition->isCalculable()) {
+            *errorList << "Only calculable expressions can be used as conditions.";
+        }
+        break;
+    }
+    case S_EXPR_TYPE_MAKEINSTANCE: {
+        // Check if the class exists. TODO
+        break;
+    }
+    case S_EXPR_TYPE_SLOTVALUE: {
+        // Check if the field exists. TODO
+        break;
+    }
+    case S_EXPR_TYPE_ASSIGN_ELT: {
+        // Checks are same as for FCALL. TODO
+        /*if (!fOperands.last()->isCalculable()) {
+            *errorList << "Only calculable expressions can be assigned.";
+        }*/
+        break;
+    }
+    case S_EXPR_TYPE_ASSIGN_FIELD: {
+        // Checks are same as for FCALL. TODO
+        break;
+    }
+    default: {
+        break;
+    }
     }
 }
 
@@ -863,77 +952,24 @@ void DefinitionNode::transform()
 void DefinitionNode::semantics(QMap<QString, SemanticClass *> * classTable, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod) const
 {
     // Analyse all child nodes.
-   /* foreach (AttributedNode * child, childNodes()) {
+    foreach (AttributedNode * child, childNodes()) {
         child->semantics(classTable, errorList, curClass, curMethod);
     }
 
-    // Now check this node.
+    // Analyse this node.
     switch (fSubType) {
-    case LIST_TYPE_FCALL: {
-        // Operands should be calculable.
-        foreach (SExpressionNode * op, fOperands) {
-            if (!op->isCalculable()) {
-                *errorList << "Only calculable expressions can be passed as arguments.";
-            }
-        }
-
+    case DEF_TYPE_CLASS: {
+        // Check if there's no class with same name yet. TODO
         break;
     }
-    case LIST_TYPE_LOOP_IN: {
-        bool result = (fContainer->fSubType == S_EXPR_TYPE_ID) ||
-                      (fContainer->fSubType == S_EXPR_TYPE_LIST && (fContainer->fList->fId == NAME_FUNC_VECTOR || fContainer->fList->fId == NAME_FUNC_LIST));
-        if (!result) {
-            *errorList << "Wrong container specified for the loop.";
-        }
-        break;
-    }
-    case LIST_TYPE_LOOP_FROM_TO: {
-        // Check if conditions are calculable.
-        if (!fFrom->isCalculable() || !fTo->isCalculable()) {
-            *errorList << "Only calculable expressions can be used as loop conditions.";
-        }
-        break;
-    }
-    case LIST_TYPE_PROGN: {
-        // Checked before this switch-case.
-        break;
-    }
-    case LIST_TYPE_IF: {
-        // Check if the condition is calculable.
-        if (!fCondition->isCalculable()) {
-            *errorList << "Only calculable expressions can be used as conditions.";
-        }
-        break;
-    }
-    case LIST_TYPE_SLOTDEF: {
-        // Checked before this switch-case.
-        break;
-    }
-    case LIST_TYPE_DEFUN: {
-        // Function parameters are identifiers.
-        foreach (SExpressionNode * op, fOperands) {
-            if (op->fSubType != S_EXPR_TYPE_ID) {
-                *errorList << "Invalid function parameter name.";
-            }
-        }
-
-        break;
-    }
-    case LIST_TYPE_DEFCLASS: {
-        // Checked before this switch-case.
-        break;
-    }
-    case LIST_TYPE_ASSIGN_ELT: {
-        // Check if the assigned expression is calculable.
-        if (!fOperands.last()->isCalculable()) {
-            *errorList << "Only calculable expressions can be assigned.";
-        }
+    case DEF_TYPE_FUNC: {
+        // Check if there's no function with same name yet. TODO
         break;
     }
     default: {
         break;
     }
-    }*/
+    }
 }
 
 DefinitionNode * DefinitionNode::fromSyntaxNode(const def_struct * syntaxNode)
