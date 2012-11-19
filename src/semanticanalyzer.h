@@ -383,6 +383,7 @@ public:
     static SExpressionNode * fromSyntaxNode(const s_expr_struct * syntaxNode);
 
 private:
+    bool isValidContainer(SemanticClass * curClass, SemanticMethod * curMethod) const;
     static QString translateMethodNameToRTLName(QString originalName);
 };
 

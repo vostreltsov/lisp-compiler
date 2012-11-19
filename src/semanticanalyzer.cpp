@@ -888,14 +888,18 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
                     *errorList << "Can't call SETF with given parameters.";
                 }
             }
+
+            if (fId == NAME_FUNC_ELT) {
+                if (fArguments.isEmpty() || !fArguments.first()->isValidContainer(curClass, curMethod)) {
+                    *errorList << "Can't call ELT with given parameters.";
+                }
+            }
         }
         break;
     }
     case S_EXPR_TYPE_LOOP_IN: {
         // Check correctness of the array.
-        bool correct = (fContainer->fSubType == S_EXPR_TYPE_ID /* && fContainer->fId exists */) ||
-                      (fContainer->fSubType == S_EXPR_TYPE_FCALL && (fContainer->fId == NAME_FUNC_VECTOR || fContainer->fId == NAME_FUNC_LIST));
-        if (!correct) {
+        if (!fContainer->isValidContainer(curClass, curMethod)) {
             *errorList << "Wrong container specified for the loop.";
         } else {
             curMethod->addLocalVar(fId);
@@ -987,6 +991,12 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
     } else {
         return NULL;
     }
+}
+
+bool SExpressionNode::isValidContainer(SemanticClass * curClass, SemanticMethod * curMethod) const
+{
+    return  (fSubType == S_EXPR_TYPE_ID) ||
+            (fSubType == S_EXPR_TYPE_FCALL && (fId == NAME_FUNC_VECTOR || fId == NAME_FUNC_LIST));
 }
 
 QString SExpressionNode::translateMethodNameToRTLName(QString originalName)
