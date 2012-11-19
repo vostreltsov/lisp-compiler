@@ -246,6 +246,7 @@ public:
     SemanticMethod();
     bool hasLocalVar(QString name) const;
     SemanticLocalVar * addLocalVar(QString name);
+    bool isRTLMethod() const;
 
 private:
     QMap<QString, SemanticLocalVar *> fLocalVarsTable; // Local variables table.

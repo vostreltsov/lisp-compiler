@@ -22,7 +22,7 @@ void exec_dot(const QString & dotBinFileName, const QString & dotFileName, const
     QProcess::execute(dotBinFileName, args);
 }
 
-void run_don_on_attr_node(ProgramNode * program, QString fileName) {
+void run_don_on_attr_node(ProgramNode * program, QString fileName, bool showResult) {
     if (program == NULL) {
         return;
     }
@@ -36,14 +36,16 @@ void run_don_on_attr_node(ProgramNode * program, QString fileName) {
         // Run image viewer automatically.
         QStringList args;
         args << fileName;
-        QProcess::execute("ristretto", args);
+        if (showResult) {
+            QProcess::execute("ristretto", args);
+        }
         QFile::remove(dotFN);
     } else {
         // Error occured, don't tell anybody about it!
     }
 }
 
-void drawProgram(const char * program, const char * image)
+void drawProgram(const char * program, const char * image, bool showResult)
 {
     yyin = fopen(program, "r");
     if (yyin == 0) {
@@ -57,7 +59,7 @@ void drawProgram(const char * program, const char * image)
             foreach (QString error, sem->errors()) {
                 QTextStream(stdout) << error << "\n";
             }
-            run_don_on_attr_node(sem->root(), image);
+            run_don_on_attr_node(sem->root(), image, showResult);
             delete sem;
         } else {
             QTextStream(stdout) << errorMessage << "\n";
@@ -72,7 +74,7 @@ int main(int argc, char *argv[])
     if (argc > 1) {
         if (strcmp(argv[1], "--draw") == 0) {
             if (argc >= 4) {
-                drawProgram(argv[2], argv[3]);
+                drawProgram(argv[2], argv[3], false);
             } else {
                 puts("too few parameters");
             }
@@ -81,7 +83,7 @@ int main(int argc, char *argv[])
         }
 
     } else if (argc == 1) {
-        drawProgram("../misc/example.defclass.cl", "attr.png");
+        drawProgram("../misc/example.defclass.cl", "attr.png", true);
     }
     return 0;
 }

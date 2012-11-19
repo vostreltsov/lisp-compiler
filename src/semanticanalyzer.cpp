@@ -327,6 +327,28 @@ SemanticLocalVar * SemanticMethod::addLocalVar(QString name)
     return result;
 }
 
+bool SemanticMethod::isRTLMethod() const
+{
+    QString name = fConstMethodref->fRef2->fRef1->fUtf8;
+    return (name == RTL_METHOD_PLUS ||
+            name == RTL_METHOD_MINUS ||
+            name == RTL_METHOD_MULT ||
+            name == RTL_METHOD_DIV ||
+            name == RTL_METHOD_GREATER ||
+            name == RTL_METHOD_GREATER_EQ ||
+            name == RTL_METHOD_LESS ||
+            name == RTL_METHOD_LESS_EQ ||
+            name == RTL_METHOD_EQ ||
+            name == RTL_METHOD_AND ||
+            name == RTL_METHOD_OR ||
+            name == RTL_METHOD_NOT ||
+            name == RTL_METHOD_SETF ||
+            name == RTL_METHOD_VECTOR ||
+            name == RTL_METHOD_ELT ||
+            name == RTL_METHOD_LIST ||
+            name == RTL_METHOD_PRINT);
+}
+
 SemanticLocalVar::SemanticLocalVar(int number, QString name)
 {
     fNumber = number;
@@ -755,9 +777,9 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
         if (!curClass->hasMethod(fId)) {
             *errorList << "Calling undefined function: \"" + fId + "\".";
         } else {
-            // Check if number of arguments is the same as in the function definition. TODO
+            // Check if number of arguments is the same as in the function definition.
             SemanticMethod * method = curClass->getMethod(fId);
-            if (method != NULL) {
+            if (method != NULL && !method->isRTLMethod()) {
                 int expectedNumberOfArgs = method->fNode->fArguments.size();
                 int realNumberOfArgs = fArguments.size();
                 if (expectedNumberOfArgs != realNumberOfArgs) {
