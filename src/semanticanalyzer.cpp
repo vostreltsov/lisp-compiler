@@ -754,31 +754,39 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
         // Check if the function exists.
         if (!curClass->hasMethod(fId)) {
             *errorList << "Calling undefined function: \"" + fId + "\".";
-        }
-
-        // Check if number of arguments is the same as in the function definition. TODO
-
-        // Check if arguments should be calculable. This also checks calculability of the assignment right side.
-        foreach (SExpressionNode * arg, fArguments) {
-            if (!arg->isCalculable()) {
-                *errorList << "Only calculable expressions can be passed as arguments.";
-                break;
+        } else {
+            // Check if number of arguments is the same as in the function definition. TODO
+            SemanticMethod * method = curClass->getMethod(fId);
+            if (method != NULL) {
+                int expectedNumberOfArgs = method->fNode->fArguments.size();
+                int realNumberOfArgs = fArguments.size();
+                if (expectedNumberOfArgs != realNumberOfArgs) {
+                    *errorList << "Method \"" + fId + "\" doesn't take " + QString::number(realNumberOfArgs) + " argument(s).";
+                }
             }
-        }
-        // Check if ID's are known.
-        foreach (SExpressionNode * arg, fArguments) {
-            // Function existance checked before this switch-case since it's a child node.
-            if (arg->fSubType == S_EXPR_TYPE_ID && !curMethod->hasLocalVar(arg->fId) && !(fId == NAME_FUNC_SETF && arg == fArguments.first())) {
-                *errorList << "Passing undefined variable: \"" + arg->fId + "\".";
-            }
-        }
 
-        // Check if assigning to an identifier.
-        if (fId == NAME_FUNC_SETF) {
-            if (!fArguments.isEmpty() && fArguments.first()->fSubType == S_EXPR_TYPE_ID) {
-                curMethod->addLocalVar(fArguments.first()->fId);
-            } else {
-                *errorList << "Can't call SETF with given parameters.";
+            // Check if arguments should be calculable. This also checks calculability of the assignment right side.
+            foreach (SExpressionNode * arg, fArguments) {
+                if (!arg->isCalculable()) {
+                    *errorList << "Only calculable expressions can be passed as arguments.";
+                    break;
+                }
+            }
+            // Check if ID's are known.
+            foreach (SExpressionNode * arg, fArguments) {
+                // Function existance checked before this switch-case since it's a child node.
+                if (arg->fSubType == S_EXPR_TYPE_ID && !curMethod->hasLocalVar(arg->fId) && !(fId == NAME_FUNC_SETF && arg == fArguments.first())) {
+                    *errorList << "Passing undefined variable: \"" + arg->fId + "\".";
+                }
+            }
+
+            // Check if assigning to an identifier.
+            if (fId == NAME_FUNC_SETF) {
+                if (!fArguments.isEmpty() && fArguments.first()->fSubType == S_EXPR_TYPE_ID) {
+                    curMethod->addLocalVar(fArguments.first()->fId);
+                } else {
+                    *errorList << "Can't call SETF with given parameters.";
+                }
             }
         }
         break;
@@ -1148,15 +1156,27 @@ void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> *
             // Check if there's no function with same name yet.
             *errorList << "Function " + fId + " is already defined.";
         } else {
-            // Add this class to the class table.
+            // Add this method to the class methods table.
             curMethodForChildNodes = curClass->addMethod(this);
-            // Add arguments as local variables.
+
+            // Check if all arguments are identifiers, their repetitions, add local vars.
             // TODO: Add "this".
+            QMap<QString, int> repetitions;
             foreach (SExpressionNode * arg, fArguments) {
                 if (arg->fSubType == S_EXPR_TYPE_ID) {
                     curMethodForChildNodes->addLocalVar(arg->fId);
+                    if (repetitions.contains(arg->fId)) {
+                        repetitions[arg->fId]++;
+                    } else {
+                        repetitions.insert(arg->fId, 1);
+                    }
                 } else {
                     *errorList << "Formal arguments should be identifiers.";
+                }
+            }
+            for (QMap<QString, int>::const_iterator iter = repetitions.constBegin(); iter != repetitions.constEnd(); iter++) {
+                if (iter.value() > 1) {
+                    *errorList << "Duplication of method arguments: \"" + iter.key() +"\" is repeated " + QString::number(iter.value()) + " times.";
                 }
             }
             curClass->addMethod(this);
