@@ -10,6 +10,64 @@ SemanticConstant::SemanticConstant(int number, JavaConstantsTypes type, QString 
     fRef2 = ref2;
 }
 
+QString SemanticConstant::dotCode(QString previous) const
+{
+    QString tmp = "\"const №" + QString::number(fNumber) + "\\n";
+    QString result;
+    switch (fType) {
+    case CONSTANT_Utf8: {
+        tmp += "Utf8 " + fUtf8 + "\"";
+        break;
+    }
+    case CONSTANT_Integer:
+    case CONSTANT_Float:
+    case CONSTANT_Long:
+    case CONSTANT_Double: {
+        tmp += "Integer " + QString::number(fInteger) + "\"";
+        break;
+    }
+    case CONSTANT_Class: {
+        tmp += "Class " + fRef1->fUtf8 + "\"";
+        result += fRef1->dotCode(tmp);
+        break;
+    }
+    case CONSTANT_String: {
+        tmp += "String\"";
+        result += fRef1->dotCode(tmp);
+        break;
+    }
+    case CONSTANT_Fieldref: {
+        tmp += "Fieldref\"";
+        result += fRef1->dotCode(tmp);
+        result += fRef2->dotCode(tmp);
+        break;
+    }
+    case CONSTANT_Methodref: {
+        tmp += "Methodref\"";
+        result += fRef1->dotCode(tmp);
+        result += fRef2->dotCode(tmp);
+        break;
+    }
+    case CONSTANT_InterfaceMethodref: {
+        tmp += "InterfaceMethodref\"";
+        break;
+    }
+    case CONSTANT_NameAndType: {
+        tmp += "NameAndType\"";
+        result += fRef1->dotCode(tmp);
+        result += fRef2->dotCode(tmp);
+        break;
+    }
+    default: {
+        return "";
+        break;
+    }
+    }
+
+    result += previous + "->" + tmp + ";\n";
+    return result;
+}
+
 SemanticProgram::SemanticProgram()
 {
     fRoot = NULL;
@@ -42,6 +100,16 @@ void SemanticProgram::doTransform()
     if (fRoot != NULL) {
         fRoot->transform();
     }
+}
+
+QString SemanticProgram::dotCode() const
+{
+    QString result;
+    foreach (SemanticClass * semClass, fClassTable) {
+        result += semClass->dotForTables("program");
+    }
+    result += fRoot->dotCode("", "");
+    return result;
 }
 
 ProgramNode * SemanticProgram::root() const
@@ -82,6 +150,17 @@ SemanticClass::SemanticClass()
     fConstClass = NULL;
     fConstParent = NULL;
     fNode = NULL;
+}
+
+QString SemanticClass::dotForTables(QString previous) const
+{
+    QString tmp = "\"class " + fConstClass->fRef1->fUtf8 + "\\nparent " + fConstParent->fRef1->fUtf8 + "\"";
+    QString result = previous + "->" + tmp + ";\n";
+    foreach (SemanticConstant * constant, fConstantsTable) {
+        result += constant->dotCode(tmp);
+    }
+
+    return result;
 }
 
 SemanticConstant * SemanticClass::addUtf8Constant(QString value)
@@ -200,7 +279,7 @@ void SemanticClass::addDefaultAndParentConstructor()
     SemanticMethod * constructorThis = new SemanticMethod();
     //SemanticMethod * constructorParent = new SemanticMethod();
     constructorThis->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_CONSTRUCTOR_VOID);
-    /*constructorParent->fConstMethodref =*/ addMethodrefConstant(fConstParent->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_CONSTRUCTOR_VOID);
+    /*constructorParent->fConstMethodref =*/ addMethodrefConstant(fConstParent->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_CONSTRUCTOR_VOID);
 
     // Add methods to the table.
     fMethodsTable.insert(NAME_JAVA_CONSTRUCTOR, constructorThis);
@@ -380,11 +459,10 @@ ProgramNode::ProgramNode() : AttributedNode()
 QString ProgramNode::dotCode(QString parent, QString label) const
 {
     QString tmp = "\"id" + QString::number(fNodeId) + "\\n program\"";
-    QString result = "digraph {\n";
+    QString result;
     foreach (AttributedNode * node, childNodes()) {
         result += node->dotCode(tmp);
     }
-    result += "}\n";
     return result;
 }
 

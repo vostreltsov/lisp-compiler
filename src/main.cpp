@@ -22,7 +22,7 @@ void exec_dot(const QString & dotBinFileName, const QString & dotFileName, const
     QProcess::execute(dotBinFileName, args);
 }
 
-void run_don_on_attr_node(ProgramNode * program, QString fileName, bool showResult) {
+void run_don_on_program(SemanticProgram * program, QString fileName, bool showResult) {
     if (program == NULL) {
         return;
     }
@@ -30,7 +30,8 @@ void run_don_on_attr_node(ProgramNode * program, QString fileName, bool showResu
     QFile dot(dotFN);
     if (dot.open(QFile::WriteOnly)) {
         QTextStream out(&dot);
-        out << program->dotCode("", "");
+        QString dotCode = "strict digraph {\n" + program->dotCode() + "}\n";
+        out << dotCode;
         dot.close();
         exec_dot("dot", dotFN, fileName);
         // Run image viewer automatically.
@@ -59,7 +60,7 @@ void drawProgram(const char * program, const char * image, bool showResult)
             foreach (QString error, sem->errors()) {
                 QTextStream(stdout) << error << "\n";
             }
-            run_don_on_attr_node(sem->root(), image, showResult);
+            run_don_on_program(sem, image, showResult);
             delete sem;
         } else {
             QTextStream(stdout) << errorMessage << "\n";

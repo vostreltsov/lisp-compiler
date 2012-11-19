@@ -22,7 +22,7 @@ class SlotPropertyNode;
 class SlotDefinitionNode;
 class DefinitionNode;
 
-#define TWOBYTES_MAX = 327687;
+#define TWOBYTES_MAX = 32767;
 #define TWOBYTES_MIN = -32768;
 
 // Names of supported Lisp functions.
@@ -158,6 +158,8 @@ public:
 
     SemanticConstant(int number = -1, JavaConstantsTypes type = CONSTANT_Utf8, QString utf8 = "",
                      int integer = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
+
+    QString dotCode(QString previous) const;
 };
 
 /**
@@ -172,6 +174,7 @@ public:
 
     bool doSemantics();
     void doTransform();
+    QString dotCode() const;
     ProgramNode * root() const;
     QLinkedList<QString> errors() const;
 
@@ -196,6 +199,9 @@ public:
     DefinitionNode const           * fNode;           // Corresponding tree node.
 
     SemanticClass();
+
+    QString dotForTables(QString previous) const;
+
     SemanticConstant * addUtf8Constant(QString value);
     SemanticConstant * addIntegerConstant(int value);
     SemanticConstant * addClassConstant(QString name);
