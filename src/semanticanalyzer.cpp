@@ -93,7 +93,7 @@ SemanticConstant * SemanticClass::addUtf8Constant(QString value)
         }
     }
     // Create the new constant.
-    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Utf8, value);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_Utf8, value);
     fConstantsTable << result;
     return result;
 }
@@ -107,7 +107,7 @@ SemanticConstant * SemanticClass::addIntegerConstant(int value)
         }
     }
     // Create the new constant.
-    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Integer, "", value);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_Integer, "", value);
     fConstantsTable << result;
     return result;
 }
@@ -122,7 +122,7 @@ SemanticConstant * SemanticClass::addClassConstant(QString name)
         }
     }
     // Create the new constant.
-    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Class, "", 0, utf8const);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_Class, "", 0, utf8const);
     fConstantsTable << result;
     return result;
 }
@@ -137,7 +137,7 @@ SemanticConstant * SemanticClass::addStringConstant(QString value)
         }
     }
     // Create the new constant.
-    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_String, "", 0, utf8const);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_String, "", 0, utf8const);
     fConstantsTable << result;
     return result;
 }
@@ -153,7 +153,7 @@ SemanticConstant * SemanticClass::addFieldrefConstant(QString className, QString
        }
    }
    // Create the new constant.
-   SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Fieldref, "", 0, classConst, nameAndTypeConst);
+   SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_Fieldref, "", 0, classConst, nameAndTypeConst);
    fConstantsTable << result;
    return result;
 }
@@ -169,7 +169,7 @@ SemanticConstant * SemanticClass::addMethodrefConstant(QString className, QStrin
         }
     }
     // Create the new constant.
-    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_Methodref, "", 0, classConst, nameAndTypeConst);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_Methodref, "", 0, classConst, nameAndTypeConst);
     fConstantsTable << result;
     return result;
 }
@@ -185,7 +185,7 @@ SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString t
         }
     }
     // Create the new constant.
-    SemanticConstant * result = new SemanticConstant(fConstantsTable.size(), CONSTANT_NameAndType, "", 0, nameConst, typeConst);
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_NameAndType, "", 0, nameConst, typeConst);
     fConstantsTable << result;
     return result;
 }
