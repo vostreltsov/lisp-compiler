@@ -4,6 +4,8 @@
 #include <QString>
 #include <QMap>
 #include <QLinkedList>
+#include <QFile>
+#include <QDir>
 #include "nodetypes.h"
 #include "parser_structs.h"
 
@@ -21,9 +23,6 @@ class SExpressionNode;
 class SlotPropertyNode;
 class SlotDefinitionNode;
 class DefinitionNode;
-
-#define TWOBYTES_MAX = 32767;
-#define TWOBYTES_MIN = -32768;
 
 // Names of supported Lisp functions.
 #define NAME_FUNC_PLUS               "+"
@@ -61,31 +60,33 @@ class DefinitionNode;
 
 // Constants to deal with Java and RTL.
 #define NAME_JAVA_CLASS_OBJECT       "java/lang/Object"
-#define NAME_JAVA_CLASS_BASECLASS    "BaseClass"
+#define NAME_JAVA_CLASS_BASE         "BaseClass"
 #define NAME_JAVA_CLASS_LISPRTL      "LispRTL"
 #define NAME_JAVA_CLASS_MAINCLASS    "MainClass"
 #define NAME_JAVA_METHOD_MAIN        "main"
 #define NAME_JAVA_CONSTRUCTOR        "<init>"
 
-#define NAME_JAVA_FIELD_BASECLASS_TYPE         "type"
-#define NAME_JAVA_FIELD_BASECLASS_VALUEINT     "valueInt"
-#define NAME_JAVA_FIELD_BASECLASS_VALUECHAR    "valueChar"
-#define NAME_JAVA_FIELD_BASECLASS_VALUESTRING  "valueString"
-#define NAME_JAVA_FIELD_BASECLASS_VALUEBOOLEAN "valueBoolean"
-#define NAME_JAVA_FIELD_BASECLASS_VALUEARRAY   "valueArray"
+#define NAME_JAVA_FIELD_BASE_TYPE           "type"
+#define NAME_JAVA_FIELD_BASE_VALUEINT       "valueInt"
+#define NAME_JAVA_FIELD_BASE_VALUECHAR      "valueChar"
+#define NAME_JAVA_FIELD_BASE_VALUESTRING    "valueString"
+#define NAME_JAVA_FIELD_BASE_VALUEBOOLEAN   "valueBoolean"
+#define NAME_JAVA_FIELD_BASE_VALUEARRAY     "valueArray"
 
 #define DESC_JAVA_VOID                      "V"
 #define DESC_JAVA_INTEGER                   "I"
 #define DESC_JAVA_STRING                    "Ljava/lang/String;"
-#define DESC_JAVA_CLASS_BASECLASS           "L"NAME_JAVA_CLASS_BASECLASS";"
-#define DESC_JAVA_ARRAY_BASECLASS           "["DESC_JAVA_CLASS_BASECLASS
-#define DESC_JAVA_CONSTRUCTOR_VOID          "()V"
-#define DESC_JAVA_CONSTRUCTOR_INT           "("DESC_JAVA_STRING")V"
-#define DESC_JAVA_CONSTRUCTOR_STRING        "("DESC_JAVA_STRING")V"
-#define DESC_JAVA_CONSTRUCTOR_ARRAY_STRING  "(["DESC_JAVA_STRING")V"
-#define DESC_JAVA_CONSTRUCTOR_BASE          "("NAME_JAVA_CLASS_BASECLASS")V"
-#define DESC_JAVA_RTL_METHOD_VOID           "("DESC_JAVA_ARRAY_BASECLASS")V"
-#define DESC_JAVA_RTL_METHOD_BASECLASS      "("DESC_JAVA_ARRAY_BASECLASS")"DESC_JAVA_CLASS_BASECLASS
+#define DESC_JAVA_CLASS_BASE                "L"NAME_JAVA_CLASS_BASE";"
+#define DESC_JAVA_ARRAY_STRING              "["DESC_JAVA_STRING
+#define DESC_JAVA_ARRAY_BASE                "["DESC_JAVA_CLASS_BASE
+
+#define DESC_JAVA_METHOD_VOID_VOID          "("DESC_JAVA_VOID")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_INTEGER_VOID       "("DESC_JAVA_INTEGER")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_STRING_VOID        "("DESC_JAVA_STRING")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_ARRAYSTRING_VOID   "("DESC_JAVA_ARRAY_STRING")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_BASE_VOID          "("DESC_JAVA_CLASS_BASE")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_ARRAYBASE_VOID     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_ARRAYBASE_BASE     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_CLASS_BASE
 
 #define RTL_BASECLASS_TYPE_DAFUQ     0
 #define RTL_BASECLASS_TYPE_INT       1
@@ -111,6 +112,40 @@ class DefinitionNode;
 #define RTL_METHOD_ELT               "elt"
 #define RTL_METHOD_LIST              "list"
 #define RTL_METHOD_PRINT             "print"
+#define RTL_METHOD_ARCHEY            "archey"
+
+///////////////////////////////////////////////////////////////////////////////////
+//                                                                               //
+//                             CODE GENERATION STUFF                             //
+//                                                                               //
+///////////////////////////////////////////////////////////////////////////////////
+
+const unsigned int   MAGIC_NUMBER      = 0xCAFEBABE;
+const unsigned short VERSION_MINOR     = 0;
+const unsigned short VERSION_MAJOR     = 50;
+
+const unsigned short TWOBYTES_MAX      = 32767;
+const unsigned short TWOBYTES_MIN      = -32768;
+
+const unsigned char  CMD_BIPUSH        = 0x10;
+const unsigned char  CMD_SIPUSH        = 0x11;
+const unsigned char  CMD_LDC           = 0x12;
+const unsigned char  CMD_ALOAD         = 0x19;
+const unsigned char  CMD_ASTORE        = 0x3A;
+const unsigned char  CMD_AASTORE       = 0x53;
+const unsigned char  CMD_POP           = 0x57;
+const unsigned char  CMD_DUP           = 0x59;
+const unsigned char  CMD_IFNE          = 0x9A;
+const unsigned char  CMD_GOTO          = 0xA7;
+const unsigned char  CMD_ARETURN       = 0xB0;
+const unsigned char  CMD_RETURN        = 0xB1;
+const unsigned char  CMD_GETFIELD      = 0xB4;
+const unsigned char  CMD_PUTFIELD      = 0xB5;
+const unsigned char  CMD_INVOKEVIRTUAL = 0xB6;
+const unsigned char  CMD_INVOKESPECIAL = 0xB7;
+const unsigned char  CMD_INVOKESTATIC  = 0xB8;
+const unsigned char  CMD_NEW           = 0xBB;
+const unsigned char  CMD_ANEWARRAY     = 0xBD;
 
 /**
  * @brief Java constants types.

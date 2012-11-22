@@ -1,4 +1,5 @@
 #/bin/sh
+./qtproject --draw ../misc/example.archey.cl ../misc/example.archey.png
 ./qtproject --draw ../misc/example.bubblesort.cl ../misc/example.bubblesort.png
 ./qtproject --draw ../misc/example.defclass.cl ../misc/example.defclass.png
 ./qtproject --draw ../misc/example.defun.cl ../misc/example.defun.png

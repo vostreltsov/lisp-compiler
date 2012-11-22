@@ -273,13 +273,13 @@ void SemanticClass::addDefaultAndParentConstructor()
 {
     // Add constructor name and descriptor.
     addUtf8Constant(NAME_JAVA_CONSTRUCTOR);
-    addUtf8Constant(DESC_JAVA_CONSTRUCTOR_VOID);
+    addUtf8Constant(DESC_JAVA_METHOD_VOID_VOID);
 
     // Add constructor to the methods table.
     SemanticMethod * constructorThis = new SemanticMethod();
     //SemanticMethod * constructorParent = new SemanticMethod();
-    constructorThis->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_CONSTRUCTOR_VOID);
-    /*constructorParent->fConstMethodref =*/ addMethodrefConstant(fConstParent->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_CONSTRUCTOR_VOID);
+    constructorThis->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
+    /*constructorParent->fConstMethodref =*/ addMethodrefConstant(fConstParent->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
 
     // Add methods to the table.
     fMethodsTable.insert(NAME_JAVA_CONSTRUCTOR, constructorThis);
@@ -287,30 +287,31 @@ void SemanticClass::addDefaultAndParentConstructor()
 
 void SemanticClass::addRTLConstants()
 {
-    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_TYPE,         DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUEINT,     DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUECHAR,    DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUESTRING,  DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUEBOOLEAN, DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASECLASS, NAME_JAVA_FIELD_BASECLASS_VALUEARRAY,   DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE,         DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT,     DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUECHAR,    DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUESTRING,  DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEARRAY,   DESC_JAVA_INTEGER);
 
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PLUS,       DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MINUS,      DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MULT,       DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_DIV,        DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_GREATER,    DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_GREATER_EQ, DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LESS,       DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LESS_EQ,    DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_EQ,         DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_AND,        DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_OR,         DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_NOT,        DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_SETF,       DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_VECTOR,     DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_ELT,        DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LIST,       DESC_JAVA_RTL_METHOD_BASECLASS);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PRINT,      DESC_JAVA_RTL_METHOD_BASECLASS);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PLUS,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MINUS,      DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MULT,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_DIV,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_GREATER,    DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_GREATER_EQ, DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LESS,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LESS_EQ,    DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_EQ,         DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_AND,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_OR,         DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_NOT,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_SETF,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_VECTOR,     DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_ELT,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LIST,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PRINT,      DESC_JAVA_METHOD_ARRAYBASE_VOID);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_ARCHEY,     DESC_JAVA_METHOD_VOID_VOID);
 }
 
 bool SemanticClass::hasField(QString name) const
@@ -353,7 +354,7 @@ SemanticMethod * SemanticClass::addMethod(const DefinitionNode * node)
     // Create the descriptor.
     QString desc;
     if (node->fId == NAME_JAVA_METHOD_MAIN) {
-        desc = DESC_JAVA_CONSTRUCTOR_ARRAY_STRING;
+        desc = DESC_JAVA_METHOD_ARRAYSTRING_VOID;
     } else if (fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS) {
         desc = createMethodDesc(node->fArguments.size() - 1); // Main class has only static members.
     } else {
@@ -371,9 +372,9 @@ QString SemanticClass::createMethodDesc(int numberOfArguments)
 {
     QString result = "(";
     for (int i = 0; i < numberOfArguments; i++) {
-        result += DESC_JAVA_CLASS_BASECLASS;
+        result += DESC_JAVA_CLASS_BASE;
     }
-    result += QString(")") + DESC_JAVA_CLASS_BASECLASS;
+    result += QString(")") + DESC_JAVA_CLASS_BASE;
     return result;
 }
 
@@ -539,7 +540,7 @@ void ProgramNode::semantics(SemanticProgram * program, QLinkedList<QString> * er
     // Main class is added in the above call since it's added as a node during transformation. Add the base class to constants.
     SemanticClass * baseClass = new SemanticClass();
     baseClass->addUtf8Constant("Code");
-    baseClass->fConstClass = baseClass->addClassConstant(NAME_JAVA_CLASS_BASECLASS);
+    baseClass->fConstClass = baseClass->addClassConstant(NAME_JAVA_CLASS_BASE);
     baseClass->fConstParent = baseClass->addClassConstant(NAME_JAVA_CLASS_OBJECT);
     baseClass->addDefaultAndParentConstructor();
     baseClass->addRTLConstants();
@@ -1318,7 +1319,7 @@ DefinitionNode * DefinitionNode::fromSyntaxNode(const def_struct * syntaxNode)
         result->fId = syntaxNode->id;
         result->fParent = syntaxNode->parent;
         if (result->fSubType == DEF_TYPE_CLASS && result->fParent.isEmpty()) {
-            result->fParent = NAME_JAVA_CLASS_BASECLASS;
+            result->fParent = NAME_JAVA_CLASS_BASE;
         }
         s_expr_struct * expr = (syntaxNode->args != NULL ? syntaxNode->args->first : NULL);
         while (expr != NULL) {
