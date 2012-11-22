@@ -19,6 +19,7 @@ public:
     void writeU4(quint32 value);
     void writeU2(quint16 value);
     void writeU1(quint8 value);
+    void writeByteArray(QByteArray bytes);
 
 };
 

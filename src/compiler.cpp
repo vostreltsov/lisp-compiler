@@ -244,7 +244,7 @@ SemanticClass * SemanticProgram::getClass(QString name) const
 SemanticClass * SemanticProgram::addClass(const DefinitionNode * node)
 {
     SemanticClass * newClass = new SemanticClass();
-    newClass->addUtf8Constant("Code");
+    newClass->fConstCode = newClass->addUtf8Constant("Code");
     newClass->fConstClass = newClass->addClassConstant(node->fId);
     newClass->fConstParent = newClass->addClassConstant(node->fParent);
     newClass->fNode = node;
@@ -256,6 +256,7 @@ SemanticClass * SemanticProgram::addClass(const DefinitionNode * node)
 
 SemanticClass::SemanticClass()
 {
+    fConstCode = NULL;
     fConstClass = NULL;
     fConstParent = NULL;
     fNode = NULL;
@@ -286,26 +287,30 @@ bool SemanticClass::generateCode(QString dir) const
     writer.writeU2(ACC_SUPER + ACC_PUBLIC);
 
     // Write CONSTANT_Class for this and parent classes.
-    writer.writeU2(111);    // TODO!!!
-    writer.writeU2(111);    // TODO!!!
+    writer.writeU2(fConstClass->fNumber);
+    writer.writeU2(fConstParent->fNumber);
 
-    // Write number of class interfaces (0).
-    writer.writeU2(0);  // Skipping the table itself.
+    // Write number of class interfaces (0), skipping the table itself.
+    writer.writeU2(0);
 
     // Write number of class fields.
     writer.writeU2(fFieldsTable.size());
 
     // Write class fields table.
-    // TODO: Goremykin.
+    foreach (SemanticField * field, fFieldsTable) {
+        // TODO: Goremykin.
+    }
 
     // Write number of class methods.
     writer.writeU2(fMethodsTable.size());
 
     // Write class methods table.
-    // TODO!!!!!!!!!!!!
+    foreach (SemanticMethod * method, fMethodsTable) {
+        method->generateCode(&writer, this);
+    }
 
-    // Write number of class attributes (0).
-    writer.writeU2(0);  // Skipping the table itself.
+    // Write number of class attributes (0), skipping the table itself.
+    writer.writeU2(0);
 }
 
 QString SemanticClass::dotForTables(QString previous) const
@@ -546,6 +551,24 @@ SemanticMethod::SemanticMethod()
     fNode = NULL;
 }
 
+void SemanticMethod::generateCode(BinaryWriter * writer, const SemanticClass * curClass) const
+{
+    // Write access flags.
+    writer->writeU2(fIsStatic ? ACC_PUBLIC + ACC_STATIC : ACC_PUBLIC);
+
+    // Write the "utf8" (method name) constant number.
+    writer->writeU2(fConstMethodref->fRef2->fRef1->fNumber);
+
+    // Write the "utf8" (descriptor) constant number.
+    writer->writeU2(fConstMethodref->fRef2->fRef2->fNumber);
+
+    // Write number of attributes (1).
+    writer->writeU2(1);
+
+    // Generate the "Code" attribute.
+    generateCodeAttribute(writer, curClass);
+}
+
 bool SemanticMethod::hasLocalVar(QString name) const
 {
     return fLocalVarsTable.contains(name);
@@ -583,6 +606,41 @@ bool SemanticMethod::isRTLMethod() const
             name == RTL_METHOD_ELT ||
             name == RTL_METHOD_LIST ||
             name == RTL_METHOD_PRINT);
+}
+
+void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const SemanticClass * curClass) const
+{
+    // Generate byte code.
+    QByteArray byteCode = generateByteCodeMethod();
+
+    // Write number of the "Code" utf8 constant.
+    writer->writeU2(curClass->fConstCode->fNumber);
+
+    // TODO: write the attribute length.
+
+    // Write the operands stack size.
+    writer->writeU2(STACK_SIZE);
+
+    // Write the local vars table size.
+    writer->writeU2(fLocalVarsTable.size());
+
+    // Write the byteCode.
+    // TODO
+
+    // Write the exceptions table size (0), skip the table itself.
+    writer->writeU2(0);
+
+    // Write number of attributes of "Code" (0), skip them too.
+    writer->writeU2(0);
+
+}
+
+QByteArray SemanticMethod::generateByteCodeMethod() const
+{
+    QByteArray result;
+    // TODO!!!!!
+
+    return result;
 }
 
 SemanticLocalVar::SemanticLocalVar(int number, QString name)
@@ -695,7 +753,7 @@ void ProgramNode::semantics(SemanticProgram * program, QLinkedList<QString> * er
 
     // Main class is added in the above call since it's added as a node during transformation. Add the base class to constants.
     SemanticClass * baseClass = new SemanticClass();
-    baseClass->addUtf8Constant("Code");
+    baseClass->fConstCode = baseClass->addUtf8Constant("Code");
     baseClass->fConstClass = baseClass->addClassConstant(NAME_JAVA_CLASS_BASE);
     baseClass->fConstParent = baseClass->addClassConstant(NAME_JAVA_CLASS_OBJECT);
     baseClass->addDefaultAndParentConstructor();

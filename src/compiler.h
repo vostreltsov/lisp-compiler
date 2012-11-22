@@ -129,8 +129,13 @@ const quint16 VERSION_MINOR     = 0x0000;
 const quint16 VERSION_MAJOR     = 0x0033;
 
 const quint16 ACC_PUBLIC        = 0x0001;
+const quint16 ACC_PRIVATE       = 0x0002;
+const quint16 ACC_PROTECTED     = 0x0004;
+const quint16 ACC_STATIC        = 0x0008;
 const quint16 ACC_FINAL         = 0x0010;
 const quint16 ACC_SUPER         = 0x0020;
+const quint16 ACC_VOLATILE      = 0x0040;
+const quint16 ACC_TRANSIENT     = 0x0080;
 const quint16 ACC_INTERFACE     = 0x0200;
 const quint16 ACC_ABSTRACT      = 0x0400;
 const quint16 ACC_SYNTHETIC     = 0x1000;
@@ -156,6 +161,8 @@ const quint8  CMD_INVOKESPECIAL = 0xB7;
 const quint8  CMD_INVOKESTATIC  = 0xB8;
 const quint8  CMD_NEW           = 0xBB;
 const quint8  CMD_ANEWARRAY     = 0xBD;
+
+const quint16 STACK_SIZE        = 1024;
 
 /**
  * @brief Java constants types.
@@ -242,6 +249,7 @@ private:
 class SemanticClass
 {
 public:
+    SemanticConstant               * fConstCode;      // Utf8 constant "Code".
     SemanticConstant               * fConstClass;     // Name of the class (CONSTANT_Class).
     SemanticConstant               * fConstParent;    // Name of the parent class (CONSTANT_Class).
     DefinitionNode const           * fNode;           // Corresponding tree node.
@@ -300,12 +308,18 @@ public:
     DefinitionNode const * fNode;           // Corresponding tree node.
 
     SemanticMethod();
+
+    void generateCode(BinaryWriter * writer, const SemanticClass * curClass) const;
+
     bool hasLocalVar(QString name) const;
     SemanticLocalVar * addLocalVar(QString name);
     bool isRTLMethod() const;
 
 private:
     QMap<QString, SemanticLocalVar *> fLocalVarsTable; // Local variables table.
+
+    void generateCodeAttribute(BinaryWriter * writer, const SemanticClass * curClass) const;
+    QByteArray generateByteCodeMethod() const;
 };
 
 /**
