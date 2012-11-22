@@ -105,4 +105,25 @@ public class LispRTL {
             break;
         }*/
     }
+
+    public static void archey() {
+        System.out.println("               +               "); 
+        System.out.println("               #               "); 
+        System.out.println("              ###              "); 
+        System.out.println("             #####             "); 
+        System.out.println("             ######            "); 
+        System.out.println("            ; #####;           ");
+        System.out.println("           +##.#####           ");
+        System.out.println("          +##########          ");
+        System.out.println("         #############;        ");
+        System.out.println("        ###############+       ");
+        System.out.println("       #######   #######       ");
+        System.out.println("     .######;     ;######.     ");
+        System.out.println("    .#######;     ;#######.    ");
+        System.out.println("    #########.   .#########    ");
+        System.out.println("   ######'           '######   ");
+        System.out.println("  ;####                 ####;  ");
+        System.out.println("  ##'                     '##  ");
+        System.out.println(" #'                         `# ");
+    }
 }
