@@ -11,7 +11,8 @@ SOURCES += \
     lexer.cpp \
     parser_funcs.cpp \
     semanticanalyzer.cpp \
-    errors.cpp
+    errors.cpp \
+    binarywriter.cpp
 
 HEADERS += \
     parser.hpp \
@@ -19,4 +20,5 @@ HEADERS += \
     parser_funcs.h \
     nodetypes.h \
     semanticanalyzer.h \
-    errors.h
+    errors.h \
+    binarywriter.h

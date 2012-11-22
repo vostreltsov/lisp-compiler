@@ -4,10 +4,10 @@
 #include <QString>
 #include <QMap>
 #include <QLinkedList>
-#include <QFile>
 #include <QDir>
 #include "nodetypes.h"
 #include "parser_structs.h"
+#include "binarywriter.h"
 
 class SemanticConstant;
 class SemanticProgram;
@@ -120,32 +120,32 @@ class DefinitionNode;
 //                                                                               //
 ///////////////////////////////////////////////////////////////////////////////////
 
-const unsigned int   MAGIC_NUMBER      = 0xCAFEBABE;
-const unsigned short VERSION_MINOR     = 0;
-const unsigned short VERSION_MAJOR     = 50;
+const qint16 TWOBYTES_MAX       = 32767;
+const qint16 TWOBYTES_MIN       = -32768;
 
-const unsigned short TWOBYTES_MAX      = 32767;
-const unsigned short TWOBYTES_MIN      = -32768;
+const quint32 MAGIC_NUMBER      = 0xCAFEBABE;
+const quint16 VERSION_MINOR     = 0x0000;
+const quint16 VERSION_MAJOR     = 0x0033;
 
-const unsigned char  CMD_BIPUSH        = 0x10;
-const unsigned char  CMD_SIPUSH        = 0x11;
-const unsigned char  CMD_LDC           = 0x12;
-const unsigned char  CMD_ALOAD         = 0x19;
-const unsigned char  CMD_ASTORE        = 0x3A;
-const unsigned char  CMD_AASTORE       = 0x53;
-const unsigned char  CMD_POP           = 0x57;
-const unsigned char  CMD_DUP           = 0x59;
-const unsigned char  CMD_IFNE          = 0x9A;
-const unsigned char  CMD_GOTO          = 0xA7;
-const unsigned char  CMD_ARETURN       = 0xB0;
-const unsigned char  CMD_RETURN        = 0xB1;
-const unsigned char  CMD_GETFIELD      = 0xB4;
-const unsigned char  CMD_PUTFIELD      = 0xB5;
-const unsigned char  CMD_INVOKEVIRTUAL = 0xB6;
-const unsigned char  CMD_INVOKESPECIAL = 0xB7;
-const unsigned char  CMD_INVOKESTATIC  = 0xB8;
-const unsigned char  CMD_NEW           = 0xBB;
-const unsigned char  CMD_ANEWARRAY     = 0xBD;
+const quint8  CMD_BIPUSH        = 0x10;
+const quint8  CMD_SIPUSH        = 0x11;
+const quint8  CMD_LDC           = 0x12;
+const quint8  CMD_ALOAD         = 0x19;
+const quint8  CMD_ASTORE        = 0x3A;
+const quint8  CMD_AASTORE       = 0x53;
+const quint8  CMD_POP           = 0x57;
+const quint8  CMD_DUP           = 0x59;
+const quint8  CMD_IFNE          = 0x9A;
+const quint8  CMD_GOTO          = 0xA7;
+const quint8  CMD_ARETURN       = 0xB0;
+const quint8  CMD_RETURN        = 0xB1;
+const quint8  CMD_GETFIELD      = 0xB4;
+const quint8  CMD_PUTFIELD      = 0xB5;
+const quint8  CMD_INVOKEVIRTUAL = 0xB6;
+const quint8  CMD_INVOKESPECIAL = 0xB7;
+const quint8  CMD_INVOKESTATIC  = 0xB8;
+const quint8  CMD_NEW           = 0xBB;
+const quint8  CMD_ANEWARRAY     = 0xBD;
 
 /**
  * @brief Java constants types.
@@ -207,8 +207,11 @@ public:
     SemanticProgram(const program_struct * root);
     ~SemanticProgram();
 
-    bool doSemantics();
     void doTransform();
+    bool doSemantics();
+    bool doGenerateCode();
+
+
     QString dotCode() const;
     ProgramNode * root() const;
     QLinkedList<QString> errors() const;

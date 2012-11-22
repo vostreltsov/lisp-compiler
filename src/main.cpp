@@ -57,8 +57,13 @@ void drawProgram(const char * program, const char * image, bool showResult)
             SemanticProgram * sem = new SemanticProgram(root);
             sem->doTransform();
             sem->doSemantics();
-            foreach (QString error, sem->errors()) {
-                QTextStream(stdout) << error << "\n";
+            QLinkedList<QString> errors = sem->errors();
+            if (errors.isEmpty()) {
+                sem->doGenerateCode();
+            } else {
+                foreach (QString error, sem->errors()) {
+                    QTextStream(stdout) << error << "\n";
+                }
             }
             run_don_on_program(sem, image, showResult);
             delete sem;

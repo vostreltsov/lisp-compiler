@@ -85,6 +85,13 @@ SemanticProgram::~SemanticProgram()
     }
 }
 
+void SemanticProgram::doTransform()
+{
+    if (fRoot != NULL) {
+        fRoot->transform();
+    }
+}
+
 bool SemanticProgram::doSemantics()
 {
     fClassTable.clear();
@@ -95,11 +102,19 @@ bool SemanticProgram::doSemantics()
     return fErrors.empty();
 }
 
-void SemanticProgram::doTransform()
+bool SemanticProgram::doGenerateCode()
 {
-    if (fRoot != NULL) {
-        fRoot->transform();
+    bool result = true;
+    foreach (SemanticClass * curClass, fClassTable) {
+        BinaryWriter w(curClass->fNode->fId + ".class");
+        ///// TODO - remove;
+        w.writeU4(MAGIC_NUMBER);
+        w.writeU2(VERSION_MINOR);
+        w.writeU2(VERSION_MAJOR);
+        ///// TODO - call each table element;
     }
+
+    return result;
 }
 
 QString SemanticProgram::dotCode() const
