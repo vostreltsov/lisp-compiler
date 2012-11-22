@@ -10,15 +10,15 @@ SOURCES += \
     main.cpp \
     lexer.cpp \
     parser_funcs.cpp \
-    semanticanalyzer.cpp \
     errors.cpp \
-    binarywriter.cpp
+    binarywriter.cpp \
+    compiler.cpp
 
 HEADERS += \
     parser.hpp \
     parser_structs.h \
     parser_funcs.h \
     nodetypes.h \
-    semanticanalyzer.h \
     errors.h \
-    binarywriter.h
+    binarywriter.h \
+    compiler.h

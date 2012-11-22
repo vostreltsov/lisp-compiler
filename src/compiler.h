@@ -4,6 +4,7 @@
 #include <QString>
 #include <QMap>
 #include <QLinkedList>
+#include <QFile>
 #include <QDir>
 #include "nodetypes.h"
 #include "parser_structs.h"
@@ -127,6 +128,15 @@ const quint32 MAGIC_NUMBER      = 0xCAFEBABE;
 const quint16 VERSION_MINOR     = 0x0000;
 const quint16 VERSION_MAJOR     = 0x0033;
 
+const quint16 ACC_PUBLIC        = 0x0001;
+const quint16 ACC_FINAL         = 0x0010;
+const quint16 ACC_SUPER         = 0x0020;
+const quint16 ACC_INTERFACE     = 0x0200;
+const quint16 ACC_ABSTRACT      = 0x0400;
+const quint16 ACC_SYNTHETIC     = 0x1000;
+const quint16 ACC_ANNOTATION    = 0x2000;
+const quint16 ACC_ENUM          = 0x4000;
+
 const quint8  CMD_BIPUSH        = 0x10;
 const quint8  CMD_SIPUSH        = 0x11;
 const quint8  CMD_LDC           = 0x12;
@@ -194,6 +204,7 @@ public:
     SemanticConstant(int number = -1, JavaConstantsTypes type = CONSTANT_Utf8, QString utf8 = "",
                      int integer = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
 
+    void generateCode(BinaryWriter * writer) const;
     QString dotCode(QString previous) const;
 };
 
@@ -209,8 +220,7 @@ public:
 
     void doTransform();
     bool doSemantics();
-    bool doGenerateCode();
-
+    bool doGenerateCode(QString dir) const;
 
     QString dotCode() const;
     ProgramNode * root() const;
@@ -237,6 +247,8 @@ public:
     DefinitionNode const           * fNode;           // Corresponding tree node.
 
     SemanticClass();
+
+    bool generateCode(QString dir) const;
 
     QString dotForTables(QString previous) const;
 

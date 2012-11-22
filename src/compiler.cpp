@@ -1,4 +1,4 @@
-#include "semanticanalyzer.h"
+#include "compiler.h"
 
 SemanticConstant::SemanticConstant(int number, JavaConstantsTypes type, QString utf8, int integer, SemanticConstant * ref1, SemanticConstant * ref2)
 {
@@ -10,6 +10,82 @@ SemanticConstant::SemanticConstant(int number, JavaConstantsTypes type, QString 
     fRef2 = ref2;
 }
 
+void SemanticConstant::generateCode(BinaryWriter * writer) const
+{
+    // Write the constant type.
+    writer->writeU2(fType);
+
+    switch (fType) {
+    case CONSTANT_Utf8: {
+        // Write the string length.
+        writer->writeU2(fUtf8.length());
+
+        // Write the string itself.
+        foreach (QChar ch, fUtf8) {
+            writer->writeU1(ch.toAscii());
+        }
+        break;
+    }
+    case CONSTANT_Integer: {
+        writer->writeU4(fInteger);
+        break;
+    }
+    case CONSTANT_Float: {
+        // Unsupported yet.
+        break;
+    }
+    case CONSTANT_Long: {
+        // Unsupported yet.
+        break;
+    }
+    case CONSTANT_Double: {
+        // Unsupported yet.
+        break;
+    }
+    case CONSTANT_Class: {
+        // Write the "utf8" constant number.
+        writer->writeU2(fRef1->fNumber);
+        break;
+    }
+    case CONSTANT_String: {
+        // Write the "utf8" constant number.
+        writer->writeU2(fRef1->fNumber);
+        break;
+    }
+    case CONSTANT_Fieldref: {
+        // Write the "class" constant number.
+        writer->writeU2(fRef1->fNumber);
+
+        // Write the "name and type" constant number.
+        writer->writeU2(fRef2->fNumber);
+        break;
+    }
+    case CONSTANT_Methodref: {
+        // Write the "class" constant number.
+        writer->writeU2(fRef1->fNumber);
+
+        // Write the "name and type" constant number.
+        writer->writeU2(fRef2->fNumber);
+        break;
+    }
+    case CONSTANT_InterfaceMethodref: {
+        // Unsupported yet.
+        break;
+    }
+    case CONSTANT_NameAndType: {
+        // Write the "utf8" constant number.
+        writer->writeU2(fRef1->fNumber);
+
+        // Write the "utf8" constant number.
+        writer->writeU2(fRef2->fNumber);
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+}
+
 QString SemanticConstant::dotCode(QString previous) const
 {
     QString tmp = "\"const №" + QString::number(fNumber) + "\\n";
@@ -19,11 +95,20 @@ QString SemanticConstant::dotCode(QString previous) const
         tmp += "Utf8 " + fUtf8 + "\"";
         break;
     }
-    case CONSTANT_Integer:
-    case CONSTANT_Float:
-    case CONSTANT_Long:
-    case CONSTANT_Double: {
+    case CONSTANT_Integer: {
         tmp += "Integer " + QString::number(fInteger) + "\"";
+        break;
+    }
+    case CONSTANT_Float: {
+        tmp += "Float\"";
+        break;
+    }
+    case CONSTANT_Long: {
+        tmp += "Long\"";
+        break;
+    }
+    case CONSTANT_Double: {
+        tmp += "Double\"";
         break;
     }
     case CONSTANT_Class: {
@@ -99,19 +184,28 @@ bool SemanticProgram::doSemantics()
     if (fRoot != NULL) {
         fRoot->semantics(this,  &fErrors, NULL, NULL);
     }
-    return fErrors.empty();
+    return fErrors.isEmpty();
 }
 
-bool SemanticProgram::doGenerateCode()
+bool SemanticProgram::doGenerateCode(QString dir) const
 {
+    if (!fErrors.isEmpty()) {
+        return false;
+    }
     bool result = true;
+
+    // Create the resulting directory.
+    if (!QDir(dir).exists()) {
+        QDir().mkdir(dir);
+    }
+
+    // Copy rtl class files.
+    QFile::copy(QString(NAME_JAVA_CLASS_BASE) + ".class", dir + "/" + NAME_JAVA_CLASS_BASE + ".class");
+    QFile::copy(QString(NAME_JAVA_CLASS_LISPRTL) + ".class", dir + "/" + NAME_JAVA_CLASS_LISPRTL + ".class");
+
+    // Generate code for all classes.
     foreach (SemanticClass * curClass, fClassTable) {
-        BinaryWriter w(curClass->fNode->fId + ".class");
-        ///// TODO - remove;
-        w.writeU4(MAGIC_NUMBER);
-        w.writeU2(VERSION_MINOR);
-        w.writeU2(VERSION_MAJOR);
-        ///// TODO - call each table element;
+        result &= curClass->generateCode(dir);
     }
 
     return result;
@@ -121,7 +215,7 @@ QString SemanticProgram::dotCode() const
 {
     QString result;
     foreach (SemanticClass * semClass, fClassTable) {
-        result += semClass->dotForTables("program");
+        //result += semClass->dotForTables("program");  // ARE YOU SURE YOU WANT THIS?
     }
     result += fRoot->dotCode("", "");
     return result;
@@ -165,6 +259,53 @@ SemanticClass::SemanticClass()
     fConstClass = NULL;
     fConstParent = NULL;
     fNode = NULL;
+}
+
+bool SemanticClass::generateCode(QString dir) const
+{
+    BinaryWriter writer(dir + "/" + fNode->fId + ".class");
+
+    if (!writer.isAlive()) {
+        return false;
+    }
+
+    // Write magic number and version.
+    writer.writeU4(MAGIC_NUMBER);
+    writer.writeU2(VERSION_MINOR);
+    writer.writeU2(VERSION_MAJOR);
+
+    // Write number of class constants + 1.
+    writer.writeU2(fConstantsTable.size() + 1);
+
+    // Write class constants table.
+    foreach (SemanticConstant * constant, fConstantsTable) {
+        constant->generateCode(&writer);
+    }
+
+    // Write access flags.
+    writer.writeU2(ACC_SUPER + ACC_PUBLIC);
+
+    // Write CONSTANT_Class for this and parent classes.
+    writer.writeU2(111);    // TODO!!!
+    writer.writeU2(111);    // TODO!!!
+
+    // Write number of class interfaces (0).
+    writer.writeU2(0);  // Skipping the table itself.
+
+    // Write number of class fields.
+    writer.writeU2(fFieldsTable.size());
+
+    // Write class fields table.
+    // TODO: Goremykin.
+
+    // Write number of class methods.
+    writer.writeU2(fMethodsTable.size());
+
+    // Write class methods table.
+    // TODO!!!!!!!!!!!!
+
+    // Write number of class attributes (0).
+    writer.writeU2(0);  // Skipping the table itself.
 }
 
 QString SemanticClass::dotForTables(QString previous) const

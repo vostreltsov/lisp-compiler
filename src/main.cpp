@@ -8,7 +8,7 @@
 #include "parser_structs.h"
 #include "parser_funcs.h"
 #include "errors.h"
-#include "semanticanalyzer.h"
+#include "compiler.h"
 
 extern int yyparse();
 extern int errorCode;
@@ -46,7 +46,7 @@ void run_don_on_program(SemanticProgram * program, QString fileName, bool showRe
     }
 }
 
-void drawProgram(const char * program, const char * image, bool showResult)
+void compile(const char * program, const char * image, bool showTree)
 {
     yyin = fopen(program, "r");
     if (yyin == 0) {
@@ -59,13 +59,14 @@ void drawProgram(const char * program, const char * image, bool showResult)
             sem->doSemantics();
             QLinkedList<QString> errors = sem->errors();
             if (errors.isEmpty()) {
-                sem->doGenerateCode();
+                QString binDirName = "bin-" + QFileInfo(program).fileName();
+                sem->doGenerateCode(binDirName);
             } else {
                 foreach (QString error, sem->errors()) {
                     QTextStream(stdout) << error << "\n";
                 }
             }
-            run_don_on_program(sem, image, showResult);
+            run_don_on_program(sem, image, showTree);
             delete sem;
         } else {
             QTextStream(stdout) << errorMessage << "\n";
@@ -80,7 +81,7 @@ int main(int argc, char *argv[])
     if (argc > 1) {
         if (strcmp(argv[1], "--draw") == 0) {
             if (argc >= 4) {
-                drawProgram(argv[2], argv[3], false);
+                compile(argv[2], argv[3], false);
             } else {
                 puts("too few parameters");
             }
@@ -89,7 +90,7 @@ int main(int argc, char *argv[])
         }
 
     } else if (argc == 1) {
-        drawProgram("../misc/example.defclass.cl", "attr.png", true);
+        compile("../misc/example.defclass.cl", "attr.png", true);
     }
     return 0;
 }
