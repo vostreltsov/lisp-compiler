@@ -252,6 +252,9 @@ public:
     SemanticConstant               * fConstCode;      // Utf8 constant "Code".
     SemanticConstant               * fConstClass;     // Name of the class (CONSTANT_Class).
     SemanticConstant               * fConstParent;    // Name of the parent class (CONSTANT_Class).
+
+    SemanticMethod                 * fConstructorThis;
+    SemanticMethod                 * fConstructorParent;
     DefinitionNode const           * fNode;           // Corresponding tree node.
 
     SemanticClass();
@@ -319,7 +322,7 @@ private:
     QMap<QString, SemanticLocalVar *> fLocalVarsTable; // Local variables table.
 
     void generateCodeAttribute(BinaryWriter * writer, const SemanticClass * curClass) const;
-    QByteArray generateByteCodeMethod() const;
+    QByteArray generateByteCodeMethod(const SemanticClass * curClass) const;
 };
 
 /**

@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         }
 
     } else if (argc == 1) {
-        compile("../misc/example.defclass.cl", "attr.png", true);
+        compile("../misc/example.archey.cl", "attr.png", false);
     }
     return 0;
 }

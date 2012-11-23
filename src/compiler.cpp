@@ -437,13 +437,17 @@ void SemanticClass::addDefaultAndParentConstructor()
     addUtf8Constant(DESC_JAVA_METHOD_VOID_VOID);
 
     // Add constructor to the methods table.
-    SemanticMethod * constructorThis = new SemanticMethod();
-    //SemanticMethod * constructorParent = new SemanticMethod();
-    constructorThis->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
-    /*constructorParent->fConstMethodref =*/ addMethodrefConstant(fConstParent->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
+    fConstructorThis = new SemanticMethod();
+    fConstructorParent = new SemanticMethod();
+
+    fConstructorThis->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
+    fConstructorThis->addLocalVar("this");
+
+    fConstructorParent->fConstMethodref = addMethodrefConstant(fConstParent->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
+    fConstructorParent->addLocalVar("this");
 
     // Add methods to the table.
-    fMethodsTable.insert(NAME_JAVA_CONSTRUCTOR, constructorThis);
+    fMethodsTable.insert(NAME_JAVA_CONSTRUCTOR, fConstructorThis);
 }
 
 void SemanticClass::addRTLConstants()
@@ -455,7 +459,7 @@ void SemanticClass::addRTLConstants()
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEARRAY,   DESC_JAVA_INTEGER);
 
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PLUS,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
+    /*addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PLUS,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
     addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MINUS,      DESC_JAVA_METHOD_ARRAYBASE_BASE);
     addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MULT,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
     addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_DIV,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
@@ -471,7 +475,7 @@ void SemanticClass::addRTLConstants()
     addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_VECTOR,     DESC_JAVA_METHOD_ARRAYBASE_BASE);
     addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_ELT,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
     addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LIST,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PRINT,      DESC_JAVA_METHOD_ARRAYBASE_VOID);
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PRINT,      DESC_JAVA_METHOD_ARRAYBASE_VOID);*/
     addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_ARCHEY,     DESC_JAVA_METHOD_VOID_VOID);
 }
 
@@ -613,7 +617,7 @@ void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const Semantic
     const quint32 EMPTY_CODE_ATTR_LENGTH = 18;  // Length of the "Code" attributes without any tables.
 
     // Generate byte code.
-    QByteArray byteCode = generateByteCodeMethod();
+    QByteArray byteCode = generateByteCodeMethod(curClass);
 
     // Write number of the "Code" utf8 constant.
     writer->writeU2(curClass->fConstCode->fNumber);
@@ -640,9 +644,18 @@ void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const Semantic
     writer->writeU2(0);
 }
 
-QByteArray SemanticMethod::generateByteCodeMethod() const
+QByteArray SemanticMethod::generateByteCodeMethod(const SemanticClass * curClass) const
 {
     QByteArray result;
+    QDataStream stream(&result, QIODevice::WriteOnly);
+
+    // Generate code for constructor.
+    if (fConstMethodref->fRef2->fRef1->fUtf8 == NAME_JAVA_CONSTRUCTOR) {
+        stream << CMD_ALOAD << (quint8)0;
+        stream << CMD_INVOKESPECIAL << (quint8)curClass->fConstructorParent->fConstMethodref->fNumber;
+        stream << CMD_RETURN;
+    }
+
     // TODO!!!!!
 
     return result;
@@ -715,6 +728,14 @@ void ProgramNode::transform()
     mainMethod->fNodeId = 100500;
     mainMethod->fSubType = DEF_TYPE_FUNC;
     mainMethod->fId = NAME_JAVA_METHOD_MAIN;
+
+    // Add "argv" to parameters.
+    SExpressionNode * argv = new SExpressionNode();
+    argv->fNodeId = 100501;
+    argv->fSubType = S_EXPR_TYPE_ID;
+    argv->fId = "argv";
+    mainMethod->fArguments << argv;
+
     // Move all global operators to the main method.
     QLinkedList<ProgramPartNode *>::iterator iter = fParts.begin();
     while (iter != fParts.end()) {
@@ -731,7 +752,7 @@ void ProgramNode::transform()
 
     // Main method is done, create main class definition node, add the main method definition node.
     DefinitionNode * mainClass = new DefinitionNode();
-    mainClass->fNodeId = 100501;
+    mainClass->fNodeId = 100502;
     mainClass->fSubType = DEF_TYPE_CLASS;
     mainClass->fId = NAME_JAVA_CLASS_MAINCLASS;
     mainClass->fParent = NAME_JAVA_CLASS_OBJECT;
@@ -739,7 +760,7 @@ void ProgramNode::transform()
 
     // Finally, create a new program part node which contains the main class.
     fMainPart = new ProgramPartNode();
-    fMainPart->fNodeId = 100502;
+    fMainPart->fNodeId = 100503;
     fMainPart->fSubType = PROGRAM_PART_TYPE_DEF;
     fMainPart->fDefinition = mainClass;
 }
@@ -1489,8 +1510,13 @@ void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> *
             // Add this method to the class methods table.
             curMethodForChildNodes = curClass->addMethod(this);
 
+
+            // Add "this" to localvars.
+            if (!curMethodForChildNodes->fIsStatic) {
+                curMethodForChildNodes->addLocalVar("this");
+            }
+
             // Check if all arguments are identifiers, their repetitions, add local vars.
-            // TODO: Add "this".
             QMap<QString, int> repetitions;
             foreach (SExpressionNode * arg, fArguments) {
                 if (arg->fSubType == S_EXPR_TYPE_ID) {
