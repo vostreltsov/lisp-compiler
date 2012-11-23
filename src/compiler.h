@@ -145,7 +145,10 @@ const quint16 ACC_ENUM          = 0x4000;
 const quint8  CMD_BIPUSH        = 0x10;
 const quint8  CMD_SIPUSH        = 0x11;
 const quint8  CMD_LDC           = 0x12;
+
 const quint8  CMD_ALOAD         = 0x19;
+const quint8  CMD_ALOAD_0       = 0x2A;
+
 const quint8  CMD_ASTORE        = 0x3A;
 const quint8  CMD_AASTORE       = 0x53;
 const quint8  CMD_POP           = 0x57;

@@ -50,6 +50,8 @@ void BinaryWriter::writeU1(quint8 value)
 void BinaryWriter::writeByteArray(QByteArray bytes)
 {
     if (isAlive()) {
-        stream << bytes;
+        foreach (unsigned char byte, bytes) {
+            stream << byte;
+        }
     }
 }

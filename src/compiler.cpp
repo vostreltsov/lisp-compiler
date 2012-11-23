@@ -635,7 +635,7 @@ void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const Semantic
     writer->writeU4(byteCode.size());
 
     // Write the byteCode itself.
-    // TODO
+    writer->writeByteArray(byteCode);
 
     // Write the exceptions table size (0), skip the table itself.
     writer->writeU2(0);
@@ -651,8 +651,8 @@ QByteArray SemanticMethod::generateByteCodeMethod(const SemanticClass * curClass
 
     // Generate code for constructor.
     if (fConstMethodref->fRef2->fRef1->fUtf8 == NAME_JAVA_CONSTRUCTOR) {
-        stream << CMD_ALOAD << (quint8)0;
-        stream << CMD_INVOKESPECIAL << (quint8)curClass->fConstructorParent->fConstMethodref->fNumber;
+        stream << CMD_ALOAD_0;
+        stream << CMD_INVOKESPECIAL << (quint16)curClass->fConstructorParent->fConstMethodref->fNumber;
         stream << CMD_RETURN;
     }
 
@@ -793,6 +793,7 @@ void ProgramNode::semantics(SemanticProgram * program, QLinkedList<QString> * er
     }
 
     // Process the main method.
+    //fMainPart->fDefinition->semantics(program, errorList, curClass, curMethod);
     foreach (AttributedNode * node, fMainPart->fDefinition->childNodes()) {
         node->semantics(program, errorList, curClass, curMethod);
     }
@@ -1541,7 +1542,6 @@ void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> *
                     *errorList << "Duplication of method arguments: \"" + iter.key() +"\" is repeated " + QString::number(iter.value()) + " times.";
                 }
             }
-            curClass->addMethod(this);
         }        
         break;
     }
