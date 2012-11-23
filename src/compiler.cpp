@@ -13,7 +13,7 @@ SemanticConstant::SemanticConstant(int number, JavaConstantsTypes type, QString 
 void SemanticConstant::generateCode(BinaryWriter * writer) const
 {
     // Write the constant type.
-    writer->writeU2(fType);
+    writer->writeU1(fType);
 
     switch (fType) {
     case CONSTANT_Utf8: {
@@ -610,13 +610,16 @@ bool SemanticMethod::isRTLMethod() const
 
 void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const SemanticClass * curClass) const
 {
+    const quint32 EMPTY_CODE_ATTR_LENGTH = 18;  // Length of the "Code" attributes without any tables.
+
     // Generate byte code.
     QByteArray byteCode = generateByteCodeMethod();
 
     // Write number of the "Code" utf8 constant.
     writer->writeU2(curClass->fConstCode->fNumber);
 
-    // TODO: write the attribute length.
+    // Write the attribute length.
+    writer->writeU4(byteCode.size() + EMPTY_CODE_ATTR_LENGTH - 6); // excluding first 6 bytes.
 
     // Write the operands stack size.
     writer->writeU2(STACK_SIZE);
@@ -624,7 +627,10 @@ void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const Semantic
     // Write the local vars table size.
     writer->writeU2(fLocalVarsTable.size());
 
-    // Write the byteCode.
+    // Write the byteCode size.
+    writer->writeU4(byteCode.size());
+
+    // Write the byteCode itself.
     // TODO
 
     // Write the exceptions table size (0), skip the table itself.
@@ -632,7 +638,6 @@ void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const Semantic
 
     // Write number of attributes of "Code" (0), skip them too.
     writer->writeU2(0);
-
 }
 
 QByteArray SemanticMethod::generateByteCodeMethod() const
