@@ -887,6 +887,12 @@ ProgramPartNode * ProgramPartNode::fromSyntaxNode(const program_part_struct * sy
 SExpressionNode::SExpressionNode() : AttributedNode()
 {
     fType = ATTR_TYPE_S_EXPR;
+    fCondition = NULL;
+    fContainer = NULL;
+    fFrom = NULL;
+    fTo = NULL;
+    fBody1 = NULL;
+    fBody2 = NULL;
 }
 
 QString SExpressionNode::dotCode(QString parent, QString label) const
