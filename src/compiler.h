@@ -26,15 +26,15 @@ class SlotDefinitionNode;
 class DefinitionNode;
 
 // Names of supported Lisp functions.
-#define NAME_FUNC_PLUS               "+"
-#define NAME_FUNC_MINUS              "-"
-#define NAME_FUNC_MULT               "*"
-#define NAME_FUNC_DIV                "/"
-#define NAME_FUNC_GREATER            ">"
-#define NAME_FUNC_GREATER_EQ         ">="
-#define NAME_FUNC_LESS               "<"
-#define NAME_FUNC_LESS_EQ            "<="
-#define NAME_FUNC_EQ                 "="
+#define NAME_FUNC_PLUS               "plus"
+#define NAME_FUNC_MINUS              "minus"
+#define NAME_FUNC_MULT               "mult"
+#define NAME_FUNC_DIV                "div"
+#define NAME_FUNC_GREATER            "greater"
+#define NAME_FUNC_GREATER_EQ         "greater_eq"
+#define NAME_FUNC_LESS               "less"
+#define NAME_FUNC_LESS_EQ            "less_eq"
+#define NAME_FUNC_EQ                 "eq"
 #define NAME_FUNC_AND                "and"
 #define NAME_FUNC_OR                 "or"
 #define NAME_FUNC_NOT                "not"
@@ -306,7 +306,6 @@ public:
     static QStringList getRTLMethods();
     static bool isRTLMethod(QString name);
     static QString getDescForRTLMethod(QString name);
-    static QString translateMethodNameToRTLName(QString originalName);
 
 private:
     QMap<QString, SemanticLocalVar *> fLocalVarsTable; // Local variables table.

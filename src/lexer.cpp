@@ -791,16 +791,17 @@ int nondec2dec(char * string, int base)
     return result;
 }
 
-void store_function_id() {
-    yylval.semantic_id = (char *)malloc(sizeof(char) * (yyleng + 1));
-    strcpy(yylval.semantic_id, yytext);
-    for (size_t i = 0; i < yyleng; i++)
+void store_function_id(const char * id) {
+    size_t length = strlen(id);
+    yylval.semantic_id = (char *)malloc(sizeof(char) * (length + 1));
+    strcpy(yylval.semantic_id, id);
+    for (size_t i = 0; i < length; i++)
         yylval.semantic_id[i] = tolower(yylval.semantic_id[i]);
 }
 
 
 
-#line 804 "lexer.cpp"
+#line 805 "lexer.cpp"
 
 #define INITIAL 0
 #define COMMENT_ML_ST 1
@@ -984,7 +985,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 87 "lexer.flex"
+#line 88 "lexer.flex"
 
 
 
@@ -992,7 +993,7 @@ char            buffer[8 * 1024];   // For storing strings, comments etc.
 unsigned int    buffer_length = 0;  // Length of the buffer.
 
 
-#line 996 "lexer.cpp"
+#line 997 "lexer.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -1073,7 +1074,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 94 "lexer.flex"
+#line 95 "lexer.flex"
 {
     // Multiline comment beginning.
     BEGIN(COMMENT_ML_ST);
@@ -1081,7 +1082,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 98 "lexer.flex"
+#line 99 "lexer.flex"
 {
     // String constant beginning.
     buffer_length = 0;
@@ -1090,7 +1091,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 103 "lexer.flex"
+#line 104 "lexer.flex"
 {
     // Singleline comment, do nothing.
 }
@@ -1098,21 +1099,21 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 106 "lexer.flex"
+#line 107 "lexer.flex"
 {
     // Whitespaces, do nothing.
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 109 "lexer.flex"
+#line 110 "lexer.flex"
 {
     return (unsigned char)'\'';
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 112 "lexer.flex"
+#line 113 "lexer.flex"
 {
     // Opening parenthesis.
     return (unsigned char)'(';
@@ -1120,7 +1121,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 116 "lexer.flex"
+#line 117 "lexer.flex"
 {
     // Closing parenthesis.
     return (unsigned char)')';
@@ -1128,275 +1129,275 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 120 "lexer.flex"
+#line 121 "lexer.flex"
 {
     // Operator: addition.
-    store_function_id();
+    store_function_id("plus");
     return ID;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 125 "lexer.flex"
+#line 126 "lexer.flex"
 {
     // Operator: subtraction.
-    store_function_id();
+    store_function_id("minus");
     return ID;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 130 "lexer.flex"
+#line 131 "lexer.flex"
 {
     // Operator: multiplication.
-     store_function_id();
+     store_function_id("mult");
     return ID;
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 135 "lexer.flex"
+#line 136 "lexer.flex"
 {
     // Operator: division.
-    store_function_id();
+    store_function_id("div");
     return ID;
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 140 "lexer.flex"
+#line 141 "lexer.flex"
 {
     // Operator: greater.
-    store_function_id();
+    store_function_id("greater");
     return ID;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 145 "lexer.flex"
+#line 146 "lexer.flex"
 {
     // Operator: greater or equal.
-    store_function_id();
+    store_function_id("greater_eq");
     return ID;
 }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 150 "lexer.flex"
+#line 151 "lexer.flex"
 {
     // Operator: less.
-    store_function_id();
+    store_function_id("less");
     return ID;
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 155 "lexer.flex"
+#line 156 "lexer.flex"
 {
     // Operator: less or equal.
-    store_function_id();
+    store_function_id("less_eq");
     return ID;
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 160 "lexer.flex"
+#line 161 "lexer.flex"
 {
     // Operator: equal.
-    store_function_id();
+    store_function_id("eq");
     return ID;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 165 "lexer.flex"
+#line 166 "lexer.flex"
 {
     // Operator: and.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 170 "lexer.flex"
+#line 171 "lexer.flex"
 {
     // Operator: or.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 175 "lexer.flex"
+#line 176 "lexer.flex"
 {
     // Operator: not.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 180 "lexer.flex"
+#line 181 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 184 "lexer.flex"
+#line 185 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 188 "lexer.flex"
+#line 189 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 192 "lexer.flex"
+#line 193 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 196 "lexer.flex"
+#line 197 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 200 "lexer.flex"
+#line 201 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 204 "lexer.flex"
+#line 205 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 208 "lexer.flex"
+#line 209 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 212 "lexer.flex"
+#line 213 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 216 "lexer.flex"
+#line 217 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 220 "lexer.flex"
+#line 221 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 224 "lexer.flex"
+#line 225 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 228 "lexer.flex"
+#line 229 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 232 "lexer.flex"
+#line 233 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 236 "lexer.flex"
+#line 237 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 240 "lexer.flex"
+#line 241 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 244 "lexer.flex"
+#line 245 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 248 "lexer.flex"
+#line 249 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 252 "lexer.flex"
+#line 253 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 256 "lexer.flex"
+#line 257 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 260 "lexer.flex"
+#line 261 "lexer.flex"
 {
     // Boolean constant - true.
     yylval.semantic_bool = 1;
@@ -1405,7 +1406,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 265 "lexer.flex"
+#line 266 "lexer.flex"
 {
     // Boolean constant - false.
     yylval.semantic_bool = 0;
@@ -1414,7 +1415,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 270 "lexer.flex"
+#line 271 "lexer.flex"
 {
     // Numeric constant - binary.
     yylval.semantic_int = nondec2dec(yytext + 2, 2);
@@ -1423,7 +1424,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 275 "lexer.flex"
+#line 276 "lexer.flex"
 {
     // Numeric constant - octal.
     yylval.semantic_int = nondec2dec(yytext + 2, 8);
@@ -1432,7 +1433,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 280 "lexer.flex"
+#line 281 "lexer.flex"
 {
     // Numeric constant.
     if (yytext[yyleng - 1] == '.')
@@ -1443,7 +1444,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 287 "lexer.flex"
+#line 288 "lexer.flex"
 {
     // Numeric constant - hexadecimal.
     yylval.semantic_int = nondec2dec(yytext + 2, 16);
@@ -1452,7 +1453,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 292 "lexer.flex"
+#line 293 "lexer.flex"
 {
     // Character constant.
     yylval.semantic_char = yytext[2];
@@ -1461,7 +1462,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 297 "lexer.flex"
+#line 298 "lexer.flex"
 {
     // Character constant - whitespace.
     yylval.semantic_char = 'q'; // TODO: convert to a real character.
@@ -1470,194 +1471,194 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 302 "lexer.flex"
+#line 303 "lexer.flex"
 {
     return LOOP;
 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 305 "lexer.flex"
+#line 306 "lexer.flex"
 {
     return FOR;
 }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 308 "lexer.flex"
+#line 309 "lexer.flex"
 {
     return IN;
 }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 311 "lexer.flex"
+#line 312 "lexer.flex"
 {
     return DO;
 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 314 "lexer.flex"
+#line 315 "lexer.flex"
 {
     return FROM;
 }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 317 "lexer.flex"
+#line 318 "lexer.flex"
 {
     return TO;
 }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 320 "lexer.flex"
+#line 321 "lexer.flex"
 {
     return WHILE;
 }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 323 "lexer.flex"
+#line 324 "lexer.flex"
 {
     return PROGN;
 }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 326 "lexer.flex"
+#line 327 "lexer.flex"
 {
     return IF;
 }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 329 "lexer.flex"
+#line 330 "lexer.flex"
 {
     return DEFCLASS;
 }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 332 "lexer.flex"
+#line 333 "lexer.flex"
 {
     return DEFUN;
 }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 335 "lexer.flex"
+#line 336 "lexer.flex"
 {
     return FUNCALL;
 }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 338 "lexer.flex"
+#line 339 "lexer.flex"
 {
     return INITFORM;
 }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 341 "lexer.flex"
+#line 342 "lexer.flex"
 {
     return READER;
 }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 344 "lexer.flex"
+#line 345 "lexer.flex"
 {
     return WRITER;
 }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 347 "lexer.flex"
+#line 348 "lexer.flex"
 {
     return ACCESSOR;
 }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 350 "lexer.flex"
+#line 351 "lexer.flex"
 {
     return ALLOCATION;
 }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 353 "lexer.flex"
+#line 354 "lexer.flex"
 {
     return ALLOCINSTANCE;
 }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 356 "lexer.flex"
+#line 357 "lexer.flex"
 {
     return ALLOCCLASS;
 }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 359 "lexer.flex"
+#line 360 "lexer.flex"
 {
     return MAKEINSTANCE;
 }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 362 "lexer.flex"
+#line 363 "lexer.flex"
 {
     return SLOTVALUE;
 }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 365 "lexer.flex"
+#line 366 "lexer.flex"
 {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 369 "lexer.flex"
+#line 370 "lexer.flex"
 {
     // User-defined symbol.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 374 "lexer.flex"
+#line 375 "lexer.flex"
 {
     // User-defined symbol.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 379 "lexer.flex"
+#line 380 "lexer.flex"
 {
     return ERROR_UNEXPECTED_CHARACTER;
 }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 382 "lexer.flex"
+#line 383 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 385 "lexer.flex"
+#line 386 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
@@ -1665,28 +1666,28 @@ YY_RULE_SETUP
 case 75:
 /* rule 75 can match eol */
 YY_RULE_SETUP
-#line 388 "lexer.flex"
+#line 389 "lexer.flex"
 {
     // Multiline comment body: any character.
 }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 391 "lexer.flex"
+#line 392 "lexer.flex"
 {
     // Multiline comment ending.
     BEGIN(INITIAL);
 }
 	YY_BREAK
 case YY_STATE_EOF(COMMENT_ML_ST):
-#line 395 "lexer.flex"
+#line 396 "lexer.flex"
 {
     return ERROR_UNCLOSED_COMMENT;
 }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 398 "lexer.flex"
+#line 399 "lexer.flex"
 {
     // String constant body: escaped quote character.
     buffer[buffer_length++] = '"';
@@ -1694,7 +1695,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 402 "lexer.flex"
+#line 403 "lexer.flex"
 {
     // String constant body: escaped slash character.
     buffer[buffer_length++] = '\\';
@@ -1703,7 +1704,7 @@ YY_RULE_SETUP
 case 79:
 /* rule 79 can match eol */
 YY_RULE_SETUP
-#line 406 "lexer.flex"
+#line 407 "lexer.flex"
 {
     // String constant body: non-quote, non-slash characters.
     for (int i = 0; i < yyleng; i++)
@@ -1712,7 +1713,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 411 "lexer.flex"
+#line 412 "lexer.flex"
 {
     // String constant body: unrecognized slash character.
     buffer[buffer_length++] = '\\';
@@ -1720,7 +1721,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 415 "lexer.flex"
+#line 416 "lexer.flex"
 {
     // String constant ending.
     buffer[buffer_length] = '\0';
@@ -1732,17 +1733,17 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case YY_STATE_EOF(STRING_ST):
-#line 424 "lexer.flex"
+#line 425 "lexer.flex"
 {
     return ERROR_UNCLOSED_STRING;
 }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 428 "lexer.flex"
+#line 429 "lexer.flex"
 ECHO;
 	YY_BREAK
-#line 1746 "lexer.cpp"
+#line 1747 "lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2737,7 +2738,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 428 "lexer.flex"
+#line 429 "lexer.flex"
 
 
 

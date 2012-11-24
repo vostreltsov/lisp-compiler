@@ -626,31 +626,6 @@ QString SemanticMethod::getDescForRTLMethod(QString name)
     }
 }
 
-QString SemanticMethod::translateMethodNameToRTLName(QString originalName)
-{
-    if (originalName == NAME_FUNC_PLUS) {
-        return "plus";
-    } else if (originalName == NAME_FUNC_MINUS) {
-        return "minus";
-    } else if (originalName == NAME_FUNC_MULT) {
-        return "mult";
-    } else if (originalName ==  NAME_FUNC_DIV) {
-        return "div";
-    } else if (originalName ==  NAME_FUNC_GREATER) {
-        return "greater";
-    } else if (originalName ==  NAME_FUNC_GREATER_EQ) {
-        return "greater_eq";
-    } else if (originalName ==  NAME_FUNC_LESS) {
-        return "less";
-    } else if (originalName ==  NAME_FUNC_LESS_EQ) {
-        return "less_eq";
-    } else if (originalName ==  NAME_FUNC_EQ) {
-        return "eq";
-    } else {
-        return originalName;
-    }
-}
-
 void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const SemanticClass * curClass) const
 {
     const quint32 EMPTY_CODE_ATTR_LENGTH = 18;  // Length of the "Code" attributes without any tables.
@@ -1346,9 +1321,6 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
         result->fTo = SExpressionNode::fromSyntaxNode(syntaxNode->to);
         result->fBody1 = SExpressionNode::fromSyntaxNode(syntaxNode->body1);
         result->fBody2 = SExpressionNode::fromSyntaxNode(syntaxNode->body2);
-        if (result->fSubType == S_EXPR_TYPE_FCALL) {
-            result->fId = SemanticMethod::translateMethodNameToRTLName(result->fId);
-        }
         return result;
     } else {
         return NULL;

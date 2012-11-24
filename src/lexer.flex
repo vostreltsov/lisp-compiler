@@ -59,10 +59,11 @@ int nondec2dec(char * string, int base)
     return result;
 }
 
-void store_function_id() {
-    yylval.semantic_id = (char *)malloc(sizeof(char) * (yyleng + 1));
-    strcpy(yylval.semantic_id, yytext);
-    for (size_t i = 0; i < yyleng; i++)
+void store_function_id(const char * id) {
+    size_t length = strlen(id);
+    yylval.semantic_id = (char *)malloc(sizeof(char) * (length + 1));
+    strcpy(yylval.semantic_id, id);
+    for (size_t i = 0; i < length; i++)
         yylval.semantic_id[i] = tolower(yylval.semantic_id[i]);
 }
 
@@ -119,142 +120,142 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 "+" {
     // Operator: addition.
-    store_function_id();
+    store_function_id("plus");
     return ID;
 }
 "-" {
     // Operator: subtraction.
-    store_function_id();
+    store_function_id("minus");
     return ID;
 }
 "*" {
     // Operator: multiplication.
-     store_function_id();
+     store_function_id("mult");
     return ID;
 }
 "/" {
     // Operator: division.
-    store_function_id();
+    store_function_id("div");
     return ID;
 }
 ">" {
     // Operator: greater.
-    store_function_id();
+    store_function_id("greater");
     return ID;
 }
 ">=" {
     // Operator: greater or equal.
-    store_function_id();
+    store_function_id("greater_eq");
     return ID;
 }
 "<" {
     // Operator: less.
-    store_function_id();
+    store_function_id("less");
     return ID;
 }
 "<=" {
     // Operator: less or equal.
-    store_function_id();
+    store_function_id("less_eq");
     return ID;
 }
 "=" {
     // Operator: equal.
-    store_function_id();
+    store_function_id("eq");
     return ID;
 }
 "and" {
     // Operator: and.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "or" {
     // Operator: or.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "not" {
     // Operator: not.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "defparameter" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "defvar" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "setf" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "let" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "vector" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "vector-push" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "vector-pop" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "elt" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "list" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "list-length" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "length" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "find" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "position" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "remove" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "substitute" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "concatenate" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "open" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "close" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "with-open-file" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "print" {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "t" {
@@ -363,17 +364,17 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     return SLOTVALUE;
 }
 ":"{SYMBOLID}+ {
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 {SYMBOLID}+ {
     // User-defined symbol.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 "|".+"|" {
     // User-defined symbol.
-    store_function_id();
+    store_function_id(yytext);
     return ID;
 }
 . {
