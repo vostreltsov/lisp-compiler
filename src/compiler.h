@@ -444,7 +444,8 @@ public:
     static SExpressionNode * fromSyntaxNode(const s_expr_struct * syntaxNode);
 
 private:
-    bool isValidContainer(SemanticClass * curClass, SemanticMethod * curMethod) const;
+    bool isValidContainer(const SemanticClass * curClass, const SemanticMethod * curMethod) const;
+    QByteArray collectExpressionsToArray(const SemanticClass * curClass, const SemanticMethod * curMethod, QLinkedList<SExpressionNode *> expressions) const;
 };
 
 /**

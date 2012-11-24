@@ -1319,8 +1319,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         stream << CMD_DUP;
         stream << CMD_LDC_W << constValue->fNumber;
         stream << CMD_PUTFIELD << constFieldValueString->fNumber;
-
-        // TODO: array.
         break;
     }
     case S_EXPR_TYPE_BOOL: {
@@ -1330,13 +1328,12 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_FCALL: {
-        // Push arguments onto the stack.
-        foreach (SExpressionNode * node, fArguments) {
-            foreach (quint8 byte, node->generateCode(curClass, curMethod)) {
-                stream << byte;
-            }
+        // Collect arguments to an array.
+        foreach (quint8 byte, collectExpressionsToArray(curClass, curMethod, fArguments)) {
+            stream << byte;
         }
 
+        // Call the method.
         SemanticConstant * constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId);
         QString methodName = constMethod->fRef2->fRef1->fUtf8;
 
@@ -1407,10 +1404,39 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
     }
 }
 
-bool SExpressionNode::isValidContainer(SemanticClass * curClass, SemanticMethod * curMethod) const
+bool SExpressionNode::isValidContainer(const SemanticClass * curClass, const SemanticMethod * curMethod) const
 {
     return  (fSubType == S_EXPR_TYPE_ID) ||
             (fSubType == S_EXPR_TYPE_FCALL && (fId == NAME_FUNC_VECTOR || fId == NAME_FUNC_LIST));
+}
+
+QByteArray SExpressionNode::collectExpressionsToArray(const SemanticClass * curClass, const SemanticMethod * curMethod, QLinkedList<SExpressionNode *> expressions) const
+{
+    QByteArray result;
+    QDataStream stream(&result, QIODevice::WriteOnly);
+
+    SemanticConstant * constBaseClass = curClass->findClassConstant(NAME_JAVA_CLASS_BASE);
+    SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_CONSTRUCTOR);
+
+    // Create a new array.
+    stream << CMD_BIPUSH << (quint8)expressions.size();
+    stream << CMD_ANEWARRAY << constBaseClass->fNumber;
+
+    // Set the items.
+    quint8 index = 0;
+    foreach (SExpressionNode * expr, expressions) {
+        stream << CMD_DUP;
+        stream << CMD_BIPUSH << index++;
+
+        // Generate code for current expression.
+        foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+            stream << byte;
+        }
+
+        stream << CMD_AASTORE;
+    }
+
+    return result;
 }
 
 SlotPropertyNode::SlotPropertyNode() : AttributedNode()
