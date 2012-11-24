@@ -86,24 +86,25 @@ public class LispRTL {
     }
 
     public static void print(BaseClass [] args) {
-        // TODO
-        /*switch(obj.type) {
-        case BaseClass.TYPE_INT:
-            System.out.println(obj.valueInt);
-            break;
-        case BaseClass.TYPE_CHAR:
-            System.out.println(obj.valueChar);
-            break;
-        case BaseClass.TYPE_STRING:
-            System.out.println(obj.valueString);
-            break;
-        case BaseClass.TYPE_ARRAY:
-            // TODO.
-        break;
-        default:
-            // Don't tell anybody about the error!!!
-            break;
-        }*/
+        for (BaseClass obj : args) {
+            switch(obj.type) {
+            case BaseClass.TYPE_INT:
+                System.out.println(obj.valueInt);
+                break;
+            case BaseClass.TYPE_CHAR:
+                System.out.println(obj.valueChar);
+                break;
+            case BaseClass.TYPE_STRING:
+                System.out.println(obj.valueString);
+                break;
+            case BaseClass.TYPE_ARRAY:
+                print(obj.valueArray);
+                break;
+            default:
+                // Don't tell anybody about the error!!!
+                break;
+            }
+        }        
     }
 
     public static void archey() {
