@@ -57,7 +57,7 @@ void compile(const char * program, const char * image, bool showTree)
             SemanticProgram * sem = new SemanticProgram(root);
             sem->doTransform();
             sem->doSemantics();
-            QLinkedList<QString> errors = sem->errors();
+            QStringList errors = sem->errors();
             if (errors.isEmpty()) {
                 QString binDirName = "bin-" + QFileInfo(program).fileName();
                 sem->doGenerateCode(binDirName);

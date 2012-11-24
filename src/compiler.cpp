@@ -226,7 +226,7 @@ ProgramNode * SemanticProgram::root() const
     return fRoot;
 }
 
-QLinkedList<QString> SemanticProgram::errors() const
+QStringList SemanticProgram::errors() const
 {
     return fErrors;
 }
@@ -430,6 +430,17 @@ SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString t
     return result;
 }
 
+SemanticConstant * SemanticClass::findMethod(QString methodName) const
+{
+    foreach (SemanticConstant * result, fConstantsTable) {
+        if (result->fType == CONSTANT_Methodref && result->fRef2->fRef1->fUtf8 == methodName) {
+            return result;
+        }
+    }
+
+    return NULL;
+}
+
 void SemanticClass::addDefaultAndParentConstructor()
 {
     // Add constructor name and descriptor.
@@ -459,24 +470,9 @@ void SemanticClass::addRTLConstants()
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEARRAY,   DESC_JAVA_INTEGER);
 
-    /*addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PLUS,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MINUS,      DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_MULT,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_DIV,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_GREATER,    DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_GREATER_EQ, DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LESS,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LESS_EQ,    DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_EQ,         DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_AND,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_OR,         DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_NOT,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_SETF,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_VECTOR,     DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_ELT,        DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_LIST,       DESC_JAVA_METHOD_ARRAYBASE_BASE);
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_PRINT,      DESC_JAVA_METHOD_ARRAYBASE_VOID);*/
-    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, RTL_METHOD_ARCHEY,     DESC_JAVA_METHOD_VOID_VOID);
+    foreach (QString methodName, SemanticMethod::getRTLMethods()) {
+        addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, methodName, SemanticMethod::getDescForRTLMethod(methodName));
+    }
 }
 
 bool SemanticClass::hasField(QString name) const
@@ -590,26 +586,69 @@ SemanticLocalVar * SemanticMethod::addLocalVar(QString name)
     return result;
 }
 
-bool SemanticMethod::isRTLMethod() const
+QStringList SemanticMethod::getRTLMethods()
 {
-    QString name = fConstMethodref->fRef2->fRef1->fUtf8;
-    return (name == RTL_METHOD_PLUS ||
-            name == RTL_METHOD_MINUS ||
-            name == RTL_METHOD_MULT ||
-            name == RTL_METHOD_DIV ||
-            name == RTL_METHOD_GREATER ||
-            name == RTL_METHOD_GREATER_EQ ||
-            name == RTL_METHOD_LESS ||
-            name == RTL_METHOD_LESS_EQ ||
-            name == RTL_METHOD_EQ ||
-            name == RTL_METHOD_AND ||
-            name == RTL_METHOD_OR ||
-            name == RTL_METHOD_NOT ||
-            name == RTL_METHOD_SETF ||
-            name == RTL_METHOD_VECTOR ||
-            name == RTL_METHOD_ELT ||
-            name == RTL_METHOD_LIST ||
-            name == RTL_METHOD_PRINT);
+    QStringList result;
+
+    result << "plus";
+    result << "minus";
+    result << "mult";
+    result << "div";
+    result << "greater";
+    result << "greater_eq";
+    result << "less";
+    result << "less_eq";
+    result << "eq";
+    result << "and";
+    result << "or";
+    result << "not";
+    result << "setf";
+    result << "vector";
+    result << "elt";
+    result << "list";
+    result << "print";
+    result << "archey";
+
+    return result;
+}
+
+bool SemanticMethod::isRTLMethod(QString name)
+{
+    return getRTLMethods().contains(name);
+}
+
+QString SemanticMethod::getDescForRTLMethod(QString name)
+{
+    if (name == "archey") {
+        return DESC_JAVA_METHOD_VOID_VOID;
+    } else {
+        return DESC_JAVA_METHOD_ARRAYBASE_VOID;
+    }
+}
+
+QString SemanticMethod::translateMethodNameToRTLName(QString originalName)
+{
+    if (originalName == NAME_FUNC_PLUS) {
+        return "plus";
+    } else if (originalName == NAME_FUNC_MINUS) {
+        return "minus";
+    } else if (originalName == NAME_FUNC_MULT) {
+        return "mult";
+    } else if (originalName ==  NAME_FUNC_DIV) {
+        return "div";
+    } else if (originalName ==  NAME_FUNC_GREATER) {
+        return "greater";
+    } else if (originalName ==  NAME_FUNC_GREATER_EQ) {
+        return "greater_eq";
+    } else if (originalName ==  NAME_FUNC_LESS) {
+        return "less";
+    } else if (originalName ==  NAME_FUNC_LESS_EQ) {
+        return "less_eq";
+    } else if (originalName ==  NAME_FUNC_EQ) {
+        return "eq";
+    } else {
+        return originalName;
+    }
 }
 
 void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const SemanticClass * curClass) const
@@ -657,7 +696,9 @@ QByteArray SemanticMethod::generateByteCodeForMethod(const SemanticClass * curCl
     } else {
         // Generate code for a simple method.
         foreach (SExpressionNode * node, fNode->fBody) {
-            result.append(node->generateCode());
+            foreach (quint8 byte, node->generateCode(curClass, this)) {
+                stream << byte;
+            }
         }
     }
 
@@ -693,7 +734,7 @@ QLinkedList<AttributedNode *> AttributedNode::childNodes() const
     return QLinkedList<AttributedNode *>();
 }
 
-QByteArray AttributedNode::generateCode() const
+QByteArray AttributedNode::generateCode(const SemanticClass * curClass, const SemanticMethod * curMethod) const
 {
     return QByteArray();
 }
@@ -780,7 +821,7 @@ void ProgramNode::transform()
     fMainPart->fDefinition = mainClass;
 }
 
-void ProgramNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void ProgramNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     // Achtung! @BADCODE! Something weird here!
     // First check the main class without its main method,
@@ -880,7 +921,7 @@ void ProgramPartNode::transform()
     }
 }
 
-void ProgramPartNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void ProgramPartNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     foreach (AttributedNode * node, childNodes()) {
         node->semantics(program, errorList, curClass, curMethod, processInner);
@@ -1098,7 +1139,7 @@ void SExpressionNode::transform()
     }
 }
 
-void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     // Analyse this node.
     switch (fSubType) {
@@ -1110,7 +1151,7 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
         break;
     }
     case S_EXPR_TYPE_ID: {
-        // Nothing to check, add to vars table?
+        // Nothing to check.
         break;
     }
     case S_EXPR_TYPE_FCALL: {
@@ -1120,7 +1161,7 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
         } else {
             // Check if number of arguments is the same as in the function definition.
             SemanticMethod * method = curClass->getMethod(fId);
-            if (method != NULL && !method->isRTLMethod()) {
+            if (method != NULL && !SemanticMethod::isRTLMethod(method->fConstMethodref->fRef2->fRef1->fUtf8)) {
                 int expectedNumberOfArgs = method->fNode->fArguments.size();
                 int realNumberOfArgs = fArguments.size();
                 if (expectedNumberOfArgs != realNumberOfArgs) {
@@ -1223,6 +1264,64 @@ void SExpressionNode::semantics(SemanticProgram * program, QLinkedList<QString> 
     }
 }
 
+QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const SemanticMethod * curMethod) const
+{
+    QByteArray result;
+    QDataStream stream(&result, QIODevice::WriteOnly);
+
+    switch (fSubType) {
+    case S_EXPR_TYPE_INT:
+    case S_EXPR_TYPE_CHAR:
+    case S_EXPR_TYPE_STRING:
+    case S_EXPR_TYPE_BOOL: {
+        // Nothing to check.
+        break;
+    }
+    case S_EXPR_TYPE_ID: {
+        break;
+    }
+    case S_EXPR_TYPE_FCALL: {
+        // TODO: push arguments
+        SemanticConstant * constMethod = curClass->findMethod(fId);
+        QString methodName = constMethod->fRef2->fRef1->fUtf8;
+
+        if (SemanticMethod::isRTLMethod(methodName)) {
+            stream << CMD_INVOKESTATIC << (quint16)constMethod->fNumber;
+        }
+        break;
+    }
+    case S_EXPR_TYPE_LOOP_IN: {
+        break;
+    }
+    case S_EXPR_TYPE_LOOP_FROM_TO: {
+        break;
+    }
+    case S_EXPR_TYPE_PROGN: {
+        break;
+    }
+    case S_EXPR_TYPE_IF: {
+        break;
+    }
+    case S_EXPR_TYPE_MAKEINSTANCE: {
+        break;
+    }
+    case S_EXPR_TYPE_SLOTVALUE: {
+        break;
+    }
+    case S_EXPR_TYPE_ASSIGN_ELT: {
+        break;
+    }
+    case S_EXPR_TYPE_ASSIGN_FIELD: {
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+
+    return result;
+}
+
 SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNode)
 {
     if (syntaxNode != NULL) {
@@ -1248,7 +1347,7 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
         result->fBody1 = SExpressionNode::fromSyntaxNode(syntaxNode->body1);
         result->fBody2 = SExpressionNode::fromSyntaxNode(syntaxNode->body2);
         if (result->fSubType == S_EXPR_TYPE_FCALL) {
-            result->fId = translateMethodNameToRTLName(result->fId);
+            result->fId = SemanticMethod::translateMethodNameToRTLName(result->fId);
         }
         return result;
     } else {
@@ -1260,31 +1359,6 @@ bool SExpressionNode::isValidContainer(SemanticClass * curClass, SemanticMethod 
 {
     return  (fSubType == S_EXPR_TYPE_ID) ||
             (fSubType == S_EXPR_TYPE_FCALL && (fId == NAME_FUNC_VECTOR || fId == NAME_FUNC_LIST));
-}
-
-QString SExpressionNode::translateMethodNameToRTLName(QString originalName)
-{
-    if (originalName == NAME_FUNC_PLUS) {
-        return RTL_METHOD_PLUS;
-    } else if (originalName == NAME_FUNC_MINUS) {
-        return RTL_METHOD_MINUS;
-    } else if (originalName == NAME_FUNC_MULT) {
-        return RTL_METHOD_MULT;
-    } else if (originalName ==  NAME_FUNC_DIV) {
-        return RTL_METHOD_DIV;
-    } else if (originalName ==  NAME_FUNC_GREATER) {
-        return RTL_METHOD_GREATER;
-    } else if (originalName ==  NAME_FUNC_GREATER_EQ) {
-        return RTL_METHOD_GREATER_EQ;
-    } else if (originalName ==  NAME_FUNC_LESS) {
-        return RTL_METHOD_LESS;
-    } else if (originalName ==  NAME_FUNC_LESS_EQ) {
-        return RTL_METHOD_LESS_EQ;
-    } else if (originalName ==  NAME_FUNC_EQ) {
-        return RTL_METHOD_EQ;
-    } else {
-        return originalName;
-    }
 }
 
 SlotPropertyNode::SlotPropertyNode() : AttributedNode()
@@ -1348,7 +1422,7 @@ void SlotPropertyNode::transform()
     }
 }
 
-void SlotPropertyNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void SlotPropertyNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     // The only thing to check is calculability of the initform.
     if (fSubType == SLOT_PROP_TYPE_INITFORM) {
@@ -1408,7 +1482,7 @@ void SlotDefinitionNode::transform()
     }
 }
 
-void SlotDefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void SlotDefinitionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
@@ -1506,7 +1580,7 @@ void DefinitionNode::transform()
     }
 }
 
-void DefinitionNode::semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void DefinitionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
 {
     SemanticClass * curClassForChildNodes = curClass;
     SemanticMethod * curMethodForChildNodes = curMethod;
