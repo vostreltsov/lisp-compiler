@@ -325,7 +325,7 @@ private:
     QMap<QString, SemanticLocalVar *> fLocalVarsTable; // Local variables table.
 
     void generateCodeAttribute(BinaryWriter * writer, const SemanticClass * curClass) const;
-    QByteArray generateByteCodeMethod(const SemanticClass * curClass) const;
+    QByteArray generateByteCodeForMethod(const SemanticClass * curClass) const;
 };
 
 /**
@@ -383,6 +383,11 @@ public:
      * @brief Does the semantic analysis of the node: checks, tables, etc.
      */
     virtual void semantics(SemanticProgram * program, QLinkedList<QString> * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const = 0;
+
+    /**
+     * @brief Generates bytecode for this node.
+     */
+    virtual QByteArray generateCode() const;
 };
 
 /**

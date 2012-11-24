@@ -617,7 +617,7 @@ void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const Semantic
     const quint32 EMPTY_CODE_ATTR_LENGTH = 18;  // Length of the "Code" attributes without any tables.
 
     // Generate byte code.
-    QByteArray byteCode = generateByteCodeMethod(curClass);
+    QByteArray byteCode = generateByteCodeForMethod(curClass);
 
     // Write number of the "Code" utf8 constant.
     writer->writeU2(curClass->fConstCode->fNumber);
@@ -644,15 +644,25 @@ void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const Semantic
     writer->writeU2(0);
 }
 
-QByteArray SemanticMethod::generateByteCodeMethod(const SemanticClass * curClass) const
+QByteArray SemanticMethod::generateByteCodeForMethod(const SemanticClass * curClass) const
 {
     QByteArray result;
     QDataStream stream(&result, QIODevice::WriteOnly);
 
-    // Generate code for constructor.
     if (fConstMethodref->fRef2->fRef1->fUtf8 == NAME_JAVA_CONSTRUCTOR) {
+        // Generate code for default constructor.
         stream << CMD_ALOAD_0;
         stream << CMD_INVOKESPECIAL << (quint16)curClass->fConstructorParent->fConstMethodref->fNumber;
+        stream << CMD_RETURN;
+    } else {
+        // Generate code for a simple method.
+        foreach (SExpressionNode * node, fNode->fBody) {
+            result.append(node->generateCode());
+        }
+    }
+
+    // Add RETURN to the main method.
+    if (fConstMethodref->fRef2->fRef1->fUtf8 == NAME_JAVA_METHOD_MAIN) {
         stream << CMD_RETURN;
     }
 
@@ -681,6 +691,11 @@ AttributedNode::~AttributedNode()
 QLinkedList<AttributedNode *> AttributedNode::childNodes() const
 {
     return QLinkedList<AttributedNode *>();
+}
+
+QByteArray AttributedNode::generateCode() const
+{
+    return QByteArray();
 }
 
 ProgramNode::ProgramNode() : AttributedNode()
