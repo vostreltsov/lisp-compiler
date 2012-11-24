@@ -1,6 +1,6 @@
 #include "compiler.h"
 
-SemanticConstant::SemanticConstant(int number, JavaConstantsTypes type, QString utf8, int integer, SemanticConstant * ref1, SemanticConstant * ref2)
+SemanticConstant::SemanticConstant(quint16 number, JavaConstantsTypes type, QString utf8, qint32 integer, SemanticConstant * ref1, SemanticConstant * ref2)
 {
     fNumber = number;
     fType = type;
@@ -311,6 +311,8 @@ bool SemanticClass::generateCode(QString dir) const
 
     // Write number of class attributes (0), skipping the table itself.
     writer.writeU2(0);
+
+    return true;
 }
 
 QString SemanticClass::dotForTables(QString previous) const
@@ -320,7 +322,6 @@ QString SemanticClass::dotForTables(QString previous) const
     foreach (SemanticConstant * constant, fConstantsTable) {
         result += constant->dotCode(tmp);
     }
-
     return result;
 }
 
@@ -338,7 +339,7 @@ SemanticConstant * SemanticClass::addUtf8Constant(QString value)
     return result;
 }
 
-SemanticConstant * SemanticClass::addIntegerConstant(int value)
+SemanticConstant * SemanticClass::addIntegerConstant(qint32 value)
 {
     // Does it already exist?
     foreach (SemanticConstant * existed, fConstantsTable) {
@@ -430,14 +431,47 @@ SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString t
     return result;
 }
 
-SemanticConstant * SemanticClass::findMethod(QString methodName) const
+SemanticConstant * SemanticClass::findClassConstant(QString name) const
 {
     foreach (SemanticConstant * result, fConstantsTable) {
-        if (result->fType == CONSTANT_Methodref && result->fRef2->fRef1->fUtf8 == methodName) {
+        if (result->fType == CONSTANT_Class && result->fRef1->fUtf8 == name) {
             return result;
         }
     }
+    return NULL;
+}
 
+SemanticConstant * SemanticClass::findStringConstant(QString name) const
+{
+    foreach (SemanticConstant * result, fConstantsTable) {
+        if (result->fType == CONSTANT_String && result->fRef1->fUtf8 == name) {
+            return result;
+        }
+    }
+    return NULL;
+}
+
+SemanticConstant * SemanticClass::findFieldrefConstant(QString className, QString fieldName) const
+{
+    foreach (SemanticConstant * result, fConstantsTable) {
+        if (result->fType == CONSTANT_Fieldref &&
+            result->fRef1->fRef1->fUtf8 == className &&
+            result->fRef2->fRef1->fUtf8 == fieldName) {
+            return result;
+        }
+    }
+    return NULL;
+}
+
+SemanticConstant * SemanticClass::findMethodrefConstant(QString className, QString methodName) const
+{
+    foreach (SemanticConstant * result, fConstantsTable) {
+        if (result->fType == CONSTANT_Methodref &&
+            result->fRef1->fRef1->fUtf8 == className &&
+            result->fRef2->fRef1->fUtf8 == methodName) {
+            return result;
+        }
+    }
     return NULL;
 }
 
@@ -465,10 +499,12 @@ void SemanticClass::addRTLConstants()
 {
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE,         DESC_JAVA_INTEGER);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT,     DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUECHAR,    DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUESTRING,  DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUECHAR,    DESC_JAVA_CHARACTER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUESTRING,  DESC_JAVA_STRING);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEARRAY,   DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEARRAY,   DESC_JAVA_ARRAY_BASE);
+
+    SemanticConstant * tmp = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
 
     foreach (QString methodName, SemanticMethod::getRTLMethods()) {
         addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, methodName, SemanticMethod::getDescForRTLMethod(methodName));
@@ -666,7 +702,7 @@ QByteArray SemanticMethod::generateByteCodeForMethod(const SemanticClass * curCl
     if (fConstMethodref->fRef2->fRef1->fUtf8 == NAME_JAVA_CONSTRUCTOR) {
         // Generate code for default constructor.
         stream << CMD_ALOAD_0;
-        stream << CMD_INVOKESPECIAL << (quint16)curClass->fConstructorParent->fConstMethodref->fNumber;
+        stream << CMD_INVOKESPECIAL << curClass->fConstructorParent->fConstMethodref->fNumber;
         stream << CMD_RETURN;
     } else {
         // Generate code for a simple method.
@@ -687,7 +723,7 @@ QByteArray SemanticMethod::generateByteCodeForMethod(const SemanticClass * curCl
     return result;
 }
 
-SemanticLocalVar::SemanticLocalVar(int number, QString name)
+SemanticLocalVar::SemanticLocalVar(quint8 number, QString name)
 {
     fNumber = number;
     fName = name;
@@ -1118,15 +1154,24 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
 {
     // Analyse this node.
     switch (fSubType) {
-    case S_EXPR_TYPE_INT:
-    case S_EXPR_TYPE_CHAR:
-    case S_EXPR_TYPE_STRING:
+    case S_EXPR_TYPE_INT: {
+        curClass->addIntegerConstant(fInteger);
+        break;
+    }
+    case S_EXPR_TYPE_CHAR: {
+        // TODO
+        break;
+    }
+    case S_EXPR_TYPE_STRING: {
+        curClass->addStringConstant(fString);
+        break;
+    }
     case S_EXPR_TYPE_BOOL: {
-        // Nothing to check.
+        // TODO
         break;
     }
     case S_EXPR_TYPE_ID: {
-        // Nothing to check.
+        // TODO
         break;
     }
     case S_EXPR_TYPE_FCALL: {
@@ -1244,14 +1289,38 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     QByteArray result;
     QDataStream stream(&result, QIODevice::WriteOnly);
 
+    SemanticConstant * constBaseClass = curClass->findClassConstant(NAME_JAVA_CLASS_BASE);
+    SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_CONSTRUCTOR);
+    SemanticConstant * constFieldType = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE);
+
+
     switch (fSubType) {
     case S_EXPR_TYPE_INT: {
+        SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT);
         break;
     }
     case S_EXPR_TYPE_CHAR: {
         break;
     }
     case S_EXPR_TYPE_STRING: {
+        SemanticConstant * constValue = curClass->findStringConstant(fString);
+        SemanticConstant * constFieldValueString = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUESTRING);
+
+        // Create an instance of the base class.
+        stream << CMD_NEW << constBaseClass->fNumber;
+        // Call the parent constructor.
+        stream << CMD_DUP;
+        stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
+        // Set the type of the variable.
+        stream << CMD_DUP;
+        stream << CMD_BIPUSH << BASECLASS_TYPE_STRING;
+        stream << CMD_PUTFIELD << constFieldType->fNumber;
+        // Set the value of the variable.
+        stream << CMD_DUP;
+        stream << CMD_LDC_W << constValue->fNumber;
+        stream << CMD_PUTFIELD << constFieldValueString->fNumber;
+
+        // TODO: array.
         break;
     }
     case S_EXPR_TYPE_BOOL: {
@@ -1268,11 +1337,11 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
             }
         }
 
-        SemanticConstant * constMethod = curClass->findMethod(fId);
+        SemanticConstant * constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId);
         QString methodName = constMethod->fRef2->fRef1->fUtf8;
 
         if (SemanticMethod::isRTLMethod(methodName)) {
-            stream << CMD_INVOKESTATIC << (quint16)constMethod->fNumber;
+            stream << CMD_INVOKESTATIC << constMethod->fNumber;
         }
         break;
     }

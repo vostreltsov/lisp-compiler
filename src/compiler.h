@@ -76,6 +76,7 @@ class DefinitionNode;
 
 #define DESC_JAVA_VOID                      "V"
 #define DESC_JAVA_INTEGER                   "I"
+#define DESC_JAVA_CHARACTER                 "C"
 #define DESC_JAVA_STRING                    "Ljava/lang/String;"
 #define DESC_JAVA_CLASS_BASE                "L"NAME_JAVA_CLASS_BASE";"
 #define DESC_JAVA_ARRAY_STRING              "["DESC_JAVA_STRING
@@ -89,18 +90,12 @@ class DefinitionNode;
 #define DESC_JAVA_METHOD_ARRAYBASE_VOID     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_ARRAYBASE_BASE     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_CLASS_BASE
 
-#define RTL_BASECLASS_TYPE_DAFUQ     0
-#define RTL_BASECLASS_TYPE_INT       1
-#define RTL_BASECLASS_TYPE_CHAR      2
-#define RTL_BASECLASS_TYPE_STRING    3
-#define RTL_BASECLASS_TYPE_BOOLEAN   4
-#define RTL_BASECLASS_TYPE_ARRAY     5
-
-///////////////////////////////////////////////////////////////////////////////////
-//                                                                               //
-//                             CODE GENERATION STUFF                             //
-//                                                                               //
-///////////////////////////////////////////////////////////////////////////////////
+const quint8 BASECLASS_TYPE_DAFUQ   = 0;
+const quint8 BASECLASS_TYPE_INT     = 1;
+const quint8 BASECLASS_TYPE_CHAR    = 2;
+const quint8 BASECLASS_TYPE_STRING  = 3;
+const quint8 BASECLASS_TYPE_BOOLEAN = 4;
+const quint8 BASECLASS_TYPE_ARRAY   = 5;
 
 const qint16 TWOBYTES_MAX       = 32767;
 const qint16 TWOBYTES_MIN       = -32768;
@@ -126,6 +121,7 @@ const quint16 ACC_ENUM          = 0x4000;
 const quint8  CMD_BIPUSH        = 0x10;
 const quint8  CMD_SIPUSH        = 0x11;
 const quint8  CMD_LDC           = 0x12;
+const quint8  CMD_LDC_W         = 0x13;
 
 const quint8  CMD_ALOAD         = 0x19;
 const quint8  CMD_ALOAD_0       = 0x2A;
@@ -185,15 +181,15 @@ enum AttributedNodeType
 class SemanticConstant
 {
 public:
-    int                fNumber;   // Number in the constants table, counts from 0.
+    quint16            fNumber;   // Number in the constants table, counts from 0.
     JavaConstantsTypes fType;     // Type of the constant.
     QString            fUtf8;     // UTF-8 string.
-    int                fInteger;  // Integer value.
+    qint32             fInteger;  // Integer value.
     SemanticConstant * fRef1;     // Pointer to another constant if required.
     SemanticConstant * fRef2;     // Pointer to another constant if required.
 
-    SemanticConstant(int number = -1, JavaConstantsTypes type = CONSTANT_Utf8, QString utf8 = "",
-                     int integer = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
+    SemanticConstant(quint16 number = 0, JavaConstantsTypes type = CONSTANT_Utf8, QString utf8 = "",
+                     qint32 integer = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
 
     void generateCode(BinaryWriter * writer) const;
     QString dotCode(QString previous) const;
@@ -248,14 +244,17 @@ public:
     QString dotForTables(QString previous) const;
 
     SemanticConstant * addUtf8Constant(QString value);
-    SemanticConstant * addIntegerConstant(int value);
+    SemanticConstant * addIntegerConstant(qint32 value);
     SemanticConstant * addClassConstant(QString name);
     SemanticConstant * addStringConstant(QString value);
     SemanticConstant * addFieldrefConstant(QString className, QString fieldName, QString descriptor);
     SemanticConstant * addMethodrefConstant(QString className, QString methodName, QString descriptor);
     SemanticConstant * addNameAndTypeConstant(QString name, QString type);
 
-    SemanticConstant * findMethod(QString methodName) const;
+    SemanticConstant * findClassConstant(QString name) const;
+    SemanticConstant * findStringConstant(QString name) const;
+    SemanticConstant * findFieldrefConstant(QString className, QString fieldName) const;
+    SemanticConstant * findMethodrefConstant(QString className, QString methodName) const;
 
     void addDefaultAndParentConstructor();
     void addRTLConstants();
@@ -320,10 +319,10 @@ private:
 class SemanticLocalVar
 {
 public:
-    int      fNumber; // Number of the variable.
+    quint8   fNumber; // Number of the variable.
     QString  fName;   // Name of the variable.
 
-    SemanticLocalVar(int number = -1, QString name = "");
+    SemanticLocalVar(quint8 number = 0, QString name = "");
 };
 
 /**
