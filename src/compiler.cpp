@@ -1245,18 +1245,29 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     QDataStream stream(&result, QIODevice::WriteOnly);
 
     switch (fSubType) {
-    case S_EXPR_TYPE_INT:
-    case S_EXPR_TYPE_CHAR:
-    case S_EXPR_TYPE_STRING:
+    case S_EXPR_TYPE_INT: {
+        break;
+    }
+    case S_EXPR_TYPE_CHAR: {
+        break;
+    }
+    case S_EXPR_TYPE_STRING: {
+        break;
+    }
     case S_EXPR_TYPE_BOOL: {
-        // Nothing to check.
         break;
     }
     case S_EXPR_TYPE_ID: {
         break;
     }
     case S_EXPR_TYPE_FCALL: {
-        // TODO: push arguments
+        // Push arguments onto the stack.
+        foreach (SExpressionNode * node, fArguments) {
+            foreach (quint8 byte, node->generateCode(curClass, curMethod)) {
+                stream << byte;
+            }
+        }
+
         SemanticConstant * constMethod = curClass->findMethod(fId);
         QString methodName = constMethod->fRef2->fRef1->fUtf8;
 

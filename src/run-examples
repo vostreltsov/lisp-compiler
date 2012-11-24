@@ -1,7 +1,9 @@
 #/bin/sh
-./qtproject --draw ../misc/example.archey.cl ../misc/example.archey.png
-./qtproject --draw ../misc/example.bubblesort.cl ../misc/example.bubblesort.png
-./qtproject --draw ../misc/example.defclass.cl ../misc/example.defclass.png
-./qtproject --draw ../misc/example.defun.cl ../misc/example.defun.png
-./qtproject --draw ../misc/example.if-else-progn.cl ../misc/example.if-else-progn.png
-./qtproject --draw ../misc/example.loops.cl ../misc/example.loops.png
+./qtproject --draw ../examples/archey.cl        ../examples/images/archey.png
+./qtproject --draw ../examples/bubblesort.cl    ../examples/images/bubblesort.png
+./qtproject --draw ../examples/defclass.cl      ../examples/images/defclass.png
+./qtproject --draw ../examples/defun.cl         ../examples/images/defun.png
+./qtproject --draw ../examples/helloworld.cl    ../examples/images/helloworld.png
+./qtproject --draw ../examples/if-else-progn.cl ../examples/images/if-else-progn.png
+./qtproject --draw ../examples/loops.cl         ../examples/images/loops.png
+./qtproject --draw ../examples/maths.cl         ../examples/images/maths.png

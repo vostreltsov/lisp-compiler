@@ -48,6 +48,13 @@ void run_don_on_program(SemanticProgram * program, QString fileName, bool showRe
 
 void compile(const char * program, const char * image, bool showTree)
 {
+    QFileInfo imageFileInfo(image);
+    QDir dir = imageFileInfo.dir();
+    if (!dir.exists()) {
+        QString path = dir.absolutePath();
+        dir.mkdir(dir.absolutePath());
+    }
+
     yyin = fopen(program, "r");
     if (yyin == 0) {
         printf("error opening %s\n", program);
@@ -90,7 +97,7 @@ int main(int argc, char *argv[])
         }
 
     } else if (argc == 1) {
-        compile("../misc/example.archey.cl", "attr.png", false);
+        compile("../examples/helloworld.cl", "../examples/images/helloworld.png", false);
     }
     return 0;
 }
