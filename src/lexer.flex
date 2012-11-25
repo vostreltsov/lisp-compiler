@@ -268,26 +268,34 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     yylval.semantic_bool = 0;
     return BOOL;
 }
-"#b"{DIGIT_BIN}+ {
+"-"?"#b"{DIGIT_BIN}+ {
     // Numeric constant - binary.
-    yylval.semantic_int = nondec2dec(yytext + 2, 2);
+    int shift = (yytext[0] == '-') ? 1 : 0;
+    int sign = shift ? -1 : 1;
+    yylval.semantic_int = sign * nondec2dec(yytext + 2 + shift, 2);
     return INT;
 }
-"#o"{DIGIT_OCT}+ {
+"-"?"#o"{DIGIT_OCT}+ {
     // Numeric constant - octal.
-    yylval.semantic_int = nondec2dec(yytext + 2, 8);
+    int shift = (yytext[0] == '-') ? 1 : 0;
+    int sign = shift ? -1 : 1;
+    yylval.semantic_int = sign * nondec2dec(yytext + 2 + shift, 8);
     return INT;
 }
-{DIGIT_DEC}+"."? {
+"-"?{DIGIT_DEC}+"."? {
     // Numeric constant.
     if (yytext[yyleng - 1] == '.')
         yytext[yyleng - 1] = '\0';
-    yylval.semantic_int = nondec2dec(yytext, 10);
+    int shift = (yytext[0] == '-') ? 1 : 0;
+    int sign = shift ? -1 : 1;
+    yylval.semantic_int = sign * nondec2dec(yytext + shift, 10);
     return INT;
 }
-"#x"{DIGIT_HEX}+ {
+"-"?"#x"{DIGIT_HEX}+ {
     // Numeric constant - hexadecimal.
-    yylval.semantic_int = nondec2dec(yytext + 2, 16);
+    int shift = (yytext[0] == '-') ? 1 : 0;
+    int sign = shift ? -1 : 1;
+    yylval.semantic_int = sign * nondec2dec(yytext + 2 + shift, 16);
     return INT;
 }
 "#\\"{NOTWHITESPACE} {
@@ -403,6 +411,10 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 <STRING_ST>"\\\\" {
     // String constant body: escaped slash character.
     buffer[buffer_length++] = '\\';
+}
+<STRING_ST>"\\n" {
+    // String constant body: newline.
+    buffer[buffer_length++] = '\n';
 }
 <STRING_ST>[^"\"\\"]+ {
     // String constant body: non-quote, non-slash characters.

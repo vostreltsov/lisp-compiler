@@ -16,7 +16,7 @@ public class LispRTL {
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_INT;
         // Some minus-specific magic here.
-        if (args.length > 1 && args[0].valueInt > 0) {
+        if (args.length > 1) {
             result.valueInt = 2 * args[0].valueInt;
         }
         for (BaseClass tmp : args) {
@@ -27,11 +27,36 @@ public class LispRTL {
 
     public static BaseClass mult(BaseClass [] args) {
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_INT;
+        result.valueInt = 1;
+        for (BaseClass tmp : args) {
+            result.valueInt *= tmp.valueInt;
+        }
         return result;
     }
 
-    public static BaseClass div(BaseClass [] args) {
+    public static BaseClass div(BaseClass [] args) throws Exception {
+        if (args.length == 0) {
+            throw new Exception("Too few arguments for division");
+        }
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_INT;
+        result.valueInt = 1;
+        // Some div-specific magic here.
+        if (args.length == 1) {
+            if (args[0].valueInt == 0) {
+                throw new Exception("Division by zero");
+            }
+            result.valueInt /= args[0].valueInt;
+        } else {
+            result.valueInt = args[0].valueInt;
+            for (int i = 1; i < args.length; i++) {
+                if (args[i].valueInt == 0) {
+                    throw new Exception("Division by zero");
+                }
+                result.valueInt /= args[i].valueInt;
+            }
+        }
         return result;
     }
 
@@ -99,16 +124,25 @@ public class LispRTL {
         for (BaseClass obj : args) {
             switch(obj.type) {
             case BaseClass.TYPE_INT:
-                System.out.println(obj.valueInt);
+                System.out.print(obj.valueInt);
                 break;
             case BaseClass.TYPE_CHAR:
-                System.out.println(obj.valueChar);
+                System.out.print(obj.valueChar);
                 break;
             case BaseClass.TYPE_STRING:
-                System.out.println(obj.valueString);
+                System.out.print(obj.valueString);
                 break;
             case BaseClass.TYPE_ARRAY:
-                print(obj.valueArray);
+                System.out.print("[");
+                for (BaseClass tmp : obj.valueArray) {
+                    BaseClass[] tmparr = new BaseClass[1];
+                    tmparr[0] = tmp;
+                    print(tmparr);
+                    if (tmp != obj.valueArray[obj.valueArray.length]) {
+                        System.out.print(" ");
+                    }
+                }
+                System.out.print("]");
                 break;
             default:
                 // Don't tell anybody about the error!!!
