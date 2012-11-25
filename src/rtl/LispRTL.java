@@ -3,15 +3,25 @@
  */
 public class LispRTL {
 
-    // TODO: parameters of functions
-
     public static BaseClass plus(BaseClass [] args) {
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_INT;
+        for (BaseClass tmp : args) {
+            result.valueInt += tmp.valueInt;
+        }
         return result;
     }
 
     public static BaseClass minus(BaseClass [] args) {
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_INT;
+        // Some minus-specific magic here.
+        if (args.length > 1 && args[0].valueInt > 0) {
+            result.valueInt = 2 * args[0].valueInt;
+        }
+        for (BaseClass tmp : args) {
+            result.valueInt -= tmp.valueInt;
+        }
         return result;
     }
 

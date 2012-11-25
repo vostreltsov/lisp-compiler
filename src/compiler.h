@@ -251,6 +251,7 @@ public:
     SemanticConstant * addMethodrefConstant(QString className, QString methodName, QString descriptor);
     SemanticConstant * addNameAndTypeConstant(QString name, QString type);
 
+    SemanticConstant * findIntegerConstant(qint32 value) const;
     SemanticConstant * findClassConstant(QString name) const;
     SemanticConstant * findStringConstant(QString name) const;
     SemanticConstant * findFieldrefConstant(QString className, QString fieldName) const;
@@ -419,10 +420,10 @@ class SExpressionNode : public AttributedNode
 {
 public:
     s_expr_type                       fSubType;
-    int                               fInteger;
+    qint32                            fInteger;
     char                              fCharacter;
     QString                           fString;
-    int                               fBoolean;
+    qint32                            fBoolean;
     QString                           fId;
     QString                           fSlotValueObject;
     QString                           fSlotValueSlot;

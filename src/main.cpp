@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
         }
 
     } else if (argc == 1) {
-        compile("../examples/helloworld.cl", "../examples/images/helloworld.png", false);
+        compile("../examples/maths.cl", "../examples/images/maths.png", false);
     }
     return 0;
 }

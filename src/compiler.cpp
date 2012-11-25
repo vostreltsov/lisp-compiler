@@ -431,6 +431,16 @@ SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString t
     return result;
 }
 
+SemanticConstant * SemanticClass::findIntegerConstant(qint32 value) const
+{
+    foreach (SemanticConstant * result, fConstantsTable) {
+        if (result->fType == CONSTANT_Integer && result->fInteger == value) {
+            return result;
+        }
+    }
+    return NULL;
+}
+
 SemanticConstant * SemanticClass::findClassConstant(QString name) const
 {
     foreach (SemanticConstant * result, fConstantsTable) {
@@ -657,8 +667,10 @@ QString SemanticMethod::getDescForRTLMethod(QString name)
 {
     if (name == "archey") {
         return DESC_JAVA_METHOD_VOID_VOID;
-    } else {
+    } else if (name == "print") {
         return DESC_JAVA_METHOD_ARRAYBASE_VOID;
+    } else {
+        return DESC_JAVA_METHOD_ARRAYBASE_BASE;
     }
 }
 
@@ -1155,7 +1167,9 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
     // Analyse this node.
     switch (fSubType) {
     case S_EXPR_TYPE_INT: {
-        curClass->addIntegerConstant(fInteger);
+        if (fInteger > TWOBYTES_MAX || fInteger < TWOBYTES_MIN) {
+            curClass->addIntegerConstant(fInteger);
+        }
         break;
     }
     case S_EXPR_TYPE_CHAR: {
@@ -1293,10 +1307,30 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_CONSTRUCTOR);
     SemanticConstant * constFieldType = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE);
 
-
     switch (fSubType) {
     case S_EXPR_TYPE_INT: {
+        SemanticConstant * constValue = curClass->findIntegerConstant(fInteger);
         SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT);
+
+        // Create an instance of the base class.
+        stream << CMD_NEW << constBaseClass->fNumber;
+        // Call the parent constructor.
+        stream << CMD_DUP;
+        stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
+        // Set the type of the variable.
+        stream << CMD_DUP;
+        stream << CMD_BIPUSH << BASECLASS_TYPE_INT;
+        stream << CMD_PUTFIELD << constFieldType->fNumber;
+        // Set the value of the variable.
+        stream << CMD_DUP;
+        if (constValue != NULL) {
+            // Store the constant number.
+            stream << CMD_LDC_W << constValue->fNumber;
+        } else {
+            // Store the operand itself.
+            stream << CMD_SIPUSH << (qint16)fInteger;
+        }
+        stream << CMD_PUTFIELD << constFieldValueInt->fNumber;
         break;
     }
     case S_EXPR_TYPE_CHAR: {
