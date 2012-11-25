@@ -43,12 +43,14 @@ void run_don_on_program(SemanticProgram & program, QString fileName, bool showRe
     }
 }
 
-void compile(const char * program, const char * image, bool showTree)
+void compile(QString sourceFileName, QString destFolder, QString imageFileName)
 {
+    QTextStream stream(stdout);
+
     // Open the input file.
-    yyin = fopen(program, "r");
+    yyin = fopen(sourceFileName.toStdString().c_str(), "r");
     if (yyin == 0) {
-        printf("error opening %s\n", program);
+        stream << "error opening " << sourceFileName << "\n";
         return;
     }
 
@@ -58,7 +60,7 @@ void compile(const char * program, const char * image, bool showTree)
 
     // There could be a lexical or syntax error.
     if (errorCode != ERROR_NO_ERROR) {
-        QTextStream(stdout) << errorMessage << "\n";
+        stream << errorMessage << "\n";
         return;
     }
 
@@ -67,39 +69,109 @@ void compile(const char * program, const char * image, bool showTree)
     sem.doTransform();
     sem.doSemantics();
     QStringList errors = sem.errors();
-    if (errors.isEmpty()) {
-        QString binDirName = "bin-" + QFileInfo(program).fileName();
-        sem.doGenerateCode(binDirName);
-    } else {
+    if (!errors.isEmpty()) {
         foreach (QString error, sem.errors()) {
-            QTextStream(stdout) << error << "\n";
+            stream << error << "\n";
         }
+        return;
     }
 
+    sem.doGenerateCode(destFolder);
+
     // Draw the sytax tree if requested.
-    if (image != NULL) {
-        run_don_on_program(sem, image, showTree);
+    if (!imageFileName.isEmpty()) {
+        run_don_on_program(sem, imageFileName, false);
     }
 
     // Delete the syntax tree.
     free_program(root);
 }
 
+void help()
+{
+    QTextStream stream(stdout);
+    stream << "Usage: compiler [options]\n";
+    stream << "Required options:\n";
+    stream << "-i file    Specifies the input file.\n";
+    stream << "\n";
+    stream << "Additional options:\n";
+    stream << "-o folder  Specifies the output folder where MainClass.class will be stored.\n";
+    stream << "-d file    Specifies the image file with syntax tree (graphviz required).\n";
+    stream << "-h         Prints this message.\n";
+}
+
 int main(int argc, char *argv[])
 {
-    if (argc > 1) {
-        if (strcmp(argv[1], "--draw") == 0) {
-            if (argc >= 4) {
-                compile(argv[2], argv[3], false);
-            } else {
-                puts("too few parameters");
-            }
-        } else {
-            puts("use --draw program.cl out.png for drawing");
-        }
+    QTextStream stream(stdout);
 
-    } else if (argc == 1) {
-        compile("../examples/correct/maths.cl", "../examples/correct/images/maths.png", false);
+    if (argc == 1) {
+        help();
+        return 0;
     }
+
+    // Parse command line arguments.
+    QString src;
+    QString dst;
+    QString img;
+    QStringList unknown;
+
+    int index = 1;
+    while (index < argc) {
+        QString cur = argv[index];
+        if (cur == "-h") {
+            if (index == 1) {
+                help();
+                return 0;
+            }
+        } else if (cur == "-i") {
+            if (index == argc - 1) {
+                stream << "Too few arguments for -i.\n";
+                help();
+                return 0;
+            }
+            src = argv[++index];
+        } else if (cur == "-o") {
+            if (index == argc - 1) {
+                stream << "Too few arguments for -o.\n";
+                help();
+                return 0;
+            }
+            dst = argv[++index];
+        } else if (cur == "-d") {
+            if (index == argc - 1) {
+                stream << "Too few arguments for -d.\n";
+                help();
+                return 0;
+            }
+            img = argv[++index];
+        } else {
+            unknown << argv[index];
+        }
+        index++;
+    }
+
+    if (!unknown.isEmpty()) {
+        stream << "Unknown parameter(s):\n";
+        foreach (QString err, unknown) {
+            stream << err << "\n";
+        }
+        stream << "Use -h to get some help.\n";
+        return 0;
+    }
+
+    if (src.isEmpty()) {
+        stream << "You should specify the source file.\n";
+        return 0;
+    }
+
+    // Calculate output folder if not specified.
+    if (dst.isEmpty()) {
+        QFileInfo srcInfo(src);
+        dst = srcInfo.dir().absolutePath() + "/bin-" + srcInfo.fileName();
+        stream << dst;
+    }
+
+    compile(src, dst, img);
+
     return 0;
 }
