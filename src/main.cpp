@@ -22,15 +22,12 @@ void exec_dot(const QString & dotBinFileName, const QString & dotFileName, const
     QProcess::execute(dotBinFileName, args);
 }
 
-void run_don_on_program(SemanticProgram * program, QString fileName, bool showResult) {
-    if (program == NULL) {
-        return;
-    }
+void run_don_on_program(SemanticProgram & program, QString fileName, bool showResult) {
     QString dotFN = "tmp.dot";
     QFile dot(dotFN);
     if (dot.open(QFile::WriteOnly)) {
         QTextStream out(&dot);
-        QString dotCode = "strict digraph {\n" + program->dotCode() + "}\n";
+        QString dotCode = "strict digraph {\n" + program.dotCode() + "}\n";
         out << dotCode;
         dot.close();
         exec_dot("dot", dotFN, fileName);
@@ -48,39 +45,44 @@ void run_don_on_program(SemanticProgram * program, QString fileName, bool showRe
 
 void compile(const char * program, const char * image, bool showTree)
 {
-    QFileInfo imageFileInfo(image);
-    QDir dir = imageFileInfo.dir();
-    if (!dir.exists()) {
-        QString path = dir.absolutePath();
-        dir.mkdir(dir.absolutePath());
-    }
-
+    // Open the input file.
     yyin = fopen(program, "r");
     if (yyin == 0) {
         printf("error opening %s\n", program);
-    } else {
-        yyparse();
-        if (errorCode == ERROR_NO_ERROR) {
-            SemanticProgram * sem = new SemanticProgram(root);
-            sem->doTransform();
-            sem->doSemantics();
-            QStringList errors = sem->errors();
-            if (errors.isEmpty()) {
-                QString binDirName = "bin-" + QFileInfo(program).fileName();
-                sem->doGenerateCode(binDirName);
-            } else {
-                foreach (QString error, sem->errors()) {
-                    QTextStream(stdout) << error << "\n";
-                }
-            }
-            run_don_on_program(sem, image, showTree);
-            delete sem;
-        } else {
-            QTextStream(stdout) << errorMessage << "\n";
-        }
-        fclose(yyin);
-        free_program(root);
+        return;
     }
+
+    // Parse the sources.
+    yyparse();
+    fclose(yyin);
+
+    // There could be a lexical or syntax error.
+    if (errorCode != ERROR_NO_ERROR) {
+        QTextStream(stdout) << errorMessage << "\n";
+        return;
+    }
+
+    // Do semantic analysis, generate bytecode.
+    SemanticProgram sem(root);
+    sem.doTransform();
+    sem.doSemantics();
+    QStringList errors = sem.errors();
+    if (errors.isEmpty()) {
+        QString binDirName = "bin-" + QFileInfo(program).fileName();
+        sem.doGenerateCode(binDirName);
+    } else {
+        foreach (QString error, sem.errors()) {
+            QTextStream(stdout) << error << "\n";
+        }
+    }
+
+    // Draw the sytax tree if requested.
+    if (image != NULL) {
+        run_don_on_program(sem, image, showTree);
+    }
+
+    // Delete the syntax tree.
+    free_program(root);
 }
 
 int main(int argc, char *argv[])
@@ -97,7 +99,7 @@ int main(int argc, char *argv[])
         }
 
     } else if (argc == 1) {
-        compile("../examples/maths.cl", "../examples/images/maths.png", false);
+        compile("../examples/correct/maths.cl", "../examples/correct/images/maths.png", false);
     }
     return 0;
 }

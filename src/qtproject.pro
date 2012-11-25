@@ -22,3 +22,6 @@ HEADERS += \
     errors.h \
     binarywriter.h \
     compiler.h
+
+RESOURCES += \
+    resources.qrc

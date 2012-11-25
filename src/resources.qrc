@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/rtl">
+        <file>rtl/BaseClass.class</file>
+        <file>rtl/LispRTL.class</file>
+    </qresource>
+</RCC>

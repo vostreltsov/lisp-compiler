@@ -6,6 +6,7 @@
 #include <QLinkedList>
 #include <QFile>
 #include <QDir>
+#include <QResource>
 #include "nodetypes.h"
 #include "parser_structs.h"
 #include "binarywriter.h"

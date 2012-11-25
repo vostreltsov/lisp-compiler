@@ -199,9 +199,25 @@ bool SemanticProgram::doGenerateCode(QString dir) const
         QDir().mkdir(dir);
     }
 
-    // Copy rtl class files.
-    QFile::copy(QString(NAME_JAVA_CLASS_BASE) + ".class", dir + "/" + NAME_JAVA_CLASS_BASE + ".class");
-    QFile::copy(QString(NAME_JAVA_CLASS_LISPRTL) + ".class", dir + "/" + NAME_JAVA_CLASS_LISPRTL + ".class");
+    // Write the RTL files.
+    QResource rBaseClass(":/rtl/rtl/BaseClass.class");
+    QResource rLispRTL(":/rtl/rtl/LispRTL.class");
+    QFile baseFile(dir + "/" + NAME_JAVA_CLASS_BASE + ".class");
+    QFile rtlFile(dir + "/" + NAME_JAVA_CLASS_LISPRTL + ".class");
+    if (baseFile.open(QIODevice::WriteOnly)) {
+        QDataStream stream(&baseFile);
+        const uchar * data = rBaseClass.data();
+        for (qint64 i = 0; i < rBaseClass.size(); i++) {
+            stream << data[i];
+        }
+    }
+    if (rtlFile.open(QIODevice::WriteOnly)) {
+        QDataStream stream(&rtlFile);
+        const uchar * data = rLispRTL.data();
+        for (qint64 i = 0; i < rLispRTL.size(); i++) {
+            stream << data[i];
+        }
+    }
 
     // Generate code for all classes.
     foreach (SemanticClass * curClass, fClassTable) {
