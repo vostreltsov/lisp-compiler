@@ -421,7 +421,7 @@ class SExpressionNode : public AttributedNode
 public:
     s_expr_type                       fSubType;
     qint32                            fInteger;
-    char                              fCharacter;
+    qint8                             fCharacter;
     QString                           fString;
     qint32                            fBoolean;
     QString                           fId;

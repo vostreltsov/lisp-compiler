@@ -132,6 +132,9 @@ public class LispRTL {
             case BaseClass.TYPE_STRING:
                 System.out.print(obj.valueString);
                 break;
+            case BaseClass.TYPE_BOOLEAN:
+                System.out.print(obj.valueBoolean != 0 ? "T" : "NIL");
+                break;
             case BaseClass.TYPE_ARRAY:
                 System.out.print("[");
                 for (BaseClass tmp : obj.valueArray) {
@@ -148,15 +151,15 @@ public class LispRTL {
                 // Don't tell anybody about the error!!!
                 break;
             }
-        }        
+        }
     }
 
     public static void archey() {
-        System.out.println("               +               "); 
-        System.out.println("               #               "); 
-        System.out.println("              ###              "); 
-        System.out.println("             #####             "); 
-        System.out.println("             ######            "); 
+        System.out.println("               +               ");
+        System.out.println("               #               ");
+        System.out.println("              ###              ");
+        System.out.println("             #####             ");
+        System.out.println("             ######            ");
         System.out.println("            ; #####;           ");
         System.out.println("           +##.#####           ");
         System.out.println("          +##########          ");

@@ -1,1 +1,5 @@
-(print "Hello, world!")
+(print "Hello, world!\n")
+(print "Some integers for you:   " 1 #\SPACE 2 #\SPACE #b111 #\SPACE #xff "\n")
+(print "Some characters for you: " #\a #|#\SPACE #\TAB #\NEWLINE #\PAGE #\RUBOUT #\LINEFEED #\RETURN #\BACKSPACE|# "\n")
+(print "Some strings for you:    " "one " "two " "three " "four\n")
+(print "Some booleans for you:   " t #\SPACE nil "\n")

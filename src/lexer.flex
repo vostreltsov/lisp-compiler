@@ -305,7 +305,30 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 "#\\"("SPACE"|"TAB"|"NEWLINE"|"PAGE"|"RUBOUT"|"LINEFEED"|"RETURN"|"BACKSPACE") {
     // Character constant - whitespace.
-    yylval.semantic_char = 'q'; // TODO: convert to a real character.
+    char upper[32];
+    strcpy(upper, yytext + 2);
+    for (size_t i = 0; i < yyleng - 2; i++) {
+        upper[i] = toupper(upper[i]);
+    }
+    if (strcmp(upper, "SPACE") == 0) {
+        yylval.semantic_char = 0x20;
+    } else if (strcmp(upper, "TAB") == 0) {
+        yylval.semantic_char = 0x09;
+    } else if (strcmp(upper, "NEWLINE") == 0) {
+        yylval.semantic_char = 0x0A;
+    } else if (strcmp(upper, "PAGE") == 0) {
+        yylval.semantic_char = 0x0C;
+    } else if (strcmp(upper, "RUBOUT") == 0) {
+        yylval.semantic_char = 0x7F;
+    } else if (strcmp(upper, "LINEFEED") == 0) {
+        yylval.semantic_char = 0x0A;
+    } else if (strcmp(upper, "RETURN") == 0) {
+        yylval.semantic_char = 0x0D;
+    } else if (strcmp(upper, "BACKSPACE") == 0) {
+        yylval.semantic_char = 0x08;
+    } else {
+        yylval.semantic_char = 0x00;
+    }
     return CHAR;
 }
 "loop" {

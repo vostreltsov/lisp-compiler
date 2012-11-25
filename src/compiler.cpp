@@ -1324,16 +1324,28 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         // Set the value of the variable.
         stream << CMD_DUP;
         if (constValue != NULL) {
-            // Store the constant number.
-            stream << CMD_LDC_W << constValue->fNumber;
+            stream << CMD_LDC_W << constValue->fNumber; // Store the constant number.
         } else {
-            // Store the operand itself.
-            stream << CMD_SIPUSH << (qint16)fInteger;
+            stream << CMD_SIPUSH << (qint16)fInteger;   // Store the operand itself.
         }
         stream << CMD_PUTFIELD << constFieldValueInt->fNumber;
         break;
     }
     case S_EXPR_TYPE_CHAR: {
+        SemanticConstant * constFieldValueChar = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUECHAR);
+        // Create an instance of the base class.
+        stream << CMD_NEW << constBaseClass->fNumber;
+        // Call the parent constructor.
+        stream << CMD_DUP;
+        stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
+        // Set the type of the variable.
+        stream << CMD_DUP;
+        stream << CMD_BIPUSH << BASECLASS_TYPE_CHAR;
+        stream << CMD_PUTFIELD << constFieldType->fNumber;
+        // Set the value of the variable.
+        stream << CMD_DUP;
+        stream << CMD_BIPUSH << fCharacter;   // Store the operand itself.
+        stream << CMD_PUTFIELD << constFieldValueChar->fNumber;
         break;
     }
     case S_EXPR_TYPE_STRING: {
@@ -1356,6 +1368,20 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_BOOL: {
+        SemanticConstant * constFieldValueBool = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN);
+        // Create an instance of the base class.
+        stream << CMD_NEW << constBaseClass->fNumber;
+        // Call the parent constructor.
+        stream << CMD_DUP;
+        stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
+        // Set the type of the variable.
+        stream << CMD_DUP;
+        stream << CMD_BIPUSH << BASECLASS_TYPE_BOOLEAN;
+        stream << CMD_PUTFIELD << constFieldType->fNumber;
+        // Set the value of the variable.
+        stream << CMD_DUP;
+        stream << CMD_BIPUSH << (quint8)(fBoolean ? 1 : 0);   // Store the operand itself.
+        stream << CMD_PUTFIELD << constFieldValueBool->fNumber;
         break;
     }
     case S_EXPR_TYPE_ID: {
