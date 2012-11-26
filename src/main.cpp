@@ -171,7 +171,6 @@ int main(int argc, char *argv[])
     if (dst.isEmpty()) {
         QFileInfo srcInfo(src);
         dst = srcInfo.dir().absolutePath() + "/bin-" + srcInfo.fileName();
-        stream << dst;
     }
 
     compile(src, dst, img);
