@@ -5,9 +5,36 @@ public class LispRTL {
 
     public static BaseClass plus(BaseClass [] args) {
         BaseClass result = new BaseClass();
-        result.type = BaseClass.TYPE_INT;
+
+        // If there is a string - concatenate everything and return a string.
+        boolean stringExists = false;
         for (BaseClass tmp : args) {
-            result.valueInt += tmp.valueInt;
+            stringExists |= !tmp.valueString.isEmpty();
+        }
+        result.type = stringExists ? BaseClass.TYPE_STRING : BaseClass.TYPE_INT;
+        for (BaseClass tmp : args) {
+            if (stringExists) {
+                switch(tmp.type) {
+                case BaseClass.TYPE_INT:
+                    result.valueString += tmp.valueInt;
+                    break;
+                case BaseClass.TYPE_CHAR:
+                    result.valueString += tmp.valueChar;
+                    break;
+                case BaseClass.TYPE_STRING:
+                    result.valueString += tmp.valueString;
+                    break;
+                case BaseClass.TYPE_BOOLEAN:
+                    result.valueString += tmp.valueBoolean != 0 ? "T" : "NIL";
+                    break;
+                default:
+                    result.valueString += tmp.toString();
+                    break;
+                }
+
+            } else {
+                result.valueInt += tmp.valueInt;
+            }
         }
         return result;
     }

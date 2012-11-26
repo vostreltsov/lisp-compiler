@@ -2,6 +2,7 @@
 # place the qtproject in this folder.
 ./qtproject -i correct/archey.cl
 ./qtproject -i correct/bubblesort.cl
+./qtproject -i correct/concatenation.cl
 ./qtproject -i correct/defclass.cl
 ./qtproject -i correct/defun.cl
 ./qtproject -i correct/helloworld.cl
