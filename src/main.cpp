@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include <QFile>
 #include <QTextStream>
 #include <QString>
@@ -90,7 +91,8 @@ void compile(QString sourceFileName, QString destFolder, QString imageFileName)
 void help()
 {
     QTextStream stream(stdout);
-    stream << "Usage: compiler [options]\n";
+    QString thisFileName = QFileInfo(QCoreApplication::applicationFilePath()).fileName();
+    stream << "Usage: " << thisFileName << " [options]\n";
     stream << "Required options:\n";
     stream << "-i file    Specifies the input file.\n";
     stream << "\n";
@@ -102,6 +104,7 @@ void help()
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication a(argc, argv);
     QTextStream stream(stdout);
 
     if (argc == 1) {

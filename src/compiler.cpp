@@ -259,23 +259,20 @@ SemanticClass * SemanticProgram::getClass(QString name) const
 
 SemanticClass * SemanticProgram::addClass(const DefinitionNode * node)
 {
-    SemanticClass * newClass = new SemanticClass();
-    newClass->fConstCode = newClass->addUtf8Constant("Code");
-    newClass->fConstClass = newClass->addClassConstant(node->fId);
-    newClass->fConstParent = newClass->addClassConstant(node->fParent);
-    newClass->fNode = node;
-    newClass->addDefaultAndParentConstructor();
-    newClass->addRTLConstants();
+    SemanticClass * newClass = new SemanticClass(node->fId, node->fParent, node);
     fClassTable.insert(node->fId, newClass);
     return newClass;
 }
 
-SemanticClass::SemanticClass()
+SemanticClass::SemanticClass(QString name, QString parent, const DefinitionNode * node)
 {
-    fConstCode = NULL;
-    fConstClass = NULL;
-    fConstParent = NULL;
-    fNode = NULL;
+    fConstCode = addUtf8Constant("Code");
+    fConstClass = addClassConstant(name);
+    fConstParent = addClassConstant(parent);
+    fNode = node;
+
+    addDefaultAndParentConstructor();
+    addRTLConstants();
 }
 
 bool SemanticClass::generateCode(QString dir) const
@@ -872,14 +869,6 @@ void ProgramNode::semantics(SemanticProgram * program, QStringList * errorList, 
     curClass = program->getClass(NAME_JAVA_CLASS_MAINCLASS);
     curMethod = curClass->getMethod(NAME_JAVA_METHOD_MAIN);
 
-    // Main class is added in the above call since it's added as a node during transformation. Add the base class to constants.
-    SemanticClass * baseClass = new SemanticClass();
-    baseClass->fConstCode = baseClass->addUtf8Constant("Code");
-    baseClass->fConstClass = baseClass->addClassConstant(NAME_JAVA_CLASS_BASE);
-    baseClass->fConstParent = baseClass->addClassConstant(NAME_JAVA_CLASS_OBJECT);
-    baseClass->addDefaultAndParentConstructor();
-    baseClass->addRTLConstants();
-
     // Create tables and check all child nodes.
     foreach (AttributedNode * node, childNodes()) {
         if (node != fMainPart) {
@@ -888,7 +877,6 @@ void ProgramNode::semantics(SemanticProgram * program, QStringList * errorList, 
     }
 
     // Process the main method.
-    //fMainPart->fDefinition->semantics(program, errorList, curClass, curMethod);
     foreach (AttributedNode * node, fMainPart->fDefinition->childNodes()) {
         node->semantics(program, errorList, curClass, curMethod);
     }

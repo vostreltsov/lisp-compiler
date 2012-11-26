@@ -238,7 +238,7 @@ public:
     SemanticMethod                 * fConstructorParent;
     DefinitionNode const           * fNode;           // Corresponding tree node.
 
-    SemanticClass();
+    SemanticClass(QString name, QString parent, const DefinitionNode * node = NULL);
 
     bool generateCode(QString dir) const;
 
