@@ -147,7 +147,7 @@ public class LispRTL {
         return result;
     }
 
-    public static void print(BaseClass [] args) {
+    public static BaseClass print(BaseClass [] args) {
         for (BaseClass obj : args) {
             switch(obj.type) {
             case BaseClass.TYPE_INT:
@@ -179,9 +179,11 @@ public class LispRTL {
                 break;
             }
         }
+        BaseClass result = new BaseClass();
+        return result;
     }
 
-    public static void archey() {
+    public static BaseClass archey() {
         System.out.println("               +               ");
         System.out.println("               #               ");
         System.out.println("              ###              ");
@@ -200,5 +202,7 @@ public class LispRTL {
         System.out.println("  ;####                 ####;  ");
         System.out.println("  ##'                     '##  ");
         System.out.println(" #'                         `# ");
+        BaseClass result = new BaseClass();
+        return result;
     }
 }

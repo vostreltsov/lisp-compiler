@@ -104,6 +104,11 @@ void help()
 
 int main(int argc, char *argv[])
 {
+
+#ifdef QT_DEBUG
+    compile("../examples/correct/defun.cl", "../examples/correct/bin", "");
+    return 0;
+#else
     QCoreApplication a(argc, argv);
     QTextStream stream(stdout);
 
@@ -176,4 +181,5 @@ int main(int argc, char *argv[])
     compile(src, dst, img);
 
     return 0;
+#endif
 }

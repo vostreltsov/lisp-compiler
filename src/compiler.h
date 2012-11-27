@@ -84,11 +84,11 @@ class DefinitionNode;
 #define DESC_JAVA_ARRAY_BASE                "["DESC_JAVA_CLASS_BASE
 
 #define DESC_JAVA_METHOD_VOID_VOID          "()"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_VOID_BASE          "()"DESC_JAVA_CLASS_BASE
 #define DESC_JAVA_METHOD_INTEGER_VOID       "("DESC_JAVA_INTEGER")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_STRING_VOID        "("DESC_JAVA_STRING")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_ARRAYSTRING_VOID   "("DESC_JAVA_ARRAY_STRING")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_BASE_VOID          "("DESC_JAVA_CLASS_BASE")"DESC_JAVA_VOID
-#define DESC_JAVA_METHOD_ARRAYBASE_VOID     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_ARRAYBASE_BASE     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_CLASS_BASE
 
 const quint8 BASECLASS_TYPE_DAFUQ   = 0;
@@ -302,6 +302,7 @@ public:
     void generateCode(BinaryWriter * writer, const SemanticClass * curClass) const;
 
     bool hasLocalVar(QString name) const;
+    SemanticLocalVar * getLocalVar(QString name) const;
     SemanticLocalVar * addLocalVar(QString name);
 
     static QStringList getRTLMethods();
@@ -508,6 +509,7 @@ public:
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
     void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
+    QByteArray generateCode(const SemanticClass * curClass, const SemanticMethod * curMethod) const;
     static DefinitionNode * fromSyntaxNode(const def_struct * syntaxNode);
 };
 

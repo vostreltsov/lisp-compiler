@@ -633,6 +633,11 @@ bool SemanticMethod::hasLocalVar(QString name) const
     return fLocalVarsTable.contains(name);
 }
 
+SemanticLocalVar * SemanticMethod::getLocalVar(QString name) const
+{
+    return fLocalVarsTable[name];
+}
+
 SemanticLocalVar * SemanticMethod::addLocalVar(QString name)
 {
     // Does it already exist?
@@ -679,9 +684,7 @@ bool SemanticMethod::isRTLMethod(QString name)
 QString SemanticMethod::getDescForRTLMethod(QString name)
 {
     if (name == "archey") {
-        return DESC_JAVA_METHOD_VOID_VOID;
-    } else if (name == "print") {
-        return DESC_JAVA_METHOD_ARRAYBASE_VOID;
+        return DESC_JAVA_METHOD_VOID_BASE;
     } else {
         return DESC_JAVA_METHOD_ARRAYBASE_BASE;
     }
@@ -730,20 +733,10 @@ QByteArray SemanticMethod::generateByteCodeForMethod(const SemanticClass * curCl
         stream << CMD_INVOKESPECIAL << curClass->fConstructorParent->fConstMethodref->fNumber;
         stream << CMD_RETURN;
     } else {
-        // Generate code for a simple method.
-        foreach (SExpressionNode * node, fNode->fBody) {
-            foreach (quint8 byte, node->generateCode(curClass, this)) {
-                stream << byte;
-            }
+        foreach (quint8 byte, fNode->generateCode(curClass, this)) {
+            stream << byte;
         }
     }
-
-    // Add RETURN to the main method.
-    if (fConstMethodref->fRef2->fRef1->fUtf8 == NAME_JAVA_METHOD_MAIN) {
-        stream << CMD_RETURN;
-    }
-
-    // TODO!!!!!
 
     return result;
 }
@@ -1389,6 +1382,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_ID: {
+        stream << CMD_ALOAD << curMethod->getLocalVar(fId)->fNumber;
         break;
     }
     case S_EXPR_TYPE_FCALL: {
@@ -1398,11 +1392,18 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         }
 
         // Call the method.
-        SemanticConstant * constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId);
-        QString methodName = constMethod->fRef2->fRef1->fUtf8;
-
-        if (SemanticMethod::isRTLMethod(methodName)) {
+        SemanticConstant * constMethod = NULL;
+        if (SemanticMethod::isRTLMethod(fId)) {
+            constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId);
             stream << CMD_INVOKESTATIC << constMethod->fNumber;
+        } else {
+            constMethod = curClass->findMethodrefConstant(curClass->fNode->fId, fId);
+            // TODO!!!
+            if (curClass->getMethod(fId)->fIsStatic) {
+                stream << CMD_INVOKESTATIC << constMethod->fNumber;
+            } else {
+                stream << CMD_INVOKEVIRTUAL << constMethod->fNumber;
+            }
         }
         break;
     }
@@ -1791,6 +1792,44 @@ void DefinitionNode::semantics(SemanticProgram * program, QStringList * errorLis
     }
 }
 
+QByteArray DefinitionNode::generateCode(const SemanticClass * curClass, const SemanticMethod * curMethod) const
+{
+    QByteArray result;
+    QDataStream stream(&result, QIODevice::WriteOnly);
+
+    switch (fSubType) {
+    case DEF_TYPE_CLASS: {
+        break;
+    }
+    case DEF_TYPE_FUNC: {
+        foreach (SExpressionNode * expr, fBody) {
+            // Generate code for current expression.
+            foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+                stream << byte;
+            }
+            // Remove the calculated value from stack, except the last expression.
+            // The last expression is also removed in case of main method.
+            //if (expr != fBody.last() || fId == NAME_JAVA_METHOD_MAIN) {
+            //    stream << CMD_POP;
+            //}
+        }
+
+        // Add RETURN.
+        if (fId == NAME_JAVA_METHOD_MAIN) {
+            stream << CMD_RETURN;
+        } else {
+            stream << CMD_ARETURN;
+        }
+
+        break;
+    }
+    default: {
+        break;
+    }
+    }
+
+    return result;
+}
 DefinitionNode * DefinitionNode::fromSyntaxNode(const def_struct * syntaxNode)
 {
     DefinitionNode * result = NULL;
