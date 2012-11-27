@@ -27,38 +27,10 @@ class SlotDefinitionNode;
 class DefinitionNode;
 
 // Names of supported Lisp functions.
-#define NAME_FUNC_PLUS               "plus"
-#define NAME_FUNC_MINUS              "minus"
-#define NAME_FUNC_MULT               "mult"
-#define NAME_FUNC_DIV                "div"
-#define NAME_FUNC_GREATER            "greater"
-#define NAME_FUNC_GREATER_EQ         "greater_eq"
-#define NAME_FUNC_LESS               "less"
-#define NAME_FUNC_LESS_EQ            "less_eq"
-#define NAME_FUNC_EQ                 "eq"
-#define NAME_FUNC_AND                "and"
-#define NAME_FUNC_OR                 "or"
-#define NAME_FUNC_NOT                "not"
-#define NAME_FUNC_DEFPARAMETER       "defparameter"
-#define NAME_FUNC_DEFVAR             "defvar"
 #define NAME_FUNC_SETF               "setf"
-#define NAME_FUNC_LET                "let"
-#define NAME_FUNC_VECTOR             "vector"
-#define NAME_FUNC_VECTOR_PUSH        "vector-push"
-#define NAME_FUNC_VECTOR_POP         "vector-pop"
 #define NAME_FUNC_ELT                "elt"
 #define NAME_FUNC_LIST               "list"
-#define NAME_FUNC_LIST_LENGTH        "list-length"
-#define NAME_FUNC_LENGTH             "length"
-#define NAME_FUNC_FIND               "find"
-#define NAME_FUNC_POSITION           "position"
-#define NAME_FUNC_REMOVE             "remove"
-#define NAME_FUNC_SUBSTITUTE         "substitute"
-#define NAME_FUNC_CONCATENATE        "concatenate"
-#define NAME_FUNC_OPEN               "open"
-#define NAME_FUNC_CLOSE              "close"
-#define NAME_FUNC_WITH_OPEN_FILE     "with-open-file"
-#define NAME_FUNC_PRINT              "print"
+#define NAME_FUNC_VECTOR             "vector"
 
 // Constants to deal with Java and RTL.
 #define NAME_JAVA_CLASS_OBJECT       "java/lang/Object"
@@ -73,12 +45,15 @@ class DefinitionNode;
 #define NAME_JAVA_FIELD_BASE_VALUECHAR      "valueChar"
 #define NAME_JAVA_FIELD_BASE_VALUESTRING    "valueString"
 #define NAME_JAVA_FIELD_BASE_VALUEBOOLEAN   "valueBoolean"
-#define NAME_JAVA_FIELD_BASE_VALUEARRAY     "valueArray"
+#define NAME_JAVA_FIELD_BASE_VALUELIST      "valueList"
+#define NAME_JAVA_FIELD_BASE_VALUEVECTOR    "valueVector"
 
 #define DESC_JAVA_VOID                      "V"
 #define DESC_JAVA_INTEGER                   "I"
 #define DESC_JAVA_CHARACTER                 "C"
 #define DESC_JAVA_STRING                    "Ljava/lang/String;"
+#define DESC_JAVA_LINKEDLIST                "Ljava/util/LinkedList;"
+#define DESC_JAVA_VECTOR                    "Ljava/util/Vector;"
 #define DESC_JAVA_CLASS_BASE                "L"NAME_JAVA_CLASS_BASE";"
 #define DESC_JAVA_ARRAY_STRING              "["DESC_JAVA_STRING
 #define DESC_JAVA_ARRAY_BASE                "["DESC_JAVA_CLASS_BASE
@@ -96,7 +71,8 @@ const quint8 BASECLASS_TYPE_INT     = 1;
 const quint8 BASECLASS_TYPE_CHAR    = 2;
 const quint8 BASECLASS_TYPE_STRING  = 3;
 const quint8 BASECLASS_TYPE_BOOLEAN = 4;
-const quint8 BASECLASS_TYPE_ARRAY   = 5;
+const quint8 BASECLASS_TYPE_LIST    = 5;
+const quint8 BASECLASS_TYPE_VECTOR  = 6;
 
 const qint16 TWOBYTES_MAX       = 32767;
 const qint16 TWOBYTES_MIN       = -32768;

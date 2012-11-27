@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+import java.util.Vector;
 /**
  * Represents the runtime library.
  */
@@ -134,6 +136,11 @@ public class LispRTL {
 
     public static BaseClass vector(BaseClass [] args) {
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_VECTOR;
+        result.valueVector = new Vector<BaseClass>(args.length);
+        for (BaseClass obj : args) {
+            result.valueVector.add(obj);
+        }
         return result;
     }
 
@@ -144,6 +151,11 @@ public class LispRTL {
 
     public static BaseClass list(BaseClass [] args) {
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_LIST;
+        result.valueList = new LinkedList<BaseClass>();
+        for (BaseClass obj : args) {
+            result.valueList.add(obj);
+        }
         return result;
     }
 
@@ -162,17 +174,29 @@ public class LispRTL {
             case BaseClass.TYPE_BOOLEAN:
                 System.out.print(obj.valueBoolean != 0 ? "T" : "NIL");
                 break;
-            case BaseClass.TYPE_ARRAY:
-                System.out.print("[");
-                for (BaseClass tmp : obj.valueArray) {
+            case BaseClass.TYPE_LIST:
+                System.out.print("(");
+                for (BaseClass tmp : obj.valueList) {
                     BaseClass[] tmparr = new BaseClass[1];
                     tmparr[0] = tmp;
                     print(tmparr);
-                    if (tmp != obj.valueArray[obj.valueArray.length]) {
+                    if (tmp != obj.valueList.getLast()) {
                         System.out.print(" ");
                     }
                 }
-                System.out.print("]");
+                System.out.print(")");
+                break;
+            case BaseClass.TYPE_VECTOR:
+                System.out.print("#(");
+                for (BaseClass tmp : obj.valueVector) {
+                    BaseClass[] tmparr = new BaseClass[1];
+                    tmparr[0] = tmp;
+                    print(tmparr);
+                    if (tmp != obj.valueVector.lastElement()) {
+                        System.out.print(" ");
+                    }
+                }
+                System.out.print(")");
                 break;
             default:
                 // Don't tell anybody about the error!!!
