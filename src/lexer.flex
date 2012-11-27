@@ -120,7 +120,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 }
 "+" {
     // Operator: addition.
-    store_function_id("plus");
+    store_function_id("plus");  // Convert to the RTL method name, same for the below rules.
     return ID;
 }
 "-" {
@@ -161,101 +161,6 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "=" {
     // Operator: equal.
     store_function_id("eq");
-    return ID;
-}
-"and" {
-    // Operator: and.
-    store_function_id(yytext);
-    return ID;
-}
-"or" {
-    // Operator: or.
-    store_function_id(yytext);
-    return ID;
-}
-"not" {
-    // Operator: not.
-    store_function_id(yytext);
-    return ID;
-}
-"defparameter" {
-    store_function_id(yytext);
-    return ID;
-}
-"defvar" {
-    store_function_id(yytext);
-    return ID;
-}
-"setf" {
-    store_function_id(yytext);
-    return ID;
-}
-"let" {
-    store_function_id(yytext);
-    return ID;
-}
-"vector" {
-    store_function_id(yytext);
-    return ID;
-}
-"vector-push" {
-    store_function_id(yytext);
-    return ID;
-}
-"vector-pop" {
-    store_function_id(yytext);
-    return ID;
-}
-"elt" {
-    store_function_id(yytext);
-    return ID;
-}
-"list" {
-    store_function_id(yytext);
-    return ID;
-}
-"list-length" {
-    store_function_id(yytext);
-    return ID;
-}
-"length" {
-    store_function_id(yytext);
-    return ID;
-}
-"find" {
-    store_function_id(yytext);
-    return ID;
-}
-"position" {
-    store_function_id(yytext);
-    return ID;
-}
-"remove" {
-    store_function_id(yytext);
-    return ID;
-}
-"substitute" {
-    store_function_id(yytext);
-    return ID;
-}
-"concatenate" {
-    store_function_id(yytext);
-    return ID;
-}
-"open" {
-    store_function_id(yytext);
-    return ID;
-}
-"close" {
-    store_function_id(yytext);
-    return ID;
-}
-"with-open-file" {
-    store_function_id(yytext);
-    return ID;
-}
-"print" {
-    store_function_id(yytext);
     return ID;
 }
 "t" {
@@ -394,12 +299,7 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "slot-value" {
     return SLOTVALUE;
 }
-":"{SYMBOLID}+ {
-    store_function_id(yytext);
-    return ID;
-}
 {SYMBOLID}+ {
-    // User-defined symbol.
     store_function_id(yytext);
     return ID;
 }
