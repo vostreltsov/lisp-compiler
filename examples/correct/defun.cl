@@ -2,8 +2,8 @@
     4)    ; guaranteed to be random
 
 (defun hello (name)
-    (print (+ "hello, " name)))
+    (print (+ "hello, " name "\n")))
 
-(print (myrandom))
+(print "random number: " (myrandom) "\n")
 
 (hello "world")

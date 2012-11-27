@@ -576,9 +576,9 @@ SemanticMethod * SemanticClass::addMethod(const DefinitionNode * node)
     if (node->fId == NAME_JAVA_METHOD_MAIN) {
         desc = DESC_JAVA_METHOD_ARRAYSTRING_VOID;
     } else if (fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS) {
-        desc = createMethodDesc(node->fArguments.size() - 1); // Main class has only static members.
+        desc = createMethodDesc(node->fArguments.size()); // Main class has only static members.
     } else {
-        desc = createMethodDesc(node->fArguments.size());
+        desc = createMethodDesc(node->fArguments.size() + 1);   // Local vars + "this".
     }
     // Add methodref constant.
     newMethod->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, node->fId, desc);
