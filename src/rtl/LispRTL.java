@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.LinkedList;
 import java.util.Vector;
 /**
@@ -5,7 +6,15 @@ import java.util.Vector;
  */
 public class LispRTL {
 
-    public static BaseClass plus(BaseClass [] args) {
+    private static void checkNumberOfArguments(BaseClass [] args, int requiredNumber, String methodName) throws Exception {
+        if (args.length < requiredNumber) {
+            throw new Exception("Too few arguments for method \"" + methodName + "\"");
+        }
+    }
+
+    public static BaseClass plus(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 1, "+");
+
         BaseClass result = new BaseClass();
 
         // If there is a string - concatenate everything and return a string.
@@ -41,7 +50,9 @@ public class LispRTL {
         return result;
     }
 
-    public static BaseClass minus(BaseClass [] args) {
+    public static BaseClass minus(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 1, "-");
+
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_INT;
         // Some minus-specific magic here.
@@ -54,7 +65,9 @@ public class LispRTL {
         return result;
     }
 
-    public static BaseClass mult(BaseClass [] args) {
+    public static BaseClass mult(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 1, "*");
+
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_INT;
         result.valueInt = 1;
@@ -65,9 +78,8 @@ public class LispRTL {
     }
 
     public static BaseClass div(BaseClass [] args) throws Exception {
-        if (args.length == 0) {
-            throw new Exception("Too few arguments for division");
-        }
+        checkNumberOfArguments(args, 1, "/");
+
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_INT;
         result.valueInt = 1;
@@ -144,9 +156,30 @@ public class LispRTL {
         return result;
     }
 
-    public static BaseClass elt(BaseClass [] args) {
-        BaseClass result = new BaseClass();
-        return result;
+    public static BaseClass elt(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 2, "elt");
+
+        if (args[1].type != BaseClass.TYPE_INT) {
+            throw new Exception("The second operand in ELT call doesn't look like an integer");
+        }
+
+        List<BaseClass> container = null;
+        int index = args[1].valueInt;
+        switch (args[0].type) {
+        case BaseClass.TYPE_LIST:
+            container = args[0].valueList;
+            break;
+        case BaseClass.TYPE_VECTOR:
+            container = args[0].valueVector;
+            break;
+        default:
+            throw new Exception("The first operand in ELT call doesn't look like a container");
+        }
+        if (index < container.size()) {
+            return container.get(index);
+        } else {
+            throw new Exception("Index out of bounds in ELT call");
+        }
     }
 
     public static BaseClass list(BaseClass [] args) {
