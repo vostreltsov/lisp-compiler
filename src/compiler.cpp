@@ -1386,19 +1386,26 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_FCALL: {
-        // Collect arguments to an array.
-        foreach (quint8 byte, collectExpressionsToArray(curClass, curMethod, fArguments)) {
-            stream << byte;
-        }
+        bool isRTL = SemanticMethod::isRTLMethod(fId);
 
         // Call the method.
         SemanticConstant * constMethod = NULL;
-        if (SemanticMethod::isRTLMethod(fId)) {
+        if (isRTL) {
             constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId);
+            // Put arguments onto the stack AS AN ARRAY.
+            foreach (quint8 byte, collectExpressionsToArray(curClass, curMethod, fArguments)) {
+                stream << byte;
+            }
+            // Call the method.
             stream << CMD_INVOKESTATIC << constMethod->fNumber;
         } else {
             constMethod = curClass->findMethodrefConstant(curClass->fNode->fId, fId);
-            // TODO!!!
+            // Put arguments onto the stack NOT AS AN ARRAY.
+            foreach (SExpressionNode * expr, fArguments) {
+                foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+                    stream << byte;
+                }
+            }
             if (curClass->getMethod(fId)->fIsStatic) {
                 stream << CMD_INVOKESTATIC << constMethod->fNumber;
             } else {
@@ -1806,12 +1813,13 @@ QByteArray DefinitionNode::generateCode(const SemanticClass * curClass, const Se
             // Generate code for current expression.
             foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
                 stream << byte;
+
             }
             // Remove the calculated value from stack, except the last expression.
             // The last expression is also removed in case of main method.
-            //if (expr != fBody.last() || fId == NAME_JAVA_METHOD_MAIN) {
-            //    stream << CMD_POP;
-            //}
+            if (expr != fBody.last() || fId == NAME_JAVA_METHOD_MAIN) {
+                //stream << CMD_POP;
+            }
         }
 
         // Add RETURN.
