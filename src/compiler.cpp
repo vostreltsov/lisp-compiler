@@ -1493,8 +1493,7 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
 
 bool SExpressionNode::isValidContainer(const SemanticClass * curClass, const SemanticMethod * curMethod) const
 {
-    return  (fSubType == S_EXPR_TYPE_ID) ||
-            (fSubType == S_EXPR_TYPE_FCALL && (fId == NAME_FUNC_VECTOR || fId == NAME_FUNC_LIST));
+    return  (fSubType == S_EXPR_TYPE_ID || fSubType == S_EXPR_TYPE_FCALL);
 }
 
 QByteArray SExpressionNode::collectExpressionsToArray(const SemanticClass * curClass, const SemanticMethod * curMethod, QLinkedList<SExpressionNode *> expressions) const
