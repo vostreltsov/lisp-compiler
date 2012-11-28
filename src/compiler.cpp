@@ -651,11 +651,6 @@ SemanticLocalVar * SemanticMethod::addLocalVar(QString name)
     return result;
 }
 
-quint8 SemanticMethod::numberOfLocalVars() const
-{
-    return fLocalVarsTable.size();
-}
-
 QStringList SemanticMethod::getRTLMethods()
 {
     QStringList result;

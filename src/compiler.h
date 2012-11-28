@@ -280,7 +280,6 @@ public:
     bool hasLocalVar(QString name) const;
     SemanticLocalVar * getLocalVar(QString name) const;
     SemanticLocalVar * addLocalVar(QString name);
-    quint8 numberOfLocalVars() const;
 
     static QStringList getRTLMethods();
     static bool isRTLMethod(QString name);
