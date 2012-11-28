@@ -651,6 +651,11 @@ SemanticLocalVar * SemanticMethod::addLocalVar(QString name)
     return result;
 }
 
+quint8 SemanticMethod::numberOfLocalVars() const
+{
+    return fLocalVarsTable.size();
+}
+
 QStringList SemanticMethod::getRTLMethods()
 {
     QStringList result;
@@ -1387,30 +1392,44 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_FCALL: {
-        bool isRTL = SemanticMethod::isRTLMethod(fId);
-
-        // Call the method.
-        SemanticConstant * constMethod = NULL;
-        if (isRTL) {
-            constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId);
-            // Put arguments onto the stack AS AN ARRAY.
-            foreach (quint8 byte, collectExpressionsToArray(curClass, curMethod, fArguments)) {
+        if (fId == NAME_FUNC_SETF) {
+            // Special case for the SETF call.
+            SExpressionNode * left = fArguments.first();
+            SExpressionNode * right = fArguments.last();
+            // Generate code for the right part.
+            foreach (quint8 byte, right->generateCode(curClass, curMethod)) {
                 stream << byte;
             }
-            // Call the method.
-            stream << CMD_INVOKESTATIC << constMethod->fNumber;
+            // Generate code for the left part.
+            stream << CMD_DUP;  // For returning value of the expression.
+            stream << CMD_ASTORE << curMethod->getLocalVar(left->fId)->fNumber;
         } else {
-            constMethod = curClass->findMethodrefConstant(curClass->fNode->fId, fId);
-            // Put arguments onto the stack NOT AS AN ARRAY.
-            foreach (SExpressionNode * expr, fArguments) {
-                foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+            // General case, user-defined or RTL method.
+            bool isRTL = SemanticMethod::isRTLMethod(fId);
+
+            // Call the method.
+            SemanticConstant * constMethod = NULL;
+            if (isRTL) {
+                constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId);
+                // Put arguments onto the stack AS AN ARRAY.
+                foreach (quint8 byte, collectExpressionsToArray(curClass, curMethod, fArguments)) {
                     stream << byte;
                 }
-            }
-            if (curClass->getMethod(fId)->fIsStatic) {
+                // Call the method.
                 stream << CMD_INVOKESTATIC << constMethod->fNumber;
             } else {
-                stream << CMD_INVOKEVIRTUAL << constMethod->fNumber;
+                constMethod = curClass->findMethodrefConstant(curClass->fNode->fId, fId);
+                // Put arguments onto the stack NOT AS AN ARRAY.
+                foreach (SExpressionNode * expr, fArguments) {
+                    foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+                        stream << byte;
+                    }
+                }
+                if (curClass->getMethod(fId)->fIsStatic) {
+                    stream << CMD_INVOKESTATIC << constMethod->fNumber;
+                } else {
+                    stream << CMD_INVOKEVIRTUAL << constMethod->fNumber;
+                }
             }
         }
         break;
@@ -1814,12 +1833,11 @@ QByteArray DefinitionNode::generateCode(const SemanticClass * curClass, const Se
             // Generate code for current expression.
             foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
                 stream << byte;
-
             }
             // Remove the calculated value from stack, except the last expression.
             // The last expression is also removed in case of main method.
             if (expr != fBody.last() || fId == NAME_JAVA_METHOD_MAIN) {
-                //stream << CMD_POP;
+                stream << CMD_POP;
             }
         }
 

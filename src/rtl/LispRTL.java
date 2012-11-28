@@ -142,8 +142,8 @@ public class LispRTL {
     }
 
     public static BaseClass setf(BaseClass [] args) {
-        BaseClass result = new BaseClass();
-        return result;
+        // This is a fictive method, actually implemented by the compiler.
+        return null;
     }
 
     public static BaseClass vector(BaseClass [] args) {
