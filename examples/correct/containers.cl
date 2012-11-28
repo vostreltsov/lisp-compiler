@@ -1,6 +1,11 @@
 (setf mahList (list 1 2 3))
-(setf mahVector (setf tmp (vector 4 5 6)))	; to be sure that a = b = c = ... works.
+(setf mahVector (setf tmp (vector 4 5 6)))    ; to be sure that a = b = c = ... works.
+(setf mahMatrix (list (list 1 2 3)
+                      (list 4 5 6)
+                      (list 7 8 9)))
 (print "Here's a list             : " mahList "\n")
 (print "Here's a vector           : " mahVector "\n")
-(print "The 3rd element of list   : " (elt mahList 2) "\n")
-(print "The 3rd element of vector : " (elt mahVector 2) "\n")
+(print "Here's a matrix           : " mahMatrix "\n")
+(print "The 1st element of list   : " (elt mahList 0) "\n")
+(print "The 2nd element of vector : " (elt mahVector 1) "\n")
+(print "The 3rd row of matrix     : " (elt mahMatrix 2) "\n")
