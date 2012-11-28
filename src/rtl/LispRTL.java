@@ -6,14 +6,20 @@ import java.util.Vector;
  */
 public class LispRTL {
 
-    private static void checkNumberOfArguments(BaseClass [] args, int requiredNumber, String methodName) throws Exception {
+    private static void checkNumberOfArgumentsNotLess(BaseClass [] args, int requiredNumber, String methodName) throws Exception {
         if (args.length < requiredNumber) {
             throw new Exception("Too few arguments for method \"" + methodName + "\"");
         }
     }
 
+    private static void checkNumberOfArgumentsNotMore(BaseClass [] args, int requiredNumber, String methodName) throws Exception {
+        if (args.length > requiredNumber) {
+            throw new Exception("Too many arguments for method \"" + methodName + "\"");
+        }
+    }
+
     public static BaseClass plus(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 1, "+");
+        checkNumberOfArgumentsNotLess(args, 1, "+");
 
         BaseClass result = new BaseClass();
 
@@ -51,7 +57,7 @@ public class LispRTL {
     }
 
     public static BaseClass minus(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 1, "-");
+        checkNumberOfArgumentsNotLess(args, 1, "-");
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_INT;
@@ -66,7 +72,7 @@ public class LispRTL {
     }
 
     public static BaseClass mult(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 1, "*");
+        checkNumberOfArgumentsNotLess(args, 1, "*");
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_INT;
@@ -78,7 +84,7 @@ public class LispRTL {
     }
 
     public static BaseClass div(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 1, "/");
+        checkNumberOfArgumentsNotLess(args, 1, "/");
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_INT;
@@ -102,7 +108,7 @@ public class LispRTL {
     }
 
     public static BaseClass greater(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 2, ">");
+        checkNumberOfArgumentsNotLess(args, 2, ">");
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
@@ -122,7 +128,7 @@ public class LispRTL {
     }
 
     public static BaseClass greater_eq(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 2, ">=");
+        checkNumberOfArgumentsNotLess(args, 2, ">=");
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
@@ -142,7 +148,7 @@ public class LispRTL {
     }
 
     public static BaseClass less(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 2, "<");
+        checkNumberOfArgumentsNotLess(args, 2, "<");
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
@@ -162,7 +168,7 @@ public class LispRTL {
     }
 
     public static BaseClass less_eq(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 2, "<=");
+        checkNumberOfArgumentsNotLess(args, 2, "<=");
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
@@ -182,7 +188,7 @@ public class LispRTL {
     }
 
     public static BaseClass eq(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 1, "=");
+        checkNumberOfArgumentsNotLess(args, 1, "=");
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
@@ -218,18 +224,56 @@ public class LispRTL {
         return result;
     }
 
-    public static BaseClass and(BaseClass [] args) {
+    public static BaseClass and(BaseClass [] args)  throws Exception {
+        checkNumberOfArgumentsNotLess(args, 1, "and");
+
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_BOOLEAN;
+        result.valueBoolean = 1;
+        for (BaseClass tmp : args) {
+            if (tmp.type != BaseClass.TYPE_BOOLEAN) {
+                throw new Exception("The operand in AND call doesn't look like a boolean");
+            }
+            if (tmp.valueBoolean == 0) {
+                result.valueBoolean = 0;
+            }
+            if (result.valueBoolean == 0) {
+                break;
+            }
+        }
         return result;
     }
 
-    public static BaseClass or(BaseClass [] args) {
+    public static BaseClass or(BaseClass [] args)  throws Exception {
+        checkNumberOfArgumentsNotLess(args, 1, "or");
+
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_BOOLEAN;
+        result.valueBoolean = 0;
+        for (BaseClass tmp : args) {
+            if (tmp.type != BaseClass.TYPE_BOOLEAN) {
+                throw new Exception("The operand in AND call doesn't look like a boolean");
+            }
+            if (tmp.valueBoolean == 1) {
+                result.valueBoolean = 1;
+            }
+            if (result.valueBoolean == 1) {
+                break;
+            }
+        }
         return result;
     }
 
-    public static BaseClass not(BaseClass [] args) {
+    public static BaseClass not(BaseClass [] args)  throws Exception {
+        checkNumberOfArgumentsNotLess(args, 1, "not");
+        checkNumberOfArgumentsNotMore(args, 1, "not");
+
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_BOOLEAN;
+        if (args[0].type != BaseClass.TYPE_BOOLEAN) {
+            throw new Exception("The operand in NOT call doesn't look like a boolean");
+        }
+        result.valueBoolean = (args[0].valueBoolean != 0) ? 0 : 1;
         return result;
     }
 
@@ -249,7 +293,7 @@ public class LispRTL {
     }
 
     public static BaseClass elt(BaseClass [] args) throws Exception {
-        checkNumberOfArguments(args, 2, "elt");
+        checkNumberOfArgumentsNotLess(args, 2, "elt");
 
         if (args[1].type != BaseClass.TYPE_INT) {
             throw new Exception("The second operand in ELT call doesn't look like an integer");
