@@ -101,28 +101,120 @@ public class LispRTL {
         return result;
     }
 
-    public static BaseClass greater(BaseClass [] args) {
+    public static BaseClass greater(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 2, ">");
+
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_BOOLEAN;
+        boolean res = true;
+        for (int i = 0; i < args.length - 1; i++) {
+            if (args[i].type != BaseClass.TYPE_INT) {
+                throw new Exception("The operand № " + (i + 1) + " in \">\" call doesn't look like an integer");
+            }
+            if (args[i + 1].type != BaseClass.TYPE_INT) {
+                throw new Exception("The operand № " + (i + 2) + " in \">\" call doesn't look like an integer");
+            }
+            res &= args[i].valueInt > args[i + 1].valueInt;
+
+        }
+        result.valueBoolean = res ? 1 : 0;
         return result;
     }
 
-    public static BaseClass greater_eq(BaseClass [] args) {
+    public static BaseClass greater_eq(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 2, ">=");
+
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_BOOLEAN;
+        boolean res = true;
+        for (int i = 0; i < args.length - 1; i++) {
+            if (args[i].type != BaseClass.TYPE_INT) {
+                throw new Exception("The operand № " + (i + 1) + " in \">=\" call doesn't look like an integer");
+            }
+            if (args[i + 1].type != BaseClass.TYPE_INT) {
+                throw new Exception("The operand № " + (i + 2) + " in \">=\" call doesn't look like an integer");
+            }
+            res &= args[i].valueInt >= args[i + 1].valueInt;
+
+        }
+        result.valueBoolean = res ? 1 : 0;
         return result;
     }
 
-    public static BaseClass less(BaseClass [] args) {
+    public static BaseClass less(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 2, "<");
+
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_BOOLEAN;
+        boolean res = true;
+        for (int i = 0; i < args.length - 1; i++) {
+            if (args[i].type != BaseClass.TYPE_INT) {
+                throw new Exception("The operand № " + (i + 1) + " in \"<\" call doesn't look like an integer");
+            }
+            if (args[i + 1].type != BaseClass.TYPE_INT) {
+                throw new Exception("The operand № " + (i + 2) + " in \"<\" call doesn't look like an integer");
+            }
+            res &= args[i].valueInt < args[i + 1].valueInt;
+
+        }
+        result.valueBoolean = res ? 1 : 0;
         return result;
     }
 
-    public static BaseClass less_eq(BaseClass [] args) {
+    public static BaseClass less_eq(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 2, "<=");
+
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_BOOLEAN;
+        boolean res = true;
+        for (int i = 0; i < args.length - 1; i++) {
+            if (args[i].type != BaseClass.TYPE_INT) {
+                throw new Exception("The operand № " + (i + 1) + " in \"<=\" call doesn't look like an integer");
+            }
+            if (args[i + 1].type != BaseClass.TYPE_INT) {
+                throw new Exception("The operand № " + (i + 2) + " in \"<=\" call doesn't look like an integer");
+            }
+            res &= args[i].valueInt <= args[i + 1].valueInt;
+
+        }
+        result.valueBoolean = res ? 1 : 0;
         return result;
     }
 
-    public static BaseClass eq(BaseClass [] args) {
+    public static BaseClass eq(BaseClass [] args) throws Exception {
+        checkNumberOfArguments(args, 1, "=");
+
         BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_BOOLEAN;
+        boolean res = true;
+        for (int i = 0; i < args.length - 1; i++) {
+            res &= args[i].type == args[i + 1].type;
+            switch(args[i].type) {
+            case BaseClass.TYPE_INT:
+                res &= args[i].valueInt == args[i + 1].valueInt;
+                break;
+            case BaseClass.TYPE_CHAR:
+                res &= args[i].valueChar == args[i + 1].valueChar;
+                break;
+            case BaseClass.TYPE_STRING:
+                res &= args[i].valueString.equals(args[i + 1].valueString);
+                break;
+            case BaseClass.TYPE_BOOLEAN:
+                res &= args[i].valueBoolean == args[i + 1].valueBoolean;
+                break;
+            case BaseClass.TYPE_LIST:
+                res &= args[i].valueList.equals(args[i + 1].valueList);
+                break;
+            case BaseClass.TYPE_VECTOR:
+                res &= args[i].valueVector.equals(args[i + 1].valueVector);
+                break;
+            default:
+                res = false;
+                break;
+            }
+
+        }
+        result.valueBoolean = res ? 1 : 0;
         return result;
     }
 

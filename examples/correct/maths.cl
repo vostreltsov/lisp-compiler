@@ -27,3 +27,16 @@
 (print "evaluating -#o777       :  " -#o777        "\n")
 (print "evaluating -65535       :  " -65535        "\n")
 (print "evaluating -#xfff       :  " -#xfff        "\n")
+
+(print "evaluating (> 3 2 1)    :  " (> 3 2 1)     "\n")
+(print "evaluating (> 3 2 2)    :  " (> 3 2 2)     "\n")
+(print "evaluating (>= 3 2 2)   :  " (>= 3 2 2)    "\n")
+
+(print "evaluating (< 1 2 3)    :  " (< 1 2 3)     "\n")
+(print "evaluating (< 1 1 2)    :  " (< 1 1 2)     "\n")
+(print "evaluating (<= 1 1 2)   :  " (<= 1 1 2)    "\n")
+
+(print "evaluating (= 3 2 1)    :  " (= 3 2 1)     "\n")
+(print "evaluating (= 3 3 3)    :  " (= 3 3 3)     "\n")
+(print "evaluating (= 3 \"3\")    :  " (= 3 "3")     "\n")
+(print "evaluating (= \"3\" \"3\")  :  " (= "3" "3")     "\n")
