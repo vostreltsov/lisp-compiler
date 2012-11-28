@@ -365,11 +365,13 @@ public class LispRTL {
                 break;
             case BaseClass.TYPE_LIST:
                 System.out.print("(");
+                int lcnt = 0;
+                int lsize = obj.valueList.size();
                 for (BaseClass tmp : obj.valueList) {
                     BaseClass[] tmparr = new BaseClass[1];
                     tmparr[0] = tmp;
                     print(tmparr);
-                    if (tmp != obj.valueList.getLast()) {
+                    if (lcnt++ != lsize - 1) {
                         System.out.print(" ");
                     }
                 }
@@ -377,11 +379,13 @@ public class LispRTL {
                 break;
             case BaseClass.TYPE_VECTOR:
                 System.out.print("#(");
+                int vcnt = 0;
+                int vsize = obj.valueVector.size();
                 for (BaseClass tmp : obj.valueVector) {
                     BaseClass[] tmparr = new BaseClass[1];
                     tmparr[0] = tmp;
                     print(tmparr);
-                    if (tmp != obj.valueVector.lastElement()) {
+                    if (vcnt++ != vsize - 1) {
                         System.out.print(" ");
                     }
                 }
