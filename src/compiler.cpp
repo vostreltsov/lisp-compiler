@@ -668,9 +668,10 @@ QStringList SemanticMethod::getRTLMethods()
     result << "or";
     result << "not";
     result << "setf";
-    result << "vector";
     result << "elt";
+    result << "setf_elt";
     result << "list";
+    result << "vector";
     result << "print";
     result << "archey";
 
@@ -1049,16 +1050,7 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         return result;
     }
-    case S_EXPR_TYPE_ASSIGN_ELT: {
-        tmp += "[]= \"";
-        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
-        int cnt = 0;
-        foreach (SExpressionNode * node, fArguments) {
-            result += node->dotCode(tmp, "arg " + QString::number(cnt++));
-        }
-        return result;
-    }
-    case S_EXPR_TYPE_ASSIGN_FIELD: {
+    case S_EXPR_TYPE_SETF_FIELD: {
         tmp += fSlotValueObject + "." + fSlotValueSlot + " = \"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         int cnt = 0;
@@ -1132,7 +1124,7 @@ void SExpressionNode::transform()
         if (op1 != NULL && fId == NAME_FUNC_SETF) {
             if (op1->fSubType == S_EXPR_TYPE_FCALL && op1->fId == NAME_FUNC_ELT) {
                 // Convert "arr[i] = value" to ternary operator.
-                fSubType = S_EXPR_TYPE_ASSIGN_ELT;
+                fId = NAME_FUNC_SETF_ELT;
                 // Remove the first element and concatenate the rest to the ELT's operands list.
                 fArguments.removeFirst();
                 op1->fArguments << fArguments;
@@ -1142,7 +1134,7 @@ void SExpressionNode::transform()
                 delete op1;
             } else if (op1->fSubType == S_EXPR_TYPE_SLOTVALUE) {
                 // Convert "obj.field = value" to ternary operator.
-                fSubType = S_EXPR_TYPE_ASSIGN_FIELD;
+                fSubType = S_EXPR_TYPE_SETF_FIELD;
                 // Remove the first element and concatenate the rest to the ELT's operands list.
                 fArguments.removeFirst();
                 fSlotValueObject = op1->fSlotValueObject;
@@ -1270,14 +1262,7 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
         // Check if the field exists. TODO
         break;
     }
-    case S_EXPR_TYPE_ASSIGN_ELT: {
-        // Checks are same as for FCALL. TODO
-        /*if (!fOperands.last()->isCalculable()) {
-            *errorList << "Only calculable expressions can be assigned.";
-        }*/
-        break;
-    }
-    case S_EXPR_TYPE_ASSIGN_FIELD: {
+    case S_EXPR_TYPE_SETF_FIELD: {
         // Checks are same as for FCALL. TODO
         break;
     }
@@ -1447,10 +1432,8 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     case S_EXPR_TYPE_SLOTVALUE: {
         break;
     }
-    case S_EXPR_TYPE_ASSIGN_ELT: {
-        break;
-    }
-    case S_EXPR_TYPE_ASSIGN_FIELD: {
+    //case S_EXPR_TYPE_SETF_ELT: Handled with S_EXPR_TYPE_FCALL
+    case S_EXPR_TYPE_SETF_FIELD: {
         break;
     }
     default: {

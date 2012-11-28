@@ -26,19 +26,18 @@ class SlotPropertyNode;
 class SlotDefinitionNode;
 class DefinitionNode;
 
-// Names of supported Lisp functions.
-#define NAME_FUNC_SETF               "setf"
-#define NAME_FUNC_ELT                "elt"
-#define NAME_FUNC_LIST               "list"
-#define NAME_FUNC_VECTOR             "vector"
+// Names of special RTL functions.
+#define NAME_FUNC_SETF                      "setf"
+#define NAME_FUNC_ELT                       "elt"
+#define NAME_FUNC_SETF_ELT                  "setf_elt"
 
 // Constants to deal with Java and RTL.
-#define NAME_JAVA_CLASS_OBJECT       "java/lang/Object"
-#define NAME_JAVA_CLASS_BASE         "BaseClass"
-#define NAME_JAVA_CLASS_LISPRTL      "LispRTL"
-#define NAME_JAVA_CLASS_MAINCLASS    "MainClass"
-#define NAME_JAVA_METHOD_MAIN        "main"
-#define NAME_JAVA_CONSTRUCTOR        "<init>"
+#define NAME_JAVA_CLASS_OBJECT              "java/lang/Object"
+#define NAME_JAVA_CLASS_BASE                "BaseClass"
+#define NAME_JAVA_CLASS_LISPRTL             "LispRTL"
+#define NAME_JAVA_CLASS_MAINCLASS           "MainClass"
+#define NAME_JAVA_METHOD_MAIN               "main"
+#define NAME_JAVA_CONSTRUCTOR               "<init>"
 
 #define NAME_JAVA_FIELD_BASE_TYPE           "type"
 #define NAME_JAVA_FIELD_BASE_VALUEINT       "valueInt"

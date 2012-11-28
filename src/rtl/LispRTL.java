@@ -282,40 +282,50 @@ public class LispRTL {
         return null;
     }
 
-    public static BaseClass vector(BaseClass [] args) {
-        BaseClass result = new BaseClass();
-        result.type = BaseClass.TYPE_VECTOR;
-        result.valueVector = new Vector<BaseClass>(args.length);
-        for (BaseClass obj : args) {
-            result.valueVector.add(obj);
-        }
-        return result;
-    }
-
     public static BaseClass elt(BaseClass [] args) throws Exception {
         checkNumberOfArgumentsNotLess(args, 2, "elt");
-
+        if (args[0].type != BaseClass.TYPE_LIST && args[0].type != BaseClass.TYPE_VECTOR) {
+            throw new Exception("The first operand in ELT call doesn't look like a container");
+        }
         if (args[1].type != BaseClass.TYPE_INT) {
             throw new Exception("The second operand in ELT call doesn't look like an integer");
         }
 
         List<BaseClass> container = null;
         int index = args[1].valueInt;
-        switch (args[0].type) {
-        case BaseClass.TYPE_LIST:
+        if (args[0].type == BaseClass.TYPE_LIST) {
             container = args[0].valueList;
-            break;
-        case BaseClass.TYPE_VECTOR:
-            container = args[0].valueVector;
-            break;
-        default:
-            throw new Exception("The first operand in ELT call doesn't look like a container");
-        }
-        if (index < container.size()) {
-            return container.get(index);
         } else {
+            container = args[0].valueVector;
+        }
+        if (index < 0 || index >= container.size()) {
             throw new Exception("Index out of bounds in ELT call");
         }
+
+        return container.get(index);
+    }
+
+    public static BaseClass setf_elt(BaseClass [] args) throws Exception {
+        checkNumberOfArgumentsNotLess(args, 3, "setf elt");
+        if (args[0].type != BaseClass.TYPE_LIST && args[0].type != BaseClass.TYPE_VECTOR) {
+            throw new Exception("The first operand in SETF ELT call doesn't look like a container");
+        }
+        if (args[1].type != BaseClass.TYPE_INT) {
+            throw new Exception("The second operand in SETF ELT call doesn't look like an integer");
+        }
+
+        List<BaseClass> container = null;
+        int index = args[1].valueInt;
+        if (args[0].type == BaseClass.TYPE_LIST) {
+            container = args[0].valueList;
+        } else {
+            container = args[0].valueVector;
+        }
+        if (index < 0 || index >= container.size()) {
+            throw new Exception("Index out of bounds in SETF ELT call");
+        }
+        container.set(index, args[2]);
+        return args[2];
     }
 
     public static BaseClass list(BaseClass [] args) {
@@ -324,6 +334,16 @@ public class LispRTL {
         result.valueList = new LinkedList<BaseClass>();
         for (BaseClass obj : args) {
             result.valueList.add(obj);
+        }
+        return result;
+    }
+
+    public static BaseClass vector(BaseClass [] args) {
+        BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_VECTOR;
+        result.valueVector = new Vector<BaseClass>(args.length);
+        for (BaseClass obj : args) {
+            result.valueVector.add(obj);
         }
         return result;
     }
