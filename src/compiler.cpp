@@ -672,6 +672,8 @@ QStringList SemanticMethod::getRTLMethods()
     result << "setf_elt";
     result << "list";
     result << "vector";
+    result << "push";
+    result << "pop";
     result << "print";
     result << "archey";
 

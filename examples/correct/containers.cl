@@ -1,4 +1,7 @@
 (setf mahList (list 1 2 3))
+(push mahList 10 11 12)
+(pop mahList)
+(push mahList (pop mahList))
 (setf mahVector (setf tmp (vector 4 5 6)))    ; to be sure that a = b = c = ... works.
 (setf mahMatrix (list (list 1 2 3)
                       (list 4 5 6)

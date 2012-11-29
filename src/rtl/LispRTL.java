@@ -346,7 +346,17 @@ public class LispRTL {
     }
 
     public static BaseClass pop(BaseClass [] args) throws Exception {
-        return null;
+        checkNumberOfArgumentsNotLess(args, 1, "pop");
+        checkArgumentType(args, 0, new int[]{BaseClass.TYPE_LIST, BaseClass.TYPE_VECTOR}, "a container", "POP");
+
+        List<BaseClass> container = null;
+        if (args[0].type == BaseClass.TYPE_LIST) {
+            container = args[0].valueList;
+        } else {
+            container = args[0].valueVector;
+        }
+
+        return container.remove(container.size() - 1) ;  
     }
 
     public static BaseClass print(BaseClass [] args) {
