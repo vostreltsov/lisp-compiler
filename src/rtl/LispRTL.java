@@ -1,6 +1,7 @@
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Vector;
+
 /**
  * Represents the runtime library.
  */
@@ -15,6 +16,16 @@ public class LispRTL {
     private static void checkNumberOfArgumentsNotMore(BaseClass [] args, int requiredNumber, String methodName) throws Exception {
         if (args.length > requiredNumber) {
             throw new Exception("Too many arguments for method \"" + methodName + "\"");
+        }
+    }
+
+    private static void checkArgumentType(BaseClass [] args, int argNumber, int [] allowedTypes, String typeStr, String functionName) throws Exception {
+        boolean result = false;
+        for (int type : allowedTypes) {
+            result |= args[argNumber].type == type;
+        }
+        if (!result) {
+            throw new Exception("The argument № " + (argNumber + 1) + " in \"" + functionName + "\" doesn't look like " + typeStr);
         }
     }
 
@@ -114,12 +125,8 @@ public class LispRTL {
         result.type = BaseClass.TYPE_BOOLEAN;
         boolean res = true;
         for (int i = 0; i < args.length - 1; i++) {
-            if (args[i].type != BaseClass.TYPE_INT) {
-                throw new Exception("The operand № " + (i + 1) + " in \">\" call doesn't look like an integer");
-            }
-            if (args[i + 1].type != BaseClass.TYPE_INT) {
-                throw new Exception("The operand № " + (i + 2) + " in \">\" call doesn't look like an integer");
-            }
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT}, "an integer", ">");
+            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT}, "an integer", ">");
             res &= args[i].valueInt > args[i + 1].valueInt;
 
         }
@@ -134,12 +141,8 @@ public class LispRTL {
         result.type = BaseClass.TYPE_BOOLEAN;
         boolean res = true;
         for (int i = 0; i < args.length - 1; i++) {
-            if (args[i].type != BaseClass.TYPE_INT) {
-                throw new Exception("The operand № " + (i + 1) + " in \">=\" call doesn't look like an integer");
-            }
-            if (args[i + 1].type != BaseClass.TYPE_INT) {
-                throw new Exception("The operand № " + (i + 2) + " in \">=\" call doesn't look like an integer");
-            }
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT}, "an integer", ">=");
+            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT}, "an integer", ">=");
             res &= args[i].valueInt >= args[i + 1].valueInt;
 
         }
@@ -154,12 +157,8 @@ public class LispRTL {
         result.type = BaseClass.TYPE_BOOLEAN;
         boolean res = true;
         for (int i = 0; i < args.length - 1; i++) {
-            if (args[i].type != BaseClass.TYPE_INT) {
-                throw new Exception("The operand № " + (i + 1) + " in \"<\" call doesn't look like an integer");
-            }
-            if (args[i + 1].type != BaseClass.TYPE_INT) {
-                throw new Exception("The operand № " + (i + 2) + " in \"<\" call doesn't look like an integer");
-            }
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT}, "an integer", "<");
+            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT}, "an integer", "<");
             res &= args[i].valueInt < args[i + 1].valueInt;
 
         }
@@ -174,12 +173,8 @@ public class LispRTL {
         result.type = BaseClass.TYPE_BOOLEAN;
         boolean res = true;
         for (int i = 0; i < args.length - 1; i++) {
-            if (args[i].type != BaseClass.TYPE_INT) {
-                throw new Exception("The operand № " + (i + 1) + " in \"<=\" call doesn't look like an integer");
-            }
-            if (args[i + 1].type != BaseClass.TYPE_INT) {
-                throw new Exception("The operand № " + (i + 2) + " in \"<=\" call doesn't look like an integer");
-            }
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT}, "an integer", "<=");
+            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT}, "an integer", "<=");
             res &= args[i].valueInt <= args[i + 1].valueInt;
 
         }
@@ -230,11 +225,9 @@ public class LispRTL {
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
         result.valueBoolean = 1;
-        for (BaseClass tmp : args) {
-            if (tmp.type != BaseClass.TYPE_BOOLEAN) {
-                throw new Exception("The operand in AND call doesn't look like a boolean");
-            }
-            if (tmp.valueBoolean == 0) {
+        for (int i = 0; i < args.length; i++) {
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_BOOLEAN}, "a boolean", "AND");
+            if (args[i].valueBoolean == 0) {
                 result.valueBoolean = 0;
             }
             if (result.valueBoolean == 0) {
@@ -250,11 +243,9 @@ public class LispRTL {
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
         result.valueBoolean = 0;
-        for (BaseClass tmp : args) {
-            if (tmp.type != BaseClass.TYPE_BOOLEAN) {
-                throw new Exception("The operand in AND call doesn't look like a boolean");
-            }
-            if (tmp.valueBoolean == 1) {
+        for (int i = 0; i < args.length; i++) {
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_BOOLEAN}, "a boolean", "OR");
+            if (args[i].valueBoolean == 1) {
                 result.valueBoolean = 1;
             }
             if (result.valueBoolean == 1) {
@@ -270,9 +261,7 @@ public class LispRTL {
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
-        if (args[0].type != BaseClass.TYPE_BOOLEAN) {
-            throw new Exception("The operand in NOT call doesn't look like a boolean");
-        }
+        checkArgumentType(args, 0, new int[]{BaseClass.TYPE_BOOLEAN}, "a boolean", "NOT");
         result.valueBoolean = (args[0].valueBoolean != 0) ? 0 : 1;
         return result;
     }
@@ -284,12 +273,8 @@ public class LispRTL {
 
     public static BaseClass elt(BaseClass [] args) throws Exception {
         checkNumberOfArgumentsNotLess(args, 2, "elt");
-        if (args[0].type != BaseClass.TYPE_LIST && args[0].type != BaseClass.TYPE_VECTOR) {
-            throw new Exception("The first operand in ELT call doesn't look like a container");
-        }
-        if (args[1].type != BaseClass.TYPE_INT) {
-            throw new Exception("The second operand in ELT call doesn't look like an integer");
-        }
+        checkArgumentType(args, 0, new int[]{BaseClass.TYPE_LIST, BaseClass.TYPE_VECTOR}, "a container", "ELT");
+        checkArgumentType(args, 1, new int[]{BaseClass.TYPE_INT}, "an integer", "ELT");
 
         List<BaseClass> container = null;
         int index = args[1].valueInt;
@@ -307,12 +292,8 @@ public class LispRTL {
 
     public static BaseClass setf_elt(BaseClass [] args) throws Exception {
         checkNumberOfArgumentsNotLess(args, 3, "setf elt");
-        if (args[0].type != BaseClass.TYPE_LIST && args[0].type != BaseClass.TYPE_VECTOR) {
-            throw new Exception("The first operand in SETF ELT call doesn't look like a container");
-        }
-        if (args[1].type != BaseClass.TYPE_INT) {
-            throw new Exception("The second operand in SETF ELT call doesn't look like an integer");
-        }
+        checkArgumentType(args, 0, new int[]{BaseClass.TYPE_LIST, BaseClass.TYPE_VECTOR}, "a container", "SETF ELT");
+        checkArgumentType(args, 1, new int[]{BaseClass.TYPE_INT}, "an integer", "SETF ELT");
 
         List<BaseClass> container = null;
         int index = args[1].valueInt;
@@ -346,6 +327,26 @@ public class LispRTL {
             result.valueVector.add(obj);
         }
         return result;
+    }
+
+    public static BaseClass push(BaseClass [] args) throws Exception {
+        checkNumberOfArgumentsNotLess(args, 2, "push");
+        checkArgumentType(args, 0, new int[]{BaseClass.TYPE_LIST, BaseClass.TYPE_VECTOR}, "a container", "PUSH");
+
+        List<BaseClass> container = null;
+        if (args[0].type == BaseClass.TYPE_LIST) {
+            container = args[0].valueList;
+        } else {
+            container = args[0].valueVector;
+        }
+        for (int i = 1; i < args.length; i++) {
+            container.add(args[i]);
+        }
+        return args[0];
+    }
+
+    public static BaseClass pop(BaseClass [] args) throws Exception {
+        return null;
     }
 
     public static BaseClass print(BaseClass [] args) {
