@@ -1420,6 +1420,60 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_LOOP_FROM_TO: {
+        SemanticConstant * from = curClass->findIntegerConstant(fFrom->fInteger);
+        SemanticConstant * to = curClass->findIntegerConstant(fTo->fInteger);
+        SemanticLocalVar * counter = curMethod->getLocalVar(fId);
+        QByteArray body = fBody1->generateCode(curClass, curMethod);
+
+        const qint16 IF_LENGTH = 3;
+        const qint16 IINC_LENGTH = 3;
+        const qint16 GOTO_LENGTH = 3;
+        qint16 TO_LENGTH = 0;
+
+        qint32 ifrom, ito;
+
+        // Init the "from".
+        if (from != NULL) {
+            ifrom = from->fInteger;
+            stream << CMD_LDC_W << from->fNumber; // Store the constant number.
+        } else {
+            ifrom = fFrom->fInteger;
+            stream << CMD_SIPUSH << (qint16)fFrom->fInteger; // Store the operand itself.
+        }
+        stream << CMD_ISTORE << counter->fNumber;
+
+        // Init the "to".
+        stream << CMD_ILOAD << counter->fNumber;
+        if (to != NULL) {
+            ito = to->fInteger;
+            TO_LENGTH = 5;
+            stream << CMD_LDC_W << to->fNumber; // Store the constant number.
+        } else {
+            ito = fTo->fInteger;
+            TO_LENGTH = 5;
+            stream << CMD_SIPUSH << (qint16)fTo->fInteger; // Store the operand itself.
+        }
+
+        // Write the condition.
+        if (ifrom <= ito) {
+            stream << CMD_ICMPGT << (qint16)(body.size() + IF_LENGTH + IINC_LENGTH + GOTO_LENGTH);
+        } else {
+            stream << CMD_ICMPLT << (qint16)(body.size() + IF_LENGTH + IINC_LENGTH + GOTO_LENGTH);
+        }
+
+        // Write the body.
+        foreach (quint8 byte, body) {
+            stream << byte;
+        }
+        // Add the counter increment/decrement.
+        if (ifrom <= ito) {
+            stream << CMD_IINC << counter->fNumber << (qint8)1;
+        } else {
+
+        }
+
+        // Add the goto.
+        stream << CMD_GOTO << (qint16)(-(body.size() + IINC_LENGTH + IF_LENGTH + TO_LENGTH));
         break;
     }
     case S_EXPR_TYPE_PROGN: {
@@ -1816,7 +1870,7 @@ QByteArray DefinitionNode::generateCode(const SemanticClass * curClass, const Se
             // Remove the calculated value from stack, except the last expression.
             // The last expression is also removed in case of main method.
             if (expr != fBody.last() || fId == NAME_JAVA_METHOD_MAIN) {
-                stream << CMD_POP;
+                //stream << CMD_POP;
             }
         }
 

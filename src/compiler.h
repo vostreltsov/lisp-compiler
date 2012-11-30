@@ -99,15 +99,25 @@ const quint8  CMD_SIPUSH        = 0x11;
 const quint8  CMD_LDC           = 0x12;
 const quint8  CMD_LDC_W         = 0x13;
 
+const quint8  CMD_ILOAD         = 0x15;
 const quint8  CMD_ALOAD         = 0x19;
 const quint8  CMD_ALOAD_0       = 0x2A;
 
+const quint8  CMD_ISTORE        = 0x36;
 const quint8  CMD_ASTORE        = 0x3A;
 const quint8  CMD_AASTORE       = 0x53;
 const quint8  CMD_POP           = 0x57;
 const quint8  CMD_DUP           = 0x59;
-const quint8  CMD_IFNE          = 0x9A;
+
+const quint8  CMD_ICMPEQ        = 0x9F;
+const quint8  CMD_ICMPNE        = 0xA0;
+const quint8  CMD_ICMPLT        = 0xA1;
+const quint8  CMD_ICMPLE        = 0xA4;
+const quint8  CMD_ICMPGT        = 0xA3;
+const quint8  CMD_ICMPGE        = 0xA2;
 const quint8  CMD_GOTO          = 0xA7;
+const quint8  CMD_IINC          = 0x84;
+
 const quint8  CMD_ARETURN       = 0xB0;
 const quint8  CMD_RETURN        = 0xB1;
 const quint8  CMD_GETFIELD      = 0xB4;
