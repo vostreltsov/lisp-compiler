@@ -172,18 +172,18 @@ struct s_expr_struct * create_s_expr_funcall(int nodeId,
 struct s_expr_struct * create_s_expr_loop(int nodeId,
                                           enum s_expr_type type,
                                           char * id,
+                                          struct s_expr_seq_struct * args,
                                           struct s_expr_struct * container,
                                           struct s_expr_struct * from,
-                                          struct s_expr_struct * to,
-                                          struct s_expr_struct * body) {
+                                          struct s_expr_struct * to) {
     struct s_expr_struct * result = create_s_expr_empty();
     result->nodeId = nodeId;
     result->type = type;
     result->id = id;
+    result->args = args;
     result->container = container;
     result->from = from;
     result->to = to;
-    result->body1 = body;
     return result;
 }
 

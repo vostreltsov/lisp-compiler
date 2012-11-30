@@ -44,12 +44,12 @@ struct s_expr_struct * create_s_expr_funcall(int nodeId,
 	                                         struct s_expr_seq_struct * args);
 
 struct s_expr_struct * create_s_expr_loop(int nodeId,
-	                                      enum s_expr_type type,
-	                                      char * id,
-	                                      struct s_expr_struct * container,
-	                                      struct s_expr_struct * from,
-	                                      struct s_expr_struct * to,
-	                                      struct s_expr_struct * body);
+                                          enum s_expr_type type,
+                                          char * id,
+                                          struct s_expr_seq_struct * args,
+                                          struct s_expr_struct * container,
+                                          struct s_expr_struct * from,
+                                          struct s_expr_struct * to);
 
 struct s_expr_struct * create_s_expr_progn(int nodeId,
 	                                       enum s_expr_type type,

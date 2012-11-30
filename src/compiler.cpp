@@ -1021,7 +1021,9 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         result += fFrom->dotCode(tmp, "from");
         result += fTo->dotCode(tmp, "to");
-        result += fBody1->dotCode(tmp, "body");
+        foreach (SExpressionNode * op, fArguments) {
+            result += op->dotCode(tmp, "body");
+        }
         return result;
     }
     case S_EXPR_TYPE_LOOP_FROM_DOWNTO: {
@@ -1029,7 +1031,9 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
         result += fFrom->dotCode(tmp, "from");
         result += fTo->dotCode(tmp, "downto");
-        result += fBody1->dotCode(tmp, "body");
+        foreach (SExpressionNode * op, fArguments) {
+            result += op->dotCode(tmp, "body");
+        }
         return result;
     }
     case S_EXPR_TYPE_PROGN: {
@@ -1433,13 +1437,22 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
 
         QByteArray codeFrom = fFrom->generateCode(curClass, curMethod);
         QByteArray codeTo = fTo->generateCode(curClass, curMethod);
-        QByteArray codeBody = fBody1->generateCode(curClass, curMethod);
+        QByteArray codeBody;
+        QDataStream streamBody(&codeBody, QIODevice::WriteOnly);
+        //= fBody1->generateCode(curClass, curMethod);
+        foreach (SExpressionNode * expr, fArguments) {
+            // Generate code for current expression.
+            foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+                streamBody << byte;
+            }
+            streamBody << CMD_POP;
+        }
 
 
         const qint16 LENGTH_FROM     = codeFrom.size() + 2;       // from + ASTORE
         const qint16 LENGTH_NEW_ITER = 2 + 3 + codeTo.size() + 3; // ALOAD + GETFIELD + to
         const qint16 LENGTH_IF       = 3;                         // IF_ICMPGT
-        const qint16 LENGTH_BODY     = codeBody.size() + 1;       // body + POP
+        const qint16 LENGTH_BODY     = codeBody.size();           // body expressions
         const qint16 LENGTH_IINC     = 11;
         const qint16 LENGTH_GOTO     = 3;
 
@@ -1469,8 +1482,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         foreach (quint8 byte, codeBody) {
             stream << byte;
         }
-        stream << CMD_POP;
-
 
         // Add the counter increment/decrement.
         stream << CMD_ALOAD << counter->fNumber;
@@ -1884,7 +1895,7 @@ QByteArray DefinitionNode::generateCode(const SemanticClass * curClass, const Se
             // Remove the calculated value from stack, except the last expression.
             // The last expression is also removed in case of main method.
             if (expr != fBody.last() || fId == NAME_JAVA_METHOD_MAIN) {
-                //stream << CMD_POP;
+                stream << CMD_POP;
             }
         }
 
