@@ -1159,9 +1159,9 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
     // Analyse this node.
     switch (fSubType) {
     case S_EXPR_TYPE_INT: {
-        if (fInteger > TWOBYTES_MAX || fInteger < TWOBYTES_MIN) {
+        //if (fInteger > TWOBYTES_MAX || fInteger < TWOBYTES_MIN) {
             curClass->addIntegerConstant(fInteger);
-        }
+        //}
         break;
     }
     case S_EXPR_TYPE_CHAR: {
@@ -1299,7 +1299,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
 
         // Create an instance of the base class.
         stream << CMD_NEW << constBaseClass->fNumber;
-        // Call the parent constructor.
         stream << CMD_DUP;
         stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
         // Set the type of the variable.
@@ -1420,60 +1419,70 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_LOOP_FROM_TO: {
+        SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT);
         SemanticConstant * from = curClass->findIntegerConstant(fFrom->fInteger);
         SemanticConstant * to = curClass->findIntegerConstant(fTo->fInteger);
         SemanticLocalVar * counter = curMethod->getLocalVar(fId);
-        QByteArray body = fBody1->generateCode(curClass, curMethod);
 
-        const qint16 IF_LENGTH = 3;
-        const qint16 IINC_LENGTH = 3;
+        QByteArray codeFrom = fFrom->generateCode(curClass, curMethod);
+        QByteArray codeTo = fTo->generateCode(curClass, curMethod);
+        QByteArray codeBody = fBody1->generateCode(curClass, curMethod);
+
+        const qint16 IF_LENGTH = 4;
+        const qint16 NEW_ITER_START_LENGTH = 2 + 3 + codeTo.size() + 1 + 2 + 1 + 2;
+        const qint16 IINC_LENGTH = 11;
         const qint16 GOTO_LENGTH = 3;
-        qint16 TO_LENGTH = 0;
 
         qint32 ifrom, ito;
 
-        // Init the "from".
-        if (from != NULL) {
-            ifrom = from->fInteger;
-            stream << CMD_LDC_W << from->fNumber; // Store the constant number.
-        } else {
-            ifrom = fFrom->fInteger;
-            stream << CMD_SIPUSH << (qint16)fFrom->fInteger; // Store the operand itself.
+        // Generate code for the "from" value, assign it to the counter.
+        foreach (quint8 byte, codeFrom) {
+            stream << byte;
         }
-        stream << CMD_ISTORE << counter->fNumber;
+        stream << CMD_ASTORE << counter->fNumber;
 
-        // Init the "to".
-        stream << CMD_ILOAD << counter->fNumber;
-        if (to != NULL) {
-            ito = to->fInteger;
-            TO_LENGTH = 5;
-            stream << CMD_LDC_W << to->fNumber; // Store the constant number.
-        } else {
-            ito = fTo->fInteger;
-            TO_LENGTH = 5;
-            stream << CMD_SIPUSH << (qint16)fTo->fInteger; // Store the operand itself.
+        // New iteration: push the counter onto the stack.
+        stream << CMD_ALOAD << counter->fNumber;
+        stream << CMD_GETFIELD << constFieldValueInt->fNumber;
+        // Push the "to" value onto the stack.
+        foreach (quint8 byte, codeTo) {
+            stream << byte;
         }
+        stream << CMD_GETFIELD << constFieldValueInt->fNumber;
 
-        // Write the condition.
+        // Compare the counter and the "to" values.
         if (ifrom <= ito) {
-            stream << CMD_ICMPGT << (qint16)(body.size() + IF_LENGTH + IINC_LENGTH + GOTO_LENGTH);
+            stream << CMD_ICMPGT << (qint16)(IF_LENGTH + codeBody.size() +  IINC_LENGTH + GOTO_LENGTH);
         } else {
-            stream << CMD_ICMPLT << (qint16)(body.size() + IF_LENGTH + IINC_LENGTH + GOTO_LENGTH);
+            stream << CMD_ICMPLT << (qint16)(IF_LENGTH + codeBody.size() +  IINC_LENGTH + GOTO_LENGTH);
         }
 
         // Write the body.
-        foreach (quint8 byte, body) {
+        foreach (quint8 byte, codeBody) {
             stream << byte;
         }
-        // Add the counter increment/decrement.
-        if (ifrom <= ito) {
-            stream << CMD_IINC << counter->fNumber << (qint8)1;
-        } else {
+        stream << CMD_POP;
 
-        }
+
+        // Add the counter increment/decrement.
+        stream << CMD_ALOAD << counter->fNumber;
+        stream << CMD_DUP;
+        stream << CMD_GETFIELD << constFieldValueInt->fNumber;
+        stream << CMD_ICONST_1;
+        stream << CMD_IADD;
+        stream << CMD_PUTFIELD << constFieldValueInt->fNumber;
+
+        //if (ifrom <= ito) {
+        //    stream << CMD_IINC << counter->fNumber << (qint8)1;
+        //} else {
+
+        //}
 
         // Add the goto.
-        stream << CMD_GOTO << (qint16)(-(body.size() + IINC_LENGTH + IF_LENGTH + TO_LENGTH));
+        stream << CMD_GOTO << (qint16)(-(NEW_ITER_START_LENGTH + codeBody.size() + IINC_LENGTH+1));
+
+        //stream << 0x9C << (qint16)3;
+
         break;
     }
     case S_EXPR_TYPE_PROGN: {

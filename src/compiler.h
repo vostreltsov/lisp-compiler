@@ -78,7 +78,7 @@ const qint16 TWOBYTES_MIN       = -32768;
 
 const quint32 MAGIC_NUMBER      = 0xCAFEBABE;
 const quint16 VERSION_MINOR     = 0x0000;
-const quint16 VERSION_MAJOR     = 0x0033;
+const quint16 VERSION_MAJOR     = 0x0032;
 
 const quint16 ACC_PUBLIC        = 0x0001;
 const quint16 ACC_PRIVATE       = 0x0002;
@@ -94,6 +94,7 @@ const quint16 ACC_SYNTHETIC     = 0x1000;
 const quint16 ACC_ANNOTATION    = 0x2000;
 const quint16 ACC_ENUM          = 0x4000;
 
+const quint8  CMD_ICONST_1      = 0x04;
 const quint8  CMD_BIPUSH        = 0x10;
 const quint8  CMD_SIPUSH        = 0x11;
 const quint8  CMD_LDC           = 0x12;
@@ -108,6 +109,8 @@ const quint8  CMD_ASTORE        = 0x3A;
 const quint8  CMD_AASTORE       = 0x53;
 const quint8  CMD_POP           = 0x57;
 const quint8  CMD_DUP           = 0x59;
+
+const quint8  CMD_IADD          = 0x60;
 
 const quint8  CMD_ICMPEQ        = 0x9F;
 const quint8  CMD_ICMPNE        = 0xA0;
