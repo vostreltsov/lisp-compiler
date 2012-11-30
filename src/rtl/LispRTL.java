@@ -356,7 +356,7 @@ public class LispRTL {
             container = args[0].valueVector;
         }
 
-        return container.remove(container.size() - 1) ;  
+        return container.remove(container.size() - 1) ;
     }
 
     public static BaseClass print(BaseClass [] args) {
@@ -407,8 +407,7 @@ public class LispRTL {
                 break;
             }
         }
-        BaseClass result = new BaseClass();
-        return result;
+        return null;
     }
 
     public static BaseClass archey() {

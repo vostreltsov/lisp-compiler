@@ -78,7 +78,7 @@ const qint16 TWOBYTES_MIN       = -32768;
 
 const quint32 MAGIC_NUMBER      = 0xCAFEBABE;
 const quint16 VERSION_MINOR     = 0x0000;
-const quint16 VERSION_MAJOR     = 0x0032;
+const quint16 VERSION_MAJOR     = 0x0032;   // Took a few hours to find out that java 7 is a buggy pile of shit.
 
 const quint16 ACC_PUBLIC        = 0x0001;
 const quint16 ACC_PRIVATE       = 0x0002;
@@ -111,6 +111,7 @@ const quint8  CMD_POP           = 0x57;
 const quint8  CMD_DUP           = 0x59;
 
 const quint8  CMD_IADD          = 0x60;
+const quint8  CMD_ISUB          = 0x64;
 
 const quint8  CMD_ICMPEQ        = 0x9F;
 const quint8  CMD_ICMPNE        = 0xA0;

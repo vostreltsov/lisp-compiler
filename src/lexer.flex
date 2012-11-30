@@ -254,6 +254,9 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "to" {
     return TO;
 }
+"downto" {
+    return DOWNTO;
+}
 "while" {
     return WHILE;
 }

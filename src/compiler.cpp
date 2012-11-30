@@ -1024,6 +1024,14 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         result += fBody1->dotCode(tmp, "body");
         return result;
     }
+    case S_EXPR_TYPE_LOOP_FROM_DOWNTO: {
+        tmp += "loop (from downto) " + fId + "\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        result += fFrom->dotCode(tmp, "from");
+        result += fTo->dotCode(tmp, "downto");
+        result += fBody1->dotCode(tmp, "body");
+        return result;
+    }
     case S_EXPR_TYPE_PROGN: {
         tmp += "progn\"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
@@ -1236,7 +1244,8 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
         }
         break;
     }
-    case S_EXPR_TYPE_LOOP_FROM_TO: {
+    case S_EXPR_TYPE_LOOP_FROM_TO:
+    case S_EXPR_TYPE_LOOP_FROM_DOWNTO:{
         // Check if borders are calculable.
         if (!fFrom->isCalculable() || !fTo->isCalculable()) {
             *errorList << "Only calculable expressions can be used as loop borders.";
@@ -1319,7 +1328,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         SemanticConstant * constFieldValueChar = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUECHAR);
         // Create an instance of the base class.
         stream << CMD_NEW << constBaseClass->fNumber;
-        // Call the parent constructor.
         stream << CMD_DUP;
         stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
         // Set the type of the variable.
@@ -1338,7 +1346,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
 
         // Create an instance of the base class.
         stream << CMD_NEW << constBaseClass->fNumber;
-        // Call the parent constructor.
         stream << CMD_DUP;
         stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
         // Set the type of the variable.
@@ -1355,7 +1362,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         SemanticConstant * constFieldValueBool = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN);
         // Create an instance of the base class.
         stream << CMD_NEW << constBaseClass->fNumber;
-        // Call the parent constructor.
         stream << CMD_DUP;
         stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
         // Set the type of the variable.
@@ -1418,7 +1424,8 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     case S_EXPR_TYPE_LOOP_IN: {
         break;
     }
-    case S_EXPR_TYPE_LOOP_FROM_TO: {
+    case S_EXPR_TYPE_LOOP_FROM_TO:
+    case S_EXPR_TYPE_LOOP_FROM_DOWNTO: {
         SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT);
         SemanticConstant * from = curClass->findIntegerConstant(fFrom->fInteger);
         SemanticConstant * to = curClass->findIntegerConstant(fTo->fInteger);
@@ -1428,12 +1435,13 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         QByteArray codeTo = fTo->generateCode(curClass, curMethod);
         QByteArray codeBody = fBody1->generateCode(curClass, curMethod);
 
-        const qint16 IF_LENGTH = 4;
-        const qint16 NEW_ITER_START_LENGTH = 2 + 3 + codeTo.size() + 1 + 2 + 1 + 2;
-        const qint16 IINC_LENGTH = 11;
-        const qint16 GOTO_LENGTH = 3;
 
-        qint32 ifrom, ito;
+        const qint16 LENGTH_FROM     = codeFrom.size() + 2;       // from + ASTORE
+        const qint16 LENGTH_NEW_ITER = 2 + 3 + codeTo.size() + 3; // ALOAD + GETFIELD + to
+        const qint16 LENGTH_IF       = 3;                         // IF_ICMPGT
+        const qint16 LENGTH_BODY     = codeBody.size() + 1;       // body + POP
+        const qint16 LENGTH_IINC     = 11;
+        const qint16 LENGTH_GOTO     = 3;
 
         // Generate code for the "from" value, assign it to the counter.
         foreach (quint8 byte, codeFrom) {
@@ -1451,10 +1459,10 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         stream << CMD_GETFIELD << constFieldValueInt->fNumber;
 
         // Compare the counter and the "to" values.
-        if (ifrom <= ito) {
-            stream << CMD_ICMPGT << (qint16)(IF_LENGTH + codeBody.size() +  IINC_LENGTH + GOTO_LENGTH);
+        if (fSubType == S_EXPR_TYPE_LOOP_FROM_TO) {
+            stream << CMD_ICMPGT << (qint16)(LENGTH_IF + LENGTH_BODY + LENGTH_IINC + LENGTH_GOTO);
         } else {
-            stream << CMD_ICMPLT << (qint16)(IF_LENGTH + codeBody.size() +  IINC_LENGTH + GOTO_LENGTH);
+            stream << CMD_ICMPLT << (qint16)(LENGTH_IF + LENGTH_BODY + LENGTH_IINC + LENGTH_GOTO);
         }
 
         // Write the body.
@@ -1469,20 +1477,17 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         stream << CMD_DUP;
         stream << CMD_GETFIELD << constFieldValueInt->fNumber;
         stream << CMD_ICONST_1;
-        stream << CMD_IADD;
+        if (fSubType == S_EXPR_TYPE_LOOP_FROM_TO) {
+            stream << CMD_IADD;
+        } else {
+            stream << CMD_ISUB;
+        }
         stream << CMD_PUTFIELD << constFieldValueInt->fNumber;
 
-        //if (ifrom <= ito) {
-        //    stream << CMD_IINC << counter->fNumber << (qint8)1;
-        //} else {
-
-        //}
-
         // Add the goto.
-        stream << CMD_GOTO << (qint16)(-(NEW_ITER_START_LENGTH + codeBody.size() + IINC_LENGTH+1));
-
-        //stream << 0x9C << (qint16)3;
-
+        stream << CMD_GOTO << (qint16)(-LENGTH_NEW_ITER - LENGTH_IF - LENGTH_BODY - LENGTH_IINC);
+        // Add the fictive result as well.
+        stream << CMD_BIPUSH << (quint8)0;
         break;
     }
     case S_EXPR_TYPE_PROGN: {

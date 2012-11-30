@@ -60,6 +60,7 @@ int idCounter = 0;
 %token DO
 %token FROM
 %token TO
+%token DOWNTO
 %token WHILE
 %token PROGN
 %token IF
@@ -100,27 +101,28 @@ program_part_seq : program_part                   {$$ = create_program_part_seq(
                  | program_part_seq program_part  {$$ = add_to_program_part_seq($1, $2);}
                  ;
 
-s_expr : INT                                                  {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_INT,      $1, '\0',  NULL,  0,  NULL);}
-       | CHAR                                                 {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_CHAR,     0,  $1,    NULL,  0,  NULL);}
-       | STRING                                               {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_STRING,   0,  '\0',  $1,    0,  NULL);}
-       | BOOL                                                 {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_BOOL,     0,  '\0',  NULL,  $1, NULL);}
-       | ID                                                   {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_ID,       0,  '\0',  NULL,  0,  $1);}
-       | '(' ')'                                              {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_RESERVED, 0,  '\0',  NULL,  0,  NULL);}
+s_expr : INT                                                     {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_INT,      $1, '\0',  NULL,  0,  NULL);}
+       | CHAR                                                    {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_CHAR,     0,  $1,    NULL,  0,  NULL);}
+       | STRING                                                  {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_STRING,   0,  '\0',  $1,    0,  NULL);}
+       | BOOL                                                    {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_BOOL,     0,  '\0',  NULL,  $1, NULL);}
+       | ID                                                      {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_ID,       0,  '\0',  NULL,  0,  $1);}
+       | '(' ')'                                                 {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_RESERVED, 0,  '\0',  NULL,  0,  NULL);}
 
-       | '(' ID ')'                                           {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, NULL);}
-       | '(' ID s_expr_seq ')'                                {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, $3);}
+       | '(' ID ')'                                              {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, NULL);}
+       | '(' ID s_expr_seq ')'                                   {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, $3);}
 
-       | '(' LOOP FOR ID IN s_expr DO s_expr ')'              {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_IN,      $4, $6,   NULL, NULL, $8);}
-       | '(' LOOP FOR ID FROM s_expr TO s_expr DO s_expr ')'  {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_FROM_TO, $4, NULL, $6,   $8,   $10);}
+       | '(' LOOP FOR ID IN s_expr DO s_expr ')'                 {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_IN,          $4, $6,   NULL, NULL, $8);}
+       | '(' LOOP FOR ID FROM s_expr TO s_expr DO s_expr ')'     {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_FROM_TO,     $4, NULL, $6,   $8,   $10);}
+       | '(' LOOP FOR ID FROM s_expr DOWNTO s_expr DO s_expr ')' {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_FROM_DOWNTO, $4, NULL, $6,   $8,   $10);}
 
-       | '(' PROGN s_expr_seq ')'                             {$$ = create_s_expr_progn(++idCounter, S_EXPR_TYPE_PROGN, $3);}
+       | '(' PROGN s_expr_seq ')'                                {$$ = create_s_expr_progn(++idCounter, S_EXPR_TYPE_PROGN, $3);}
 
-       | '(' IF s_expr s_expr ')'                             {$$ = create_s_expr_if(++idCounter, S_EXPR_TYPE_IF, $3, $4, NULL);}
-       | '(' IF s_expr s_expr s_expr ')'                      {$$ = create_s_expr_if(++idCounter, S_EXPR_TYPE_IF, $3, $4, $5);}
+       | '(' IF s_expr s_expr ')'                                {$$ = create_s_expr_if(++idCounter, S_EXPR_TYPE_IF, $3, $4, NULL);}
+       | '(' IF s_expr s_expr s_expr ')'                         {$$ = create_s_expr_if(++idCounter, S_EXPR_TYPE_IF, $3, $4, $5);}
 
-       | '(' MAKEINSTANCE '\'' ID ')'                         {$$ = create_s_expr_makeinstance(++idCounter, S_EXPR_TYPE_MAKEINSTANCE, $4);}
-       | '(' SLOTVALUE ID '\'' ID ')'                         {$$ = create_s_expr_slotvalue(++idCounter, S_EXPR_TYPE_SLOTVALUE, $3, $5);}
-       | lexerror                                             {}
+       | '(' MAKEINSTANCE '\'' ID ')'                            {$$ = create_s_expr_makeinstance(++idCounter, S_EXPR_TYPE_MAKEINSTANCE, $4);}
+       | '(' SLOTVALUE ID '\'' ID ')'                            {$$ = create_s_expr_slotvalue(++idCounter, S_EXPR_TYPE_SLOTVALUE, $3, $5);}
+       | lexerror                                                {}
        ;
 
 s_expr_seq : s_expr                        {$$ = create_s_expr_seq(++idCounter, $1);}
