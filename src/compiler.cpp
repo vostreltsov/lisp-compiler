@@ -1171,9 +1171,9 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
     // Analyse this node.
     switch (fSubType) {
     case S_EXPR_TYPE_INT: {
-        //if (fInteger > TWOBYTES_MAX || fInteger < TWOBYTES_MIN) {
+        if (fInteger > TWOBYTES_MAX || fInteger < TWOBYTES_MIN) {
             curClass->addIntegerConstant(fInteger);
-        //}
+        }
         break;
     }
     case S_EXPR_TYPE_CHAR: {
