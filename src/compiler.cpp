@@ -301,7 +301,7 @@ bool SemanticClass::generateCode(QString dir) const
 
     // Write class fields table.
     foreach (SemanticField * field, fFieldsTable) {
-        // TODO: Goremykin.
+        // TODO
     }
 
     // Write number of class methods.
@@ -1499,11 +1499,11 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
             streamBody << CMD_POP;
         }
 
-        const qint16 LENGTH_NEW_ITER  = 2 + 5;             // ALOAD + CMD_INVOKEINTERFACE
-        const qint16 LENGTH_IF        = 3;                         // IFEQ
-        const qint16 LENGTH_NEW_VALUE = 2 + 5 + 2;         // ALOAD + CMD_INVOKEINTERFACE + ASTORE
-        const qint16 LENGTH_BODY      = codeBody.size();           // body expressions
-        const qint16 LENGTH_GOTO      = 3;                         // GOTO
+        const qint16 LENGTH_NEW_ITER  = 2 + 5;           // ALOAD + CMD_INVOKEINTERFACE
+        const qint16 LENGTH_IF        = 3;               // IFEQ
+        const qint16 LENGTH_NEW_VALUE = 2 + 5 + 2;       // ALOAD + CMD_INVOKEINTERFACE + ASTORE
+        const qint16 LENGTH_BODY      = codeBody.size(); // body expressions
+        const qint16 LENGTH_GOTO      = 3;               // GOTO
 
         // Get the iterator by calling BaseClass's method.
         foreach (quint8 byte, fContainer->generateCode(curClass, curMethod)) {
@@ -1522,7 +1522,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         // Get the current value.
         stream << CMD_ALOAD << fIterator->fNumber;
         stream << CMD_INVOKEINTERFACE << constMethodNext->fNumber << (quint8)1 << (quint8)0;
-        // TODO: checkcast?
         stream << CMD_ASTORE << value->fNumber;
 
         // Write the body.
@@ -2095,7 +2094,7 @@ DefinitionNode * DefinitionNode::fromSyntaxNode(const def_struct * syntaxNode)
         // Decide what slots are fields and what slots are methods.
         slot_def_struct * slotdef = (syntaxNode->slotdefs != NULL ? syntaxNode->slotdefs->first : NULL);
         while (slotdef != NULL) {
-            // TODO!!!
+            // TODO
             result->fClassFields << SlotDefinitionNode::fromSyntaxNode(slotdef);
             slotdef = slotdef->next;
         }

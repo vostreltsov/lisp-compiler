@@ -16,14 +16,46 @@ thisdir=$(pwd)
 ./qtproject -i correct/loops.cl          -o $thisdir"/correct/bin-loops"
 ./qtproject -i correct/maths.cl          -o $thisdir"/correct/bin-maths"
 
+echo "----------------------------------------"
+echo "archey"
 cd $thisdir"/correct/bin-archey"          && java MainClass
+
+echo "----------------------------------------"
+echo "boolean"
 cd $thisdir"/correct/bin-boolean"         && java MainClass
+
+echo "----------------------------------------"
+echo "bubblesort"
 cd $thisdir"/correct/bin-bubblesort"      && java MainClass
+
+echo "----------------------------------------"
+echo "concatenation"
 cd $thisdir"/correct/bin-concatenation"   && java MainClass
+
+echo "----------------------------------------"
+echo "containers"
 cd $thisdir"/correct/bin-containers"      && java MainClass
+
+echo "----------------------------------------"
+echo "defclass"
 cd $thisdir"/correct/bin-defclass"        && java MainClass
+
+echo "----------------------------------------"
+echo "defun"
 cd $thisdir"/correct/bin-defun"           && java MainClass
+
+echo "----------------------------------------"
+echo "helloworld"
 cd $thisdir"/correct/bin-helloworld"      && java MainClass
+
+echo "----------------------------------------"
+echo "if-else-progn"
 cd $thisdir"/correct/bin-if-else-progn"   && java MainClass
+
+echo "----------------------------------------"
+echo "loops"
 cd $thisdir"/correct/bin-loops"           && java MainClass
+
+echo "----------------------------------------"
+echo "maths"
 cd $thisdir"/correct/bin-maths"           && java MainClass

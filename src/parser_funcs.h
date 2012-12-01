@@ -17,31 +17,31 @@ struct slot_def_seq_struct * create_slot_def_seq_empty();
 struct def_struct * create_def_empty();
 
 struct program_struct * create_program(int nodeId,
-	                                   struct program_part_seq_struct * parts);
+                                       struct program_part_seq_struct * parts);
 
 struct program_part_struct * create_program_part(int nodeId,
-	                                             enum program_part_type type,
-	                                             struct s_expr_struct * s_expr,
-	                                             struct def_struct * def);
+                                                 enum program_part_type type,
+                                                 struct s_expr_struct * s_expr,
+                                                 struct def_struct * def);
 
 struct program_part_seq_struct * create_program_part_seq(int nodeId,
-	                                                     struct program_part_struct * first);
+                                                         struct program_part_struct * first);
 
 struct program_part_seq_struct * add_to_program_part_seq(struct program_part_seq_struct * seq,
-	                                                     struct program_part_struct * part);
+                                                         struct program_part_struct * part);
 
 struct s_expr_struct * create_s_expr_simple(int nodeId,
-	                                        enum s_expr_type type,
-	                                        int integer,
-	                                        char character,
-	                                        char * string,
-	                                        int boolean,
-	                                        char * id);
+                                            enum s_expr_type type,
+                                            int integer,
+                                            char character,
+                                            char * string,
+                                            int boolean,
+                                            char * id);
 
 struct s_expr_struct * create_s_expr_funcall(int nodeId,
-	                                         enum s_expr_type type,
-	                                         char * id,
-	                                         struct s_expr_seq_struct * args);
+                                             enum s_expr_type type,
+                                             char * id,
+                                             struct s_expr_seq_struct * args);
 
 struct s_expr_struct * create_s_expr_loop(int nodeId,
                                           enum s_expr_type type,
@@ -52,17 +52,17 @@ struct s_expr_struct * create_s_expr_loop(int nodeId,
                                           struct s_expr_struct * to);
 
 struct s_expr_struct * create_s_expr_progn(int nodeId,
-	                                       enum s_expr_type type,
+                                           enum s_expr_type type,
                                            struct s_expr_seq_struct * args);
 
 struct s_expr_struct * create_s_expr_if(int nodeId,
-	                                    enum s_expr_type type,
+                                        enum s_expr_type type,
                                         struct s_expr_struct * cond,
                                         struct s_expr_struct * body1,
                                         struct s_expr_struct * body2);
 
 struct s_expr_struct * create_s_expr_makeinstance(int nodeId,
-	                                              enum s_expr_type type,
+                                                  enum s_expr_type type,
                                                   char * id);
 
 struct s_expr_struct * create_s_expr_slotvalue(int nodeId,
@@ -71,40 +71,40 @@ struct s_expr_struct * create_s_expr_slotvalue(int nodeId,
                                                char * slvalslot);
 
 struct s_expr_seq_struct * create_s_expr_seq(int nodeId,
-	                                         struct s_expr_struct * first);
+                                             struct s_expr_struct * first);
 
 struct s_expr_seq_struct * add_to_s_expr_seq(struct s_expr_seq_struct * seq,
-	                                         struct s_expr_struct * expr);
+                                             struct s_expr_struct * expr);
 
 struct slot_prop_struct * create_slot_prop(int nodeId,
-	                                       enum slot_prop_type type,
-	                                       struct s_expr_struct * initform,
-	                                       char * id,
-	                                       enum slot_alloc_type alloc);
+                                           enum slot_prop_type type,
+                                           struct s_expr_struct * initform,
+                                           char * id,
+                                           enum slot_alloc_type alloc);
 
 struct slot_prop_seq_struct * create_slot_prop_seq(int nodeId,
-	                                               struct slot_prop_struct * first);
+                                                   struct slot_prop_struct * first);
 
 struct slot_prop_seq_struct * add_to_slot_prop_seq(struct slot_prop_seq_struct * seq,
-	                                               struct slot_prop_struct * prop);
+                                                   struct slot_prop_struct * prop);
 
 struct slot_def_struct * create_slot_def(int nodeId,
-	                                     char * id,
-	                                     struct slot_prop_seq_struct * props);
+                                         char * id,
+                                         struct slot_prop_seq_struct * props);
 
 struct slot_def_seq_struct * create_slot_def_seq(int nodeId,
-	                                             struct slot_def_struct * first);
+                                                 struct slot_def_struct * first);
 
 struct slot_def_seq_struct * add_to_slot_def_seq(struct slot_def_seq_struct * seq,
-	                                             struct slot_def_struct * def);
+                                                 struct slot_def_struct * def);
 
 struct def_struct * create_def(int nodeId,
-	                           enum def_type type,
-	                           char * id,
-	                           char * parent,
-	                           struct s_expr_seq_struct * args,
-	                           struct slot_def_seq_struct * slotdefs,
-	                           struct s_expr_seq_struct * body);
+                               enum def_type type,
+                               char * id,
+                               char * parent,
+                               struct s_expr_seq_struct * args,
+                               struct slot_def_seq_struct * slotdefs,
+                               struct s_expr_seq_struct * body);
 
 void free_char(char * ch);
 
