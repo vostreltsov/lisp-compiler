@@ -52,24 +52,14 @@ void SemanticConstant::generateCode(BinaryWriter * writer) const
         writer->writeU2(fRef1->fNumber);
         break;
     }
-    case CONSTANT_Fieldref: {
-        // Write the "class" constant number.
-        writer->writeU2(fRef1->fNumber);
-
-        // Write the "name and type" constant number.
-        writer->writeU2(fRef2->fNumber);
-        break;
-    }
-    case CONSTANT_Methodref: {
-        // Write the "class" constant number.
-        writer->writeU2(fRef1->fNumber);
-
-        // Write the "name and type" constant number.
-        writer->writeU2(fRef2->fNumber);
-        break;
-    }
+    case CONSTANT_Fieldref:
+    case CONSTANT_Methodref:
     case CONSTANT_InterfaceMethodref: {
-        // Unsupported yet.
+        // Write the "class" constant number.
+        writer->writeU2(fRef1->fNumber);
+
+        // Write the "name and type" constant number.
+        writer->writeU2(fRef2->fNumber);
         break;
     }
     case CONSTANT_NameAndType: {
@@ -428,6 +418,22 @@ SemanticConstant * SemanticClass::addMethodrefConstant(QString className, QStrin
     return result;
 }
 
+SemanticConstant * SemanticClass::addInterfaceMethodrefConstant(QString interfaceName, QString methodName, QString descriptor)
+{
+    SemanticConstant * interfaceConst = addClassConstant(interfaceName);
+    SemanticConstant * nameAndTypeConst = addNameAndTypeConstant(methodName, descriptor);
+    // Does it already exist? Check by the pointers to the class and nameAndType constants.
+    foreach (SemanticConstant * existed, fConstantsTable) {
+        if (existed->fType == CONSTANT_InterfaceMethodref && existed->fRef1 == interfaceConst && existed->fRef2 == nameAndTypeConst) {
+            return existed;
+        }
+    }
+    // Create the new constant.
+    SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_InterfaceMethodref, "", 0, interfaceConst, nameAndTypeConst);
+    fConstantsTable << result;
+    return result;
+}
+
 SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString type)
 {
     SemanticConstant * nameConst = addUtf8Constant(name);
@@ -501,21 +507,21 @@ SemanticConstant * SemanticClass::findMethodrefConstant(QString className, QStri
 void SemanticClass::addDefaultAndParentConstructor()
 {
     // Add constructor name and descriptor.
-    addUtf8Constant(NAME_JAVA_CONSTRUCTOR);
+    addUtf8Constant(NAME_JAVA_METHOD_INIT);
     addUtf8Constant(DESC_JAVA_METHOD_VOID_VOID);
 
     // Add constructor to the methods table.
     fConstructorThis = new SemanticMethod();
     fConstructorParent = new SemanticMethod();
 
-    fConstructorThis->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
+    fConstructorThis->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_VOID_VOID);
     fConstructorThis->addLocalVar("this");
 
-    fConstructorParent->fConstMethodref = addMethodrefConstant(fConstParent->fRef1->fUtf8, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
+    fConstructorParent->fConstMethodref = addMethodrefConstant(fConstParent->fRef1->fUtf8, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_VOID_VOID);
     fConstructorParent->addLocalVar("this");
 
     // Add methods to the table.
-    fMethodsTable.insert(NAME_JAVA_CONSTRUCTOR, fConstructorThis);
+    fMethodsTable.insert(NAME_JAVA_METHOD_INIT, fConstructorThis);
 }
 
 void SemanticClass::addRTLConstants()
@@ -523,12 +529,12 @@ void SemanticClass::addRTLConstants()
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE,         DESC_JAVA_INTEGER);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT,     DESC_JAVA_INTEGER);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUECHAR,    DESC_JAVA_CHARACTER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUESTRING,  DESC_JAVA_STRING);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUESTRING,  DESC_JAVA_CLASS_STRING);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUELIST,    DESC_JAVA_LINKEDLIST);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEVECTOR,  DESC_JAVA_VECTOR);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUELIST,    DESC_JAVA_CLASS_LINKEDLIST);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEVECTOR,  DESC_JAVA_CLASS_VECTOR);
 
-    SemanticConstant * tmp = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_CONSTRUCTOR, DESC_JAVA_METHOD_VOID_VOID);
+    SemanticConstant * tmp = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_VOID_VOID);
 
     foreach (QString methodName, SemanticMethod::getRTLMethods()) {
         addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, methodName, SemanticMethod::getDescForRTLMethod(methodName));
@@ -732,7 +738,7 @@ QByteArray SemanticMethod::generateByteCodeForMethod(const SemanticClass * curCl
     QByteArray result;
     QDataStream stream(&result, QIODevice::WriteOnly);
 
-    if (fConstMethodref->fRef2->fRef1->fUtf8 == NAME_JAVA_CONSTRUCTOR) {
+    if (fConstMethodref->fRef2->fRef1->fUtf8 == NAME_JAVA_METHOD_INIT) {
         // Generate code for default constructor.
         stream << CMD_ALOAD_0;
         stream << CMD_INVOKESPECIAL << curClass->fConstructorParent->fConstMethodref->fNumber;
@@ -1247,6 +1253,12 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
         if (!fContainer->isValidContainer(curClass, curMethod)) {
             *errorList << "Wrong container specified for the loop.";
         } else {
+            // Add constants to deal with iterators.
+            curClass->addInterfaceMethodrefConstant(NAME_JAVA_INTERFACE_ITERATOR, NAME_JAVA_METHOD_HASNEXT, DESC_JAVA_METHOD_VOID_BOOLEAN);
+            curClass->addInterfaceMethodrefConstant(NAME_JAVA_INTERFACE_ITERATOR, NAME_JAVA_METHOD_NEXT, DESC_JAVA_METHOD_VOID_OBJECT);
+            curClass->addMethodrefConstant(NAME_JAVA_CLASS_LINKEDLIST, NAME_JAVA_METHOD_ITERATOR, DESC_JAVA_METHOD_VOID_ITERATOR);
+            curClass->addMethodrefConstant(NAME_JAVA_CLASS_VECTOR, NAME_JAVA_METHOD_ITERATOR, DESC_JAVA_METHOD_VOID_ITERATOR);
+
             // Add the local variable.
             curMethod->addLocalVar(fId);
         }
@@ -1307,7 +1319,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     QDataStream stream(&result, QIODevice::WriteOnly);
 
     SemanticConstant * constBaseClass = curClass->findClassConstant(NAME_JAVA_CLASS_BASE);
-    SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_CONSTRUCTOR);
+    SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT);
     SemanticConstant * constFieldType = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE);
 
     switch (fSubType) {
@@ -1624,7 +1636,7 @@ QByteArray SExpressionNode::collectExpressionsToArray(const SemanticClass * curC
     QDataStream stream(&result, QIODevice::WriteOnly);
 
     SemanticConstant * constBaseClass = curClass->findClassConstant(NAME_JAVA_CLASS_BASE);
-    SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_CONSTRUCTOR);
+    SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT);
 
     // Create a new array.
     stream << CMD_BIPUSH << (quint8)expressions.size();

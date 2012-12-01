@@ -33,11 +33,18 @@ class DefinitionNode;
 
 // Constants to deal with Java and RTL.
 #define NAME_JAVA_CLASS_OBJECT              "java/lang/Object"
+#define NAME_JAVA_CLASS_STRING              "java/lang/String"
+#define NAME_JAVA_CLASS_LINKEDLIST          "java/util/LinkedList"
+#define NAME_JAVA_CLASS_VECTOR              "java/util/Vector"
 #define NAME_JAVA_CLASS_BASE                "BaseClass"
 #define NAME_JAVA_CLASS_LISPRTL             "LispRTL"
 #define NAME_JAVA_CLASS_MAINCLASS           "MainClass"
+#define NAME_JAVA_INTERFACE_ITERATOR        "java/util/Iterator"
 #define NAME_JAVA_METHOD_MAIN               "main"
-#define NAME_JAVA_CONSTRUCTOR               "<init>"
+#define NAME_JAVA_METHOD_INIT               "<init>"
+#define NAME_JAVA_METHOD_HASNEXT            "hasNext"
+#define NAME_JAVA_METHOD_NEXT               "next"
+#define NAME_JAVA_METHOD_ITERATOR           "iterator"
 
 #define NAME_JAVA_FIELD_BASE_TYPE           "type"
 #define NAME_JAVA_FIELD_BASE_VALUEINT       "valueInt"
@@ -50,20 +57,28 @@ class DefinitionNode;
 #define DESC_JAVA_VOID                      "V"
 #define DESC_JAVA_INTEGER                   "I"
 #define DESC_JAVA_CHARACTER                 "C"
-#define DESC_JAVA_STRING                    "Ljava/lang/String;"
-#define DESC_JAVA_LINKEDLIST                "Ljava/util/LinkedList;"
-#define DESC_JAVA_VECTOR                    "Ljava/util/Vector;"
+#define DESC_JAVA_BOOLEAN                   "Z"
+#define DESC_JAVA_CLASS_OBJECT              "L"NAME_JAVA_CLASS_OBJECT";"
+#define DESC_JAVA_CLASS_STRING              "L"NAME_JAVA_CLASS_STRING";"
+#define DESC_JAVA_CLASS_LINKEDLIST          "L"NAME_JAVA_CLASS_LINKEDLIST";"
+#define DESC_JAVA_CLASS_VECTOR              "L"NAME_JAVA_CLASS_VECTOR";"
 #define DESC_JAVA_CLASS_BASE                "L"NAME_JAVA_CLASS_BASE";"
-#define DESC_JAVA_ARRAY_STRING              "["DESC_JAVA_STRING
+#define DESC_JAVA_INTERFACE_ITERATOR        "L"NAME_JAVA_INTERFACE_ITERATOR";"
+#define DESC_JAVA_ARRAY_STRING              "["DESC_JAVA_CLASS_STRING
 #define DESC_JAVA_ARRAY_BASE                "["DESC_JAVA_CLASS_BASE
 
 #define DESC_JAVA_METHOD_VOID_VOID          "()"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_VOID_BOOLEAN       "()"DESC_JAVA_BOOLEAN
+#define DESC_JAVA_METHOD_VOID_OBJECT        "()"DESC_JAVA_CLASS_OBJECT
 #define DESC_JAVA_METHOD_VOID_BASE          "()"DESC_JAVA_CLASS_BASE
+#define DESC_JAVA_METHOD_VOID_ITERATOR      "()"DESC_JAVA_INTERFACE_ITERATOR
+
 #define DESC_JAVA_METHOD_INTEGER_VOID       "("DESC_JAVA_INTEGER")"DESC_JAVA_VOID
-#define DESC_JAVA_METHOD_STRING_VOID        "("DESC_JAVA_STRING")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_STRING_VOID        "("DESC_JAVA_CLASS_STRING")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_ARRAYSTRING_VOID   "("DESC_JAVA_ARRAY_STRING")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_BASE_VOID          "("DESC_JAVA_CLASS_BASE")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_ARRAYBASE_BASE     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_CLASS_BASE
+
 
 const quint8 BASECLASS_TYPE_DAFUQ   = 0;
 const quint8 BASECLASS_TYPE_INT     = 1;
@@ -242,6 +257,7 @@ public:
     SemanticConstant * addStringConstant(QString value);
     SemanticConstant * addFieldrefConstant(QString className, QString fieldName, QString descriptor);
     SemanticConstant * addMethodrefConstant(QString className, QString methodName, QString descriptor);
+    SemanticConstant * addInterfaceMethodrefConstant(QString interfaceName, QString methodName, QString descriptor);
     SemanticConstant * addNameAndTypeConstant(QString name, QString type);
 
     SemanticConstant * findIntegerConstant(qint32 value) const;
@@ -249,6 +265,7 @@ public:
     SemanticConstant * findStringConstant(QString name) const;
     SemanticConstant * findFieldrefConstant(QString className, QString fieldName) const;
     SemanticConstant * findMethodrefConstant(QString className, QString methodName) const;
+    SemanticConstant * findInterfaceMethodrefConstant(QString interfaceName, QString methodName) const;
 
     void addDefaultAndParentConstructor();
     void addRTLConstants();
