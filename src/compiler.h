@@ -88,69 +88,70 @@ const quint8 BASECLASS_TYPE_BOOLEAN = 4;
 const quint8 BASECLASS_TYPE_LIST    = 5;
 const quint8 BASECLASS_TYPE_VECTOR  = 6;
 
-const qint16 TWOBYTES_MAX       = 32767;
-const qint16 TWOBYTES_MIN       = -32768;
+const qint16 TWOBYTES_MAX         = 32767;
+const qint16 TWOBYTES_MIN         = -32768;
 
-const quint32 MAGIC_NUMBER      = 0xCAFEBABE;
-const quint16 VERSION_MINOR     = 0x0000;
-const quint16 VERSION_MAJOR     = 0x0032;   // Took a few hours to find out that java 7 is a buggy pile of shit.
+const quint32 MAGIC_NUMBER        = 0xCAFEBABE;
+const quint16 VERSION_MINOR       = 0x0000;
+const quint16 VERSION_MAJOR       = 0x0032;   // Took a few hours to find out that java 7 is a buggy pile of shit.
 
-const quint16 ACC_PUBLIC        = 0x0001;
-const quint16 ACC_PRIVATE       = 0x0002;
-const quint16 ACC_PROTECTED     = 0x0004;
-const quint16 ACC_STATIC        = 0x0008;
-const quint16 ACC_FINAL         = 0x0010;
-const quint16 ACC_SUPER         = 0x0020;
-const quint16 ACC_VOLATILE      = 0x0040;
-const quint16 ACC_TRANSIENT     = 0x0080;
-const quint16 ACC_INTERFACE     = 0x0200;
-const quint16 ACC_ABSTRACT      = 0x0400;
-const quint16 ACC_SYNTHETIC     = 0x1000;
-const quint16 ACC_ANNOTATION    = 0x2000;
-const quint16 ACC_ENUM          = 0x4000;
+const quint16 ACC_PUBLIC          = 0x0001;
+const quint16 ACC_PRIVATE         = 0x0002;
+const quint16 ACC_PROTECTED       = 0x0004;
+const quint16 ACC_STATIC          = 0x0008;
+const quint16 ACC_FINAL           = 0x0010;
+const quint16 ACC_SUPER           = 0x0020;
+const quint16 ACC_VOLATILE        = 0x0040;
+const quint16 ACC_TRANSIENT       = 0x0080;
+const quint16 ACC_INTERFACE       = 0x0200;
+const quint16 ACC_ABSTRACT        = 0x0400;
+const quint16 ACC_SYNTHETIC       = 0x1000;
+const quint16 ACC_ANNOTATION      = 0x2000;
+const quint16 ACC_ENUM            = 0x4000;
 
-const quint8  CMD_ACONST_NULL   = 0x01;
-const quint8  CMD_ICONST_1      = 0x04;
-const quint8  CMD_BIPUSH        = 0x10;
-const quint8  CMD_SIPUSH        = 0x11;
-const quint8  CMD_LDC           = 0x12;
-const quint8  CMD_LDC_W         = 0x13;
+const quint8  CMD_ACONST_NULL     = 0x01;
+const quint8  CMD_ICONST_1        = 0x04;
+const quint8  CMD_BIPUSH          = 0x10;
+const quint8  CMD_SIPUSH          = 0x11;
+const quint8  CMD_LDC             = 0x12;
+const quint8  CMD_LDC_W           = 0x13;
 
-const quint8  CMD_ILOAD         = 0x15;
-const quint8  CMD_ALOAD         = 0x19;
-const quint8  CMD_ALOAD_0       = 0x2A;
+const quint8  CMD_ILOAD           = 0x15;
+const quint8  CMD_ALOAD           = 0x19;
+const quint8  CMD_ALOAD_0         = 0x2A;
 
-const quint8  CMD_ISTORE        = 0x36;
-const quint8  CMD_ASTORE        = 0x3A;
-const quint8  CMD_AASTORE       = 0x53;
-const quint8  CMD_POP           = 0x57;
-const quint8  CMD_DUP           = 0x59;
+const quint8  CMD_ISTORE          = 0x36;
+const quint8  CMD_ASTORE          = 0x3A;
+const quint8  CMD_AASTORE         = 0x53;
+const quint8  CMD_POP             = 0x57;
+const quint8  CMD_DUP             = 0x59;
 
-const quint8  CMD_IADD          = 0x60;
-const quint8  CMD_ISUB          = 0x64;
+const quint8  CMD_IADD            = 0x60;
+const quint8  CMD_ISUB            = 0x64;
 
-const quint8  CMD_IFEQ          = 0x99;
-const quint8  CMD_IFNE          = 0x9A;
-const quint8  CMD_ICMPEQ        = 0x9F;
-const quint8  CMD_ICMPNE        = 0xA0;
-const quint8  CMD_ICMPLT        = 0xA1;
-const quint8  CMD_ICMPLE        = 0xA4;
-const quint8  CMD_ICMPGT        = 0xA3;
-const quint8  CMD_ICMPGE        = 0xA2;
-const quint8  CMD_GOTO          = 0xA7;
-const quint8  CMD_IINC          = 0x84;
+const quint8  CMD_IFEQ            = 0x99;
+const quint8  CMD_IFNE            = 0x9A;
+const quint8  CMD_ICMPEQ          = 0x9F;
+const quint8  CMD_ICMPNE          = 0xA0;
+const quint8  CMD_ICMPLT          = 0xA1;
+const quint8  CMD_ICMPLE          = 0xA4;
+const quint8  CMD_ICMPGT          = 0xA3;
+const quint8  CMD_ICMPGE          = 0xA2;
+const quint8  CMD_GOTO            = 0xA7;
+const quint8  CMD_IINC            = 0x84;
 
-const quint8  CMD_ARETURN       = 0xB0;
-const quint8  CMD_RETURN        = 0xB1;
-const quint8  CMD_GETFIELD      = 0xB4;
-const quint8  CMD_PUTFIELD      = 0xB5;
-const quint8  CMD_INVOKEVIRTUAL = 0xB6;
-const quint8  CMD_INVOKESPECIAL = 0xB7;
-const quint8  CMD_INVOKESTATIC  = 0xB8;
-const quint8  CMD_NEW           = 0xBB;
-const quint8  CMD_ANEWARRAY     = 0xBD;
+const quint8  CMD_ARETURN         = 0xB0;
+const quint8  CMD_RETURN          = 0xB1;
+const quint8  CMD_GETFIELD        = 0xB4;
+const quint8  CMD_PUTFIELD        = 0xB5;
+const quint8  CMD_INVOKEVIRTUAL   = 0xB6;
+const quint8  CMD_INVOKESPECIAL   = 0xB7;
+const quint8  CMD_INVOKESTATIC    = 0xB8;
+const quint8  CMD_INVOKEINTERFACE = 0xB9;
+const quint8  CMD_NEW             = 0xBB;
+const quint8  CMD_ANEWARRAY       = 0xBD;
 
-const quint16 STACK_SIZE        = 1024;
+const quint16 STACK_SIZE          = 1024;
 
 /**
  * @brief Java constants types.
@@ -314,8 +315,11 @@ public:
     SemanticLocalVar * getLocalVar(QString name) const;
     SemanticLocalVar * addLocalVar(QString name);
 
+    static QStringList getBaseClassMethods();
     static QStringList getRTLMethods();
+    static bool isBaseClassMethod(QString name);
     static bool isRTLMethod(QString name);
+    static QString getDescForBaseClassMethod(QString name);
     static QString getDescForRTLMethod(QString name);
 
 private:
@@ -379,7 +383,7 @@ public:
     /**
      * @brief Does the semantic analysis of the node: checks, tables, etc.
      */
-    virtual void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const = 0;
+    virtual void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) = 0;
 
     /**
      * @brief Generates bytecode for this node.
@@ -398,7 +402,7 @@ public:
 
     ProgramNode();
     QString dotCode(QString parent, QString label = "") const;
-    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
+    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true);
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
@@ -420,7 +424,7 @@ public:
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
+    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true);
     static ProgramPartNode * fromSyntaxNode(const program_part_struct * syntaxNode);
 };
 
@@ -445,13 +449,14 @@ public:
     SExpressionNode                 * fTo;
     SExpressionNode                 * fBody1;
     SExpressionNode                 * fBody2;
+    SemanticLocalVar                * fIterator; // Additional local variable to deal with iterators.
 
     SExpressionNode();
     QString dotCode(QString parent, QString label = "") const;
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
+    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true);
     QByteArray generateCode(const SemanticClass * curClass, const SemanticMethod * curMethod) const;
     static SExpressionNode * fromSyntaxNode(const s_expr_struct * syntaxNode);
 
@@ -476,7 +481,7 @@ public:
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
+    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true);
     static SlotPropertyNode * fromSyntaxNode(const slot_prop_struct * syntaxNode);
 };
 
@@ -494,7 +499,7 @@ public:
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
+    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true);
     static SlotDefinitionNode * fromSyntaxNode(const slot_def_struct * syntaxNode);
 };
 
@@ -517,7 +522,7 @@ public:
     bool isCalculable() const;
     QLinkedList<AttributedNode *> childNodes() const;
     void transform();
-    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true) const;
+    void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true);
     QByteArray generateCode(const SemanticClass * curClass, const SemanticMethod * curMethod) const;
     static DefinitionNode * fromSyntaxNode(const def_struct * syntaxNode);
 };

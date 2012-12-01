@@ -23,4 +23,12 @@
         (print "a" i j " "))
     (print "\n"))
 
+(setf list (list 1 2 3))
+(setf vector (vector 10 11 12))
+
+(loop for litem in list do
+	(loop for vitem in vector do
+		(print vitem " "))
+	(print litem " \n"))
+
 (print "\nwell done!\n")

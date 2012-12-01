@@ -1,5 +1,6 @@
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.Iterator;
 
 /**
  * Represents a base class, all dynamic types inherit this class.
@@ -29,5 +30,14 @@ public class BaseClass {
         valueBoolean = 0;
         valueList = null;
         valueVector = null;
+    }
+
+    public Iterator iterator() {
+        if (type == TYPE_LIST) {
+            return valueList.iterator();
+        } else if (type == TYPE_VECTOR) {
+            return valueVector.iterator();
+        }
+        return null;
     }
 }

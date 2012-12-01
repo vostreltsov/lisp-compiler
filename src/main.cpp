@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 {
 
 #ifdef QT_DEBUG
-    compile("../examples/correct/if-else-progn.cl", "../examples/correct/bin", "");
+    compile("../examples/correct/loops.cl", "../examples/correct/bin", "");
     return 0;
 #else
     QCoreApplication a(argc, argv);

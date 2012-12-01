@@ -504,6 +504,18 @@ SemanticConstant * SemanticClass::findMethodrefConstant(QString className, QStri
     return NULL;
 }
 
+SemanticConstant * SemanticClass::findInterfaceMethodrefConstant(QString interfaceName, QString methodName) const
+{
+    foreach (SemanticConstant * result, fConstantsTable) {
+        if (result->fType == CONSTANT_InterfaceMethodref &&
+            result->fRef1->fRef1->fUtf8 == interfaceName &&
+            result->fRef2->fRef1->fUtf8 == methodName) {
+            return result;
+        }
+    }
+    return NULL;
+}
+
 void SemanticClass::addDefaultAndParentConstructor()
 {
     // Add constructor name and descriptor.
@@ -535,6 +547,10 @@ void SemanticClass::addRTLConstants()
     addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEVECTOR,  DESC_JAVA_CLASS_VECTOR);
 
     SemanticConstant * tmp = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_VOID_VOID);
+
+    foreach (QString methodName, SemanticMethod::getBaseClassMethods()) {
+        addMethodrefConstant(NAME_JAVA_CLASS_BASE, methodName, SemanticMethod::getDescForBaseClassMethod(methodName));
+    }
 
     foreach (QString methodName, SemanticMethod::getRTLMethods()) {
         addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, methodName, SemanticMethod::getDescForRTLMethod(methodName));
@@ -657,6 +673,14 @@ SemanticLocalVar * SemanticMethod::addLocalVar(QString name)
     return result;
 }
 
+QStringList SemanticMethod::getBaseClassMethods() {
+    QStringList result;
+
+    result << "iterator";
+
+    return result;
+}
+
 QStringList SemanticMethod::getRTLMethods()
 {
     QStringList result;
@@ -687,9 +711,23 @@ QStringList SemanticMethod::getRTLMethods()
     return result;
 }
 
+bool SemanticMethod::isBaseClassMethod(QString name)
+{
+    return getBaseClassMethods().contains(name);
+}
+
 bool SemanticMethod::isRTLMethod(QString name)
 {
     return getRTLMethods().contains(name);
+}
+
+QString SemanticMethod::getDescForBaseClassMethod(QString name)
+{
+    if (name == "iterator") {
+        return DESC_JAVA_METHOD_VOID_ITERATOR;
+    } else {
+        return "";  // Should never get here.
+    }
 }
 
 QString SemanticMethod::getDescForRTLMethod(QString name)
@@ -861,7 +899,7 @@ void ProgramNode::transform()
     fMainPart->fDefinition = mainClass;
 }
 
-void ProgramNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void ProgramNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner)
 {
     // Achtung! @BADCODE! Something weird here!
     // First check the main class without its main method,
@@ -952,7 +990,7 @@ void ProgramPartNode::transform()
     }
 }
 
-void ProgramPartNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void ProgramPartNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner)
 {
     foreach (AttributedNode * node, childNodes()) {
         node->semantics(program, errorList, curClass, curMethod, processInner);
@@ -981,6 +1019,7 @@ SExpressionNode::SExpressionNode() : AttributedNode()
     fTo = NULL;
     fBody1 = NULL;
     fBody2 = NULL;
+    fIterator = NULL;
 }
 
 QString SExpressionNode::dotCode(QString parent, QString label) const
@@ -1173,7 +1212,7 @@ void SExpressionNode::transform()
     }
 }
 
-void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner)
 {
     // Analyse this node.
     switch (fSubType) {
@@ -1259,8 +1298,10 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
             curClass->addMethodrefConstant(NAME_JAVA_CLASS_LINKEDLIST, NAME_JAVA_METHOD_ITERATOR, DESC_JAVA_METHOD_VOID_ITERATOR);
             curClass->addMethodrefConstant(NAME_JAVA_CLASS_VECTOR, NAME_JAVA_METHOD_ITERATOR, DESC_JAVA_METHOD_VOID_ITERATOR);
 
-            // Add the local variable.
+            // Add the local variable for value.
             curMethod->addLocalVar(fId);
+            // Add the local variable for iterator.
+            fIterator = curMethod->addLocalVar("," + fId);  // Commas are disabled for regular variable names.
         }
         break;
     }
@@ -1443,7 +1484,56 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_LOOP_IN: {
-        // TODO
+        SemanticConstant * constMethodIterator = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_ITERATOR);
+        SemanticConstant * constMethodHasNext = curClass->findInterfaceMethodrefConstant(NAME_JAVA_INTERFACE_ITERATOR, NAME_JAVA_METHOD_HASNEXT);
+        SemanticConstant * constMethodNext = curClass->findInterfaceMethodrefConstant(NAME_JAVA_INTERFACE_ITERATOR, NAME_JAVA_METHOD_NEXT);
+        SemanticLocalVar * value = curMethod->getLocalVar(fId);
+
+        QByteArray codeBody;
+        QDataStream streamBody(&codeBody, QIODevice::WriteOnly);
+        foreach (SExpressionNode * expr, fArguments) {
+            // Generate code for current expression.
+            foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+                streamBody << byte;
+            }
+            streamBody << CMD_POP;
+        }
+
+        const qint16 LENGTH_NEW_ITER  = 2 + 5;             // ALOAD + CMD_INVOKEINTERFACE
+        const qint16 LENGTH_IF        = 3;                         // IFEQ
+        const qint16 LENGTH_NEW_VALUE = 2 + 5 + 2;         // ALOAD + CMD_INVOKEINTERFACE + ASTORE
+        const qint16 LENGTH_BODY      = codeBody.size();           // body expressions
+        const qint16 LENGTH_GOTO      = 3;                         // GOTO
+
+        // Get the iterator by calling BaseClass's method.
+        foreach (quint8 byte, fContainer->generateCode(curClass, curMethod)) {
+            stream << byte;
+        }
+        stream << CMD_INVOKEVIRTUAL << constMethodIterator->fNumber;
+        // Save it to the local variable.
+        stream << CMD_ASTORE << fIterator->fNumber;
+        stream << CMD_ALOAD << fIterator->fNumber;
+
+        // The party starts here.
+        stream << CMD_INVOKEINTERFACE << constMethodHasNext->fNumber << (quint8)1 << (quint8)0; // Zero at the end is required by jvm.
+
+        stream << CMD_IFEQ << (qint16)(qint16)(LENGTH_IF + LENGTH_NEW_VALUE + LENGTH_BODY + LENGTH_GOTO);
+
+        // Get the current value.
+        stream << CMD_ALOAD << fIterator->fNumber;
+        stream << CMD_INVOKEINTERFACE << constMethodNext->fNumber << (quint8)1 << (quint8)0;
+        // TODO: checkcast?
+        stream << CMD_ASTORE << value->fNumber;
+
+        // Write the body.
+        foreach (quint8 byte, codeBody) {
+            stream << byte;
+        }
+
+        // Add the goto.
+        stream << CMD_GOTO << (qint16)(-LENGTH_NEW_ITER - LENGTH_IF - LENGTH_NEW_VALUE - LENGTH_BODY);
+        break;
+
         break;
     }
     case S_EXPR_TYPE_LOOP_FROM_TO:
@@ -1466,8 +1556,8 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         const qint16 LENGTH_NEW_ITER = 2 + 3 + codeTo.size() + 3; // ALOAD + GETFIELD + to
         const qint16 LENGTH_IF       = 3;                         // IF_ICMPGT
         const qint16 LENGTH_BODY     = codeBody.size();           // body expressions
-        const qint16 LENGTH_IINC     = 11;
-        const qint16 LENGTH_GOTO     = 3;
+        const qint16 LENGTH_IINC     = 11;                        // IINC
+        const qint16 LENGTH_GOTO     = 3;                         // GOTO
 
         // Generate code for the "from" value, assign it to the counter.
         foreach (quint8 byte, codeFrom) {
@@ -1627,7 +1717,7 @@ SExpressionNode * SExpressionNode::fromSyntaxNode(const s_expr_struct * syntaxNo
 
 bool SExpressionNode::isValidContainer(const SemanticClass * curClass, const SemanticMethod * curMethod) const
 {
-    return  (fSubType == S_EXPR_TYPE_ID || fSubType == S_EXPR_TYPE_FCALL);
+    return  ((fSubType == S_EXPR_TYPE_ID && curMethod->getLocalVar(fId) != NULL) || fSubType == S_EXPR_TYPE_FCALL);
 }
 
 QByteArray SExpressionNode::collectExpressionsToArray(const SemanticClass * curClass, const SemanticMethod * curMethod, QLinkedList<SExpressionNode *> expressions) const
@@ -1720,7 +1810,7 @@ void SlotPropertyNode::transform()
     }
 }
 
-void SlotPropertyNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void SlotPropertyNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner)
 {
     // The only thing to check is calculability of the initform.
     if (fSubType == SLOT_PROP_TYPE_INITFORM) {
@@ -1780,7 +1870,7 @@ void SlotDefinitionNode::transform()
     }
 }
 
-void SlotDefinitionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void SlotDefinitionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner)
 {
     // Analyse all child nodes.
     foreach (AttributedNode * child, childNodes()) {
@@ -1878,7 +1968,7 @@ void DefinitionNode::transform()
     }
 }
 
-void DefinitionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner) const
+void DefinitionNode::semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner)
 {
     SemanticClass * curClassForChildNodes = curClass;
     SemanticMethod * curMethodForChildNodes = curMethod;
