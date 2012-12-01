@@ -1172,25 +1172,27 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
     // Analyse this node.
     switch (fSubType) {
     case S_EXPR_TYPE_INT: {
+        // Add an integer constant if 2 bytes not enough.
         if (fInteger > TWOBYTES_MAX || fInteger < TWOBYTES_MIN) {
             curClass->addIntegerConstant(fInteger);
         }
         break;
     }
     case S_EXPR_TYPE_CHAR: {
-        // TODO
+        // Nothing to do.
         break;
     }
     case S_EXPR_TYPE_STRING: {
+        // Add a string constant.
         curClass->addStringConstant(fString);
         break;
     }
     case S_EXPR_TYPE_BOOL: {
-        // TODO
+        // Nothing to do.
         break;
     }
     case S_EXPR_TYPE_ID: {
-        // TODO
+        // Nothing to do.
         break;
     }
     case S_EXPR_TYPE_FCALL: {
@@ -1245,6 +1247,7 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
         if (!fContainer->isValidContainer(curClass, curMethod)) {
             *errorList << "Wrong container specified for the loop.";
         } else {
+            // Add the local variable.
             curMethod->addLocalVar(fId);
         }
         break;
@@ -1255,12 +1258,13 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
         if (!fFrom->isCalculable() || !fTo->isCalculable()) {
             *errorList << "Only calculable expressions can be used as loop borders.";
         } else {
+            // Add the local variable.
             curMethod->addLocalVar(fId);
         }
         break;
     }
     case S_EXPR_TYPE_PROGN: {
-        // Child nodes are checked before this switch-case.
+        // Nothing to do, child nodes are checked after this switch-case.
         break;
     }
     case S_EXPR_TYPE_IF: {
@@ -1427,6 +1431,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_LOOP_IN: {
+        // TODO
         break;
     }
     case S_EXPR_TYPE_LOOP_FROM_TO:
@@ -1495,8 +1500,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
 
         // Add the goto.
         stream << CMD_GOTO << (qint16)(-LENGTH_NEW_ITER - LENGTH_IF - LENGTH_BODY - LENGTH_IINC);
-        // Add the fictive result as well.
-        stream << CMD_ACONST_NULL;
         break;
     }
     case S_EXPR_TYPE_PROGN: {
@@ -1512,21 +1515,30 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_IF: {
+        // TODO
         break;
     }
     case S_EXPR_TYPE_MAKEINSTANCE: {
+        // TODO
         break;
     }
     case S_EXPR_TYPE_SLOTVALUE: {
+        // TODO
         break;
     }
     //case S_EXPR_TYPE_SETF_ELT: Handled with S_EXPR_TYPE_FCALL
     case S_EXPR_TYPE_SETF_FIELD: {
+        // TODO
         break;
     }
     default: {
         break;
     }
+    }
+
+    if (!isCalculable()) {
+        // Add the fictive result for non-calculable expressions.
+        stream << CMD_ACONST_NULL;
     }
 
     return result;

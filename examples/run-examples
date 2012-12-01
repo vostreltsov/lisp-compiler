@@ -1,13 +1,29 @@
 #/bin/sh
 # place the qtproject in this folder.
-./qtproject -i correct/archey.cl
-./qtproject -i correct/boolean.cl
-./qtproject -i correct/bubblesort.cl
-./qtproject -i correct/concatenation.cl
-./qtproject -i correct/containers.cl
-./qtproject -i correct/defclass.cl
-./qtproject -i correct/defun.cl
-./qtproject -i correct/helloworld.cl
-./qtproject -i correct/if-else-progn.cl
-./qtproject -i correct/loops.cl
-./qtproject -i correct/maths.cl
+# run this file from the examples directory
+
+thisdir=$(pwd)
+
+./qtproject -i correct/archey.cl         -o $thisdir"/correct/bin-archey"
+./qtproject -i correct/boolean.cl        -o $thisdir"/correct/bin-boolean"
+./qtproject -i correct/bubblesort.cl     -o $thisdir"/correct/bin-bubblesort"
+./qtproject -i correct/concatenation.cl  -o $thisdir"/correct/bin-concatenation"
+./qtproject -i correct/containers.cl     -o $thisdir"/correct/bin-containers"
+./qtproject -i correct/defclass.cl       -o $thisdir"/correct/bin-defclass"
+./qtproject -i correct/defun.cl          -o $thisdir"/correct/bin-defun"
+./qtproject -i correct/helloworld.cl     -o $thisdir"/correct/bin-helloworld"
+./qtproject -i correct/if-else-progn.cl  -o $thisdir"/correct/bin-if-else-progn"
+./qtproject -i correct/loops.cl          -o $thisdir"/correct/bin-loops"
+./qtproject -i correct/maths.cl          -o $thisdir"/correct/bin-maths"
+
+cd $thisdir"/correct/bin-archey"          && java MainClass
+cd $thisdir"/correct/bin-boolean"         && java MainClass
+cd $thisdir"/correct/bin-bubblesort"      && java MainClass
+cd $thisdir"/correct/bin-concatenation"   && java MainClass
+cd $thisdir"/correct/bin-containers"      && java MainClass
+cd $thisdir"/correct/bin-defclass"        && java MainClass
+cd $thisdir"/correct/bin-defun"           && java MainClass
+cd $thisdir"/correct/bin-helloworld"      && java MainClass
+cd $thisdir"/correct/bin-if-else-progn"   && java MainClass
+cd $thisdir"/correct/bin-loops"           && java MainClass
+cd $thisdir"/correct/bin-maths"           && java MainClass
