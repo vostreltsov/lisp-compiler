@@ -672,6 +672,7 @@ QStringList SemanticMethod::getRTLMethods()
     result << "setf_elt";
     result << "list";
     result << "vector";
+    result << "length";
     result << "push";
     result << "pop";
     result << "print";
@@ -1495,7 +1496,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         // Add the goto.
         stream << CMD_GOTO << (qint16)(-LENGTH_NEW_ITER - LENGTH_IF - LENGTH_BODY - LENGTH_IINC);
         // Add the fictive result as well.
-        stream << CMD_BIPUSH << (quint8)0;
+        stream << CMD_ACONST_NULL;
         break;
     }
     case S_EXPR_TYPE_PROGN: {

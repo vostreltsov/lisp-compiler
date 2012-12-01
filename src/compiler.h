@@ -94,6 +94,7 @@ const quint16 ACC_SYNTHETIC     = 0x1000;
 const quint16 ACC_ANNOTATION    = 0x2000;
 const quint16 ACC_ENUM          = 0x4000;
 
+const quint8  CMD_ACONST_NULL   = 0x01;
 const quint8  CMD_ICONST_1      = 0x04;
 const quint8  CMD_BIPUSH        = 0x10;
 const quint8  CMD_SIPUSH        = 0x11;

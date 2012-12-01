@@ -329,6 +329,25 @@ public class LispRTL {
         return result;
     }
 
+    public static BaseClass length(BaseClass [] args) throws Exception {
+        checkNumberOfArgumentsNotLess(args, 1, "length");
+        checkArgumentType(args, 0, new int[]{BaseClass.TYPE_LIST, BaseClass.TYPE_VECTOR}, "a container", "LENGTH");
+
+        BaseClass result = new BaseClass();
+        result.type = BaseClass.TYPE_INT;
+        List<BaseClass> container = null;
+        if (args[0].type == BaseClass.TYPE_LIST) {
+            container = args[0].valueList;
+        } else {
+            container = args[0].valueVector;
+        }
+        for (int i = 1; i < args.length; i++) {
+            container.add(args[i]);
+        }
+        result.valueInt = container.size();
+        return result;
+    }
+
     public static BaseClass push(BaseClass [] args) throws Exception {
         checkNumberOfArgumentsNotLess(args, 2, "push");
         checkArgumentType(args, 0, new int[]{BaseClass.TYPE_LIST, BaseClass.TYPE_VECTOR}, "a container", "PUSH");
