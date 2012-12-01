@@ -1506,9 +1506,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
             foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
                 stream << byte;
             }
-            if (expr != fArguments.last()) {
-                stream << CMD_POP;
-            }
+            stream << CMD_POP;
         }
         break;
     }
