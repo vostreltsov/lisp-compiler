@@ -5,7 +5,7 @@
     (print (+ "hello, " name "!\n")))
 
 (defun |{0,0}| ()
-	(print "yean, I'm an owl |{0,0}|\n"))
+    (print "yean, I'm an owl |{0,0}|\n"))
 
 (print "random number: " (myrandom) "\n")
 (hello "world")

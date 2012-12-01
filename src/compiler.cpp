@@ -1439,7 +1439,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         QByteArray codeTo = fTo->generateCode(curClass, curMethod);
         QByteArray codeBody;
         QDataStream streamBody(&codeBody, QIODevice::WriteOnly);
-        //= fBody1->generateCode(curClass, curMethod);
         foreach (SExpressionNode * expr, fArguments) {
             // Generate code for current expression.
             foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
@@ -1448,8 +1447,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
             streamBody << CMD_POP;
         }
 
-
-        const qint16 LENGTH_FROM     = codeFrom.size() + 2;       // from + ASTORE
         const qint16 LENGTH_NEW_ITER = 2 + 3 + codeTo.size() + 3; // ALOAD + GETFIELD + to
         const qint16 LENGTH_IF       = 3;                         // IF_ICMPGT
         const qint16 LENGTH_BODY     = codeBody.size();           // body expressions
@@ -1502,6 +1499,15 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_PROGN: {
+        foreach (SExpressionNode * expr, fArguments) {
+            // Generate code for current expression.
+            foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+                stream << byte;
+            }
+            if (expr != fArguments.last()) {
+                stream << CMD_POP;
+            }
+        }
         break;
     }
     case S_EXPR_TYPE_IF: {
