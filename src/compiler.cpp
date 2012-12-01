@@ -1437,8 +1437,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     case S_EXPR_TYPE_LOOP_FROM_TO:
     case S_EXPR_TYPE_LOOP_FROM_DOWNTO: {
         SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT);
-        SemanticConstant * from = curClass->findIntegerConstant(fFrom->fInteger);
-        SemanticConstant * to = curClass->findIntegerConstant(fTo->fInteger);
         SemanticLocalVar * counter = curMethod->getLocalVar(fId);
 
         QByteArray codeFrom = fFrom->generateCode(curClass, curMethod);
@@ -1515,7 +1513,50 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_IF: {
-        // TODO
+        SemanticConstant * constFieldValueBoolean = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN);
+
+        QByteArray codeBody1;
+        QDataStream streamBody1(&codeBody1, QIODevice::WriteOnly);
+        // Generate code for body1.
+        foreach (quint8 byte, fBody1->generateCode(curClass, curMethod)) {
+            streamBody1 << byte;
+        }
+        streamBody1 << CMD_POP;
+
+        QByteArray codeBody2;
+        if (fBody2 != NULL){
+            QDataStream streamBody2(&codeBody2, QIODevice::WriteOnly);
+            // Generate code for body2.
+            foreach (quint8 byte, fBody2->generateCode(curClass, curMethod)) {
+                streamBody2 << byte;
+            }
+            streamBody2 << CMD_POP;
+        }
+
+        const qint16 LENGTH_BODY1 = codeBody1.size();
+        const qint16 LENGTH_BODY2 = codeBody2.size();
+        const qint16 LENGTH_IF = 3;
+        const qint16 LENGTH_GOTO = 3;
+
+        // Generate code for condition.
+        foreach (quint8 byte, fCondition->generateCode(curClass, curMethod)) {
+            stream << byte;
+        }
+
+        stream << CMD_GETFIELD << constFieldValueBoolean->fNumber;
+        stream << CMD_IFNE << (qint16)(LENGTH_IF + LENGTH_BODY2 + LENGTH_GOTO);
+
+        // Generate code for body2.
+        foreach (quint8 byte, codeBody2) {
+            stream << byte;
+        }
+        stream << CMD_GOTO << (qint16)(LENGTH_GOTO + LENGTH_BODY1);
+
+        // Generate code for body1.
+        foreach (quint8 byte, codeBody1) {
+            stream << byte;
+        }
+
         break;
     }
     case S_EXPR_TYPE_MAKEINSTANCE: {

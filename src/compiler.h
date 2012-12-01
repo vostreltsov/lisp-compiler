@@ -114,6 +114,8 @@ const quint8  CMD_DUP           = 0x59;
 const quint8  CMD_IADD          = 0x60;
 const quint8  CMD_ISUB          = 0x64;
 
+const quint8  CMD_IFEQ          = 0x99;
+const quint8  CMD_IFNE          = 0x9A;
 const quint8  CMD_ICMPEQ        = 0x9F;
 const quint8  CMD_ICMPNE        = 0xA0;
 const quint8  CMD_ICMPLT        = 0xA1;

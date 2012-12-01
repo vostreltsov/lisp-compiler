@@ -1,6 +1,5 @@
-(progn (print "seeing this means ")
-       (print "that progn works just fine.\n"))
+(if t (print "true\n"))
 
-(setf TRUE t)
-(if TRUE (progn (print "datz tru!") (print "yeah!"))
-         (print "r u kiddin' me?"))
+(if (not nil) (print "true\n"))
+
+(if nil (print "true\n") (print "false\n"))
