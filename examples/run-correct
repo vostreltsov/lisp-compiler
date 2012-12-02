@@ -9,7 +9,6 @@ thisdir=$(pwd)
 ./qtproject -i correct/bubblesort.cl     -o $thisdir"/correct/bin-bubblesort"
 ./qtproject -i correct/concatenation.cl  -o $thisdir"/correct/bin-concatenation"
 ./qtproject -i correct/containers.cl     -o $thisdir"/correct/bin-containers"
-./qtproject -i correct/defclass.cl       -o $thisdir"/correct/bin-defclass"
 ./qtproject -i correct/defun.cl          -o $thisdir"/correct/bin-defun"
 ./qtproject -i correct/helloworld.cl     -o $thisdir"/correct/bin-helloworld"
 ./qtproject -i correct/if-else-progn.cl  -o $thisdir"/correct/bin-if-else-progn"
@@ -35,10 +34,6 @@ cd $thisdir"/correct/bin-concatenation"   && java MainClass
 echo "----------------------------------------"
 echo "containers"
 cd $thisdir"/correct/bin-containers"      && java MainClass
-
-echo "----------------------------------------"
-echo "defclass"
-cd $thisdir"/correct/bin-defclass"        && java MainClass
 
 echo "----------------------------------------"
 echo "defun"

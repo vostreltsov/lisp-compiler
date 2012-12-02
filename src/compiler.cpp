@@ -863,7 +863,7 @@ void ProgramNode::transform()
     mainMethod->fSubType = DEF_TYPE_FUNC;
     mainMethod->fId = NAME_JAVA_METHOD_MAIN;
 
-    // Add "argv" to parameters.
+    // Add "argv" to arguments.
     SExpressionNode * argv = new SExpressionNode();
     argv->fNodeId = 100501;
     argv->fSubType = S_EXPR_TYPE_ID;
@@ -1275,13 +1275,13 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
                 if (!fArguments.isEmpty() && fArguments.first()->fSubType == S_EXPR_TYPE_ID) {
                     curMethod->addLocalVar(fArguments.first()->fId);
                 } else {
-                    *errorList << "Can't call SETF with given parameters.";
+                    *errorList << "Can't call \"setf\" with given arguments.";
                 }
             }
 
             if (fId == NAME_FUNC_ELT) {
                 if (fArguments.isEmpty() || !fArguments.first()->isValidContainer(curClass, curMethod)) {
-                    *errorList << "Can't call ELT with given parameters.";
+                    *errorList << "Can't call \"elt\" with given arguments.";
                 }
             }
         }
@@ -1974,12 +1974,17 @@ void DefinitionNode::semantics(SemanticProgram * program, QStringList * errorLis
 
     // Analyse this node.
     switch (fSubType) {
-    case DEF_TYPE_CLASS: {        
+    case DEF_TYPE_CLASS: {
+        // DEFCLASS is unsupported.
+        if (fId != NAME_JAVA_CLASS_MAINCLASS) {
+            *errorList << "DEFCLASS is unsupported.";
+        }
+
         if (program->hasClass(fId)) {
             // Check if there's no class with same name yet.
-            *errorList << "Class " + fId + " is already defined.";
+            *errorList << "Class \"" + fId + "\" is already defined.";
         } else {
-            // Add this class to the class table.            
+            // Add this class to the class table.
             curClassForChildNodes = program->addClass(this);
             // TODO: add fields to the class.
         }
@@ -1988,7 +1993,7 @@ void DefinitionNode::semantics(SemanticProgram * program, QStringList * errorLis
     case DEF_TYPE_FUNC: {
         if (curClass->hasMethod(fId)) {
             // Check if there's no function with same name yet.
-            *errorList << "Function " + fId + " is already defined.";
+            *errorList << "Function \"" + fId + "\" is already defined.";
         } else {
             // Add this method to the class methods table.
             curMethodForChildNodes = curClass->addMethod(this);
@@ -2018,7 +2023,7 @@ void DefinitionNode::semantics(SemanticProgram * program, QStringList * errorLis
                     *errorList << "Duplication of method arguments: \"" + iter.key() +"\" is repeated " + QString::number(iter.value()) + " times.";
                 }
             }
-        }        
+        }
         break;
     }
     default: {

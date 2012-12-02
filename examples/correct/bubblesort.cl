@@ -8,5 +8,6 @@
 
 
 (setf |{0,0}| (vector 7 15 1 4 16 8 15))
+(print |{0,0}| "\n")
 (BubbleSort |{0,0}|)
 (print |{0,0}| "\n")

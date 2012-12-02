@@ -1,0 +1,57 @@
+#/bin/sh
+# place the qtproject in this folder.
+# run this file from the examples directory
+
+thisdir=$(pwd)
+
+echo "----------------------------------------"
+echo "error1-conditions-1"
+./qtproject -i incorrect/error1-conditions-1.cl
+
+echo "----------------------------------------"
+echo "error1-conditions-2"
+./qtproject -i incorrect/error1-conditions-2.cl
+
+echo "----------------------------------------"
+echo "error1-conditions-3"
+./qtproject -i incorrect/error1-conditions-3.cl
+
+echo "----------------------------------------"
+echo "error1-conditions-4"
+./qtproject -i incorrect/error1-conditions-4.cl
+
+echo "----------------------------------------"
+echo "error1-conditions-5"
+./qtproject -i incorrect/error1-conditions-5.cl
+
+echo "----------------------------------------"
+echo "error2-container"
+./qtproject -i incorrect/error2-container.cl
+
+echo "----------------------------------------"
+echo "error3-arguments"
+./qtproject -i incorrect/error3-arguments.cl
+
+echo "----------------------------------------"
+echo "error4-assignment"
+./qtproject -i incorrect/error4-assignment.cl
+
+echo "----------------------------------------"
+echo "error5-arguments"
+./qtproject -i incorrect/error5-arguments.cl
+
+echo "----------------------------------------"
+echo "error6-unknown-function"
+./qtproject -i incorrect/error6-unknown-function.cl
+
+echo "----------------------------------------"
+echo "error7-unknown-arguments"
+./qtproject -i incorrect/error7-unknown-arguments.cl
+
+echo "----------------------------------------"
+echo "error8-wrong-number-of-arguments"
+./qtproject -i incorrect/error8-wrong-number-of-arguments.cl
+
+echo "----------------------------------------"
+echo "error9-duplicated-defun"
+./qtproject -i incorrect/error9-duplicated-defun.cl

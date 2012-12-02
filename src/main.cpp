@@ -61,7 +61,7 @@ void compile(QString sourceFileName, QString destFolder, QString imageFileName)
 
     // There could be a lexical or syntax error.
     if (errorCode != ERROR_NO_ERROR) {
-        stream << errorMessage << "\n";
+        stream << errorMessage << ".\n";
         return;
     }
 
