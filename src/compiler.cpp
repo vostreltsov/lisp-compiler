@@ -158,6 +158,9 @@ SemanticProgram::~SemanticProgram()
     if (fRoot != NULL) {
         delete fRoot;
     }
+    foreach (SemanticClass * curClass, fClassTable) {
+        delete curClass;
+    }
 }
 
 void SemanticProgram::doTransform()
@@ -263,6 +266,22 @@ SemanticClass::SemanticClass(QString name, QString parent, const DefinitionNode 
 
     addDefaultAndParentConstructor();
     addRTLConstants();
+}
+
+SemanticClass::~SemanticClass()
+{
+    foreach (SemanticConstant * constant, fConstantsTable) {
+        delete constant;
+    }
+    foreach (SemanticField * field, fFieldsTable) {
+        delete field;
+    }
+    foreach (SemanticMethod * method, fMethodsTable) {
+        delete method;
+    }
+    if (fConstructorParent != NULL) {
+        delete fConstructorParent;
+    }
 }
 
 bool SemanticClass::generateCode(QString dir) const
@@ -631,6 +650,13 @@ SemanticMethod::SemanticMethod()
     fConstMethodref = NULL;
     fIsStatic = false;
     fNode = NULL;
+}
+
+SemanticMethod::~SemanticMethod()
+{
+    foreach (SemanticLocalVar * var, fLocalVarsTable) {
+        delete var;
+    }
 }
 
 void SemanticMethod::generateCode(BinaryWriter * writer, const SemanticClass * curClass) const
