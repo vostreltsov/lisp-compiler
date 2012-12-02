@@ -375,7 +375,7 @@ public:
     /**
      * @brief Returns all child nodes of this node.
      */
-    virtual QLinkedList<AttributedNode *> childNodes() const;
+    virtual QLinkedList<AttributedNode *> childNodes() const = 0;
 
     /**
      * @brief Transforms the subtree of this node.
@@ -403,6 +403,7 @@ public:
     QLinkedList<ProgramPartNode *>   fParts;    // All other parts.
 
     ProgramNode();
+    ~ProgramNode();
     virtual QString dotCode(QString parent, QString label = "") const;
     virtual void semantics(SemanticProgram * program, QStringList * errorList, SemanticClass * curClass, SemanticMethod * curMethod, bool processInner = true);
     virtual bool isCalculable() const;
@@ -422,6 +423,7 @@ public:
     DefinitionNode  * fDefinition;
 
     ProgramPartNode();
+    ~ProgramPartNode();
     virtual QString dotCode(QString parent, QString label = "") const;
     virtual bool isCalculable() const;
     virtual QLinkedList<AttributedNode *> childNodes() const;
@@ -454,6 +456,7 @@ public:
     SemanticLocalVar                * fIterator; // Additional local variable to deal with iterators.
 
     SExpressionNode();
+    ~SExpressionNode();
     virtual QString dotCode(QString parent, QString label = "") const;
     virtual bool isCalculable() const;
     virtual QLinkedList<AttributedNode *> childNodes() const;
@@ -479,6 +482,7 @@ public:
     slot_alloc_type   fAllocationType;
 
     SlotPropertyNode();
+    ~SlotPropertyNode();
     virtual QString dotCode(QString parent, QString label = "") const;
     virtual bool isCalculable() const;
     virtual QLinkedList<AttributedNode *> childNodes() const;
@@ -497,6 +501,7 @@ public:
     QLinkedList<SlotPropertyNode *> fProperties;
 
     SlotDefinitionNode();
+    ~SlotDefinitionNode();
     virtual QString dotCode(QString parent, QString label = "") const;
     virtual bool isCalculable() const;
     virtual QLinkedList<AttributedNode *> childNodes() const;
@@ -520,6 +525,7 @@ public:
     QLinkedList<SExpressionNode *>    fBody;
 
     DefinitionNode();
+    ~DefinitionNode();
     virtual QString dotCode(QString parent, QString label = "") const;
     virtual bool isCalculable() const;
     virtual QLinkedList<AttributedNode *> childNodes() const;

@@ -828,14 +828,6 @@ AttributedNode::AttributedNode()
 
 AttributedNode::~AttributedNode()
 {
-    foreach (AttributedNode * child, childNodes()) {
-        delete child;
-    }
-}
-
-QLinkedList<AttributedNode *> AttributedNode::childNodes() const
-{
-    return QLinkedList<AttributedNode *>();
 }
 
 QByteArray AttributedNode::generateCode(const SemanticClass * curClass, const SemanticMethod * curMethod) const
@@ -847,6 +839,13 @@ ProgramNode::ProgramNode() : AttributedNode()
 {
     fType = ATTR_TYPE_PROGRAM;
     fMainPart = NULL;
+}
+
+ProgramNode::~ProgramNode()
+{
+    foreach (AttributedNode * child, childNodes()) {
+        delete child;
+    }
 }
 
 QString ProgramNode::dotCode(QString parent, QString label) const
@@ -903,6 +902,7 @@ void ProgramNode::transform()
         if (curNode->fSubType == PROGRAM_PART_TYPE_S_EXPR) {
             mainMethod->fBody << curNode->fSExpression;
             curNode->fSExpression = NULL;
+            delete curNode;
             iter = fParts.erase(iter);
         } else {
             ++iter;
@@ -970,6 +970,13 @@ ProgramPartNode::ProgramPartNode() : AttributedNode()
     fType = ATTR_TYPE_PROGRAM_PART;
     fSExpression = NULL;
     fDefinition = NULL;
+}
+
+ProgramPartNode::~ProgramPartNode()
+{
+    foreach (AttributedNode * child, childNodes()) {
+        delete child;
+    }
 }
 
 QString ProgramPartNode::dotCode(QString parent, QString label) const
@@ -1046,6 +1053,13 @@ SExpressionNode::SExpressionNode() : AttributedNode()
     fBody1 = NULL;
     fBody2 = NULL;
     fIterator = NULL;
+}
+
+SExpressionNode::~SExpressionNode()
+{
+    foreach (AttributedNode * child, childNodes()) {
+        delete child;
+    }
 }
 
 QString SExpressionNode::dotCode(QString parent, QString label) const
@@ -1780,6 +1794,13 @@ SlotPropertyNode::SlotPropertyNode() : AttributedNode()
     fInitform = NULL;
 }
 
+SlotPropertyNode::~SlotPropertyNode()
+{
+    foreach (AttributedNode * child, childNodes()) {
+        delete child;
+    }
+}
+
 QString SlotPropertyNode::dotCode(QString parent, QString label) const
 {
     QString tmp = "\"id" + QString::number(fNodeId) + "\\n:";
@@ -1864,6 +1885,13 @@ SlotDefinitionNode::SlotDefinitionNode() : AttributedNode()
     fType = ATTR_TYPE_SLOT_DEF;
 }
 
+SlotDefinitionNode::~SlotDefinitionNode()
+{
+    foreach (AttributedNode * child, childNodes()) {
+        delete child;
+    }
+}
+
 QString SlotDefinitionNode::dotCode(QString parent, QString label) const
 {
     QString tmp = "\"id" + QString::number(fNodeId) + "\\nslot " + fId + "\"";
@@ -1922,6 +1950,13 @@ SlotDefinitionNode * SlotDefinitionNode::fromSyntaxNode(const slot_def_struct * 
 DefinitionNode::DefinitionNode() : AttributedNode()
 {
     fType = ATTR_TYPE_DEFINITION;
+}
+
+DefinitionNode::~DefinitionNode()
+{
+    foreach (AttributedNode * child, childNodes()) {
+        delete child;
+    }
 }
 
 QString DefinitionNode::dotCode(QString parent, QString label) const
