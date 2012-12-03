@@ -276,9 +276,9 @@ public:
     SemanticConstant * findIntegerConstant(qint32 value) const;
     SemanticConstant * findClassConstant(QString name) const;
     SemanticConstant * findStringConstant(QString name) const;
-    SemanticConstant * findFieldrefConstant(QString className, QString fieldName) const;
-    SemanticConstant * findMethodrefConstant(QString className, QString methodName) const;
-    SemanticConstant * findInterfaceMethodrefConstant(QString interfaceName, QString methodName) const;
+    SemanticConstant * findFieldrefConstant(QString className, QString fieldName, QString descriptor) const;
+    SemanticConstant * findMethodrefConstant(QString className, QString methodName, QString descriptor) const;
+    SemanticConstant * findInterfaceMethodrefConstant(QString interfaceName, QString methodName, QString descriptor) const;
 
     void addDefaultAndParentConstructor();
     void addBaseClassConstants();

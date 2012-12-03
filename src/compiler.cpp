@@ -516,36 +516,39 @@ SemanticConstant * SemanticClass::findStringConstant(QString name) const
     return NULL;
 }
 
-SemanticConstant * SemanticClass::findFieldrefConstant(QString className, QString fieldName) const
+SemanticConstant * SemanticClass::findFieldrefConstant(QString className, QString fieldName, QString descriptor) const
 {
     foreach (SemanticConstant * result, fConstantsTable) {
         if (result->fType == CONSTANT_Fieldref &&
             result->fRef1->fRef1->fUtf8 == className &&
-            result->fRef2->fRef1->fUtf8 == fieldName) {
+            result->fRef2->fRef1->fUtf8 == fieldName &&
+            result->fRef2->fRef2->fUtf8 == descriptor) {
             return result;
         }
     }
     return NULL;
 }
 
-SemanticConstant * SemanticClass::findMethodrefConstant(QString className, QString methodName) const
+SemanticConstant * SemanticClass::findMethodrefConstant(QString className, QString methodName, QString descriptor) const
 {
     foreach (SemanticConstant * result, fConstantsTable) {
         if (result->fType == CONSTANT_Methodref &&
             result->fRef1->fRef1->fUtf8 == className &&
-            result->fRef2->fRef1->fUtf8 == methodName) {
+            result->fRef2->fRef1->fUtf8 == methodName &&
+            result->fRef2->fRef2->fUtf8 == descriptor) {
             return result;
         }
     }
     return NULL;
 }
 
-SemanticConstant * SemanticClass::findInterfaceMethodrefConstant(QString interfaceName, QString methodName) const
+SemanticConstant * SemanticClass::findInterfaceMethodrefConstant(QString interfaceName, QString methodName, QString descriptor) const
 {
     foreach (SemanticConstant * result, fConstantsTable) {
         if (result->fType == CONSTANT_InterfaceMethodref &&
             result->fRef1->fRef1->fUtf8 == interfaceName &&
-            result->fRef2->fRef1->fUtf8 == methodName) {
+            result->fRef2->fRef1->fUtf8 == methodName &&
+            result->fRef2->fRef2->fUtf8 == descriptor) {
             return result;
         }
     }
@@ -1516,7 +1519,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
             // Call the method.
             SemanticConstant * constMethod = NULL;
             if (isRTL) {
-                constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId);
+                constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId, SemanticMethod::getDescForRTLMethod(fId));
                 // Put arguments onto the stack AS AN ARRAY.
                 foreach (quint8 byte, collectExpressionsToArray(curClass, curMethod, fArguments)) {
                     stream << byte;
@@ -1524,7 +1527,8 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
                 // Call the method.
                 stream << CMD_INVOKESTATIC << constMethod->fNumber;
             } else {
-                constMethod = curClass->findMethodrefConstant(curClass->fNode->fId, fId);
+                int numberOfDescArgs = fArguments.size();  // TODO: +1 for dynamic methods.
+                constMethod = curClass->findMethodrefConstant(curClass->fNode->fId, fId, SemanticMethod::getDescForRegularMethod(numberOfDescArgs));
                 // Put arguments onto the stack NOT AS AN ARRAY.
                 foreach (SExpressionNode * expr, fArguments) {
                     foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
@@ -1541,9 +1545,9 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_LOOP_IN: {
-        SemanticConstant * constMethodIterator = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_ITERATOR);
-        SemanticConstant * constMethodHasNext = curClass->findInterfaceMethodrefConstant(NAME_JAVA_INTERFACE_ITERATOR, NAME_JAVA_METHOD_HASNEXT);
-        SemanticConstant * constMethodNext = curClass->findInterfaceMethodrefConstant(NAME_JAVA_INTERFACE_ITERATOR, NAME_JAVA_METHOD_NEXT);
+        SemanticConstant * constMethodIterator = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_ITERATOR, DESC_JAVA_METHOD_VOID_ITERATOR);
+        SemanticConstant * constMethodHasNext = curClass->findInterfaceMethodrefConstant(NAME_JAVA_INTERFACE_ITERATOR, NAME_JAVA_METHOD_HASNEXT, DESC_JAVA_METHOD_VOID_BOOLEAN);
+        SemanticConstant * constMethodNext = curClass->findInterfaceMethodrefConstant(NAME_JAVA_INTERFACE_ITERATOR, NAME_JAVA_METHOD_NEXT, DESC_JAVA_METHOD_VOID_OBJECT);
         SemanticLocalVar * value = curMethod->getLocalVar(fId);
 
         QByteArray codeBody;
@@ -1595,7 +1599,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     }
     case S_EXPR_TYPE_LOOP_FROM_TO:
     case S_EXPR_TYPE_LOOP_FROM_DOWNTO: {
-        SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT);
+        SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT, DESC_JAVA_INTEGER);
         SemanticLocalVar * counter = curMethod->getLocalVar(fId);
 
         QByteArray codeFrom = fFrom->generateCode(curClass, curMethod);
@@ -1675,7 +1679,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     case S_EXPR_TYPE_IF: {
-        SemanticConstant * constFieldValueBoolean = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN);
+        SemanticConstant * constFieldValueBoolean = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
 
         QByteArray codeBody1;
         QDataStream streamBody1(&codeBody1, QIODevice::WriteOnly);
