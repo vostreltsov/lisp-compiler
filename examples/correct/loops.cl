@@ -31,4 +31,10 @@
         (print vitem " "))
     (print litem " \n"))
 
+(print "conditional loop:\n")
+(setf counter 5)
+(loop while (>= counter 0) do
+    (print counter "\n")
+    (setf counter (- counter 1)))
+
 (print "\nwell done!\n")

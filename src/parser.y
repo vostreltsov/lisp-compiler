@@ -111,9 +111,10 @@ s_expr : INT                                                         {$$ = creat
        | '(' ID ')'                                                  {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, NULL);}
        | '(' ID s_expr_seq ')'                                       {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, $3);}
 
-       | '(' LOOP FOR ID IN s_expr DO s_expr_seq ')'                 {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_IN,          $4, $8,  $6,   NULL, NULL);}
-       | '(' LOOP FOR ID FROM s_expr TO s_expr DO s_expr_seq ')'     {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_FROM_TO,     $4, $10, NULL, $6,   $8);}
-       | '(' LOOP FOR ID FROM s_expr DOWNTO s_expr DO s_expr_seq ')' {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_FROM_DOWNTO, $4, $10, NULL, $6,   $8);}
+       | '(' LOOP FOR ID IN s_expr DO s_expr_seq ')'                 {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_IN,          $4,   $8,  NULL, $6,   NULL, NULL);}
+       | '(' LOOP FOR ID FROM s_expr TO s_expr DO s_expr_seq ')'     {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_FROM_TO,     $4,   $10, NULL, NULL, $6,   $8);}
+       | '(' LOOP FOR ID FROM s_expr DOWNTO s_expr DO s_expr_seq ')' {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_FROM_DOWNTO, $4,   $10, NULL, NULL, $6,   $8);}
+       | '(' LOOP WHILE s_expr DO s_expr_seq ')'                     {$$ = create_s_expr_loop(++idCounter, S_EXPR_TYPE_LOOP_WHILE,       NULL, $6,  $4,   NULL, NULL, NULL);}
 
        | '(' PROGN s_expr_seq ')'                                    {$$ = create_s_expr_progn(++idCounter, S_EXPR_TYPE_PROGN, $3);}
 

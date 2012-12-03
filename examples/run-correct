@@ -15,6 +15,7 @@ thisdir=$(pwd)
 ./qtproject -i correct/if-else-progn.cl  -o $thisdir"/correct/bin-if-else-progn"
 ./qtproject -i correct/loops.cl          -o $thisdir"/correct/bin-loops"
 ./qtproject -i correct/maths.cl          -o $thisdir"/correct/bin-maths"
+./qtproject -i correct/quicksort.cl      -o $thisdir"/correct/bin-quicksort"
 
 echo "----------------------------------------"
 echo "boolean"
@@ -55,6 +56,10 @@ cd $thisdir"/correct/bin-loops"           && java MainClass
 echo "----------------------------------------"
 echo "maths"
 cd $thisdir"/correct/bin-maths"           && java MainClass
+
+echo "----------------------------------------"
+echo "quicksort"
+cd $thisdir"/correct/bin-quicksort"       && java MainClass
 
 echo "----------------------------------------"
 echo "archey"

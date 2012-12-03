@@ -30,6 +30,7 @@ enum s_expr_type {
     S_EXPR_TYPE_LOOP_IN,          // Loop "loop for x in array do (print x)".
     S_EXPR_TYPE_LOOP_FROM_TO,     // Loop "loop for x from 1 to 10 do (print x)".
     S_EXPR_TYPE_LOOP_FROM_DOWNTO, // Loop "loop for x from 10 downto 1 do (print x)".
+    S_EXPR_TYPE_LOOP_WHILE,       // Loop "loop while (< y 10) do (print x)"."
     S_EXPR_TYPE_PROGN,            // Uniting a couple of expressions to one expression.
     S_EXPR_TYPE_IF,               // Conditional operator.
     S_EXPR_TYPE_MAKEINSTANCE,     // Making an instance of a class.

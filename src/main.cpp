@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 {
 
 #ifdef QT_DEBUG
-    compile("../examples/correct/factorial.cl", "../examples/correct/bin", "", "");
+    compile("../examples/correct/quicksort.cl", "../examples/correct/bin", "", "");
     return 0;
 #else
     QCoreApplication a(argc, argv);

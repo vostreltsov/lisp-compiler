@@ -1162,6 +1162,15 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
         }
         return result;
     }
+    case S_EXPR_TYPE_LOOP_WHILE: {
+        tmp += "loop (while)\"";
+        QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+        result += fCondition->dotCode(tmp, "condition");
+        foreach (SExpressionNode * op, fArguments) {
+            result += op->dotCode(tmp, "body");
+        }
+        return result;
+    }
     case S_EXPR_TYPE_PROGN: {
         tmp += "progn\"";
         QString result = parent + "->" + tmp + "[label=\"" + label + "\"];\n";
@@ -1406,6 +1415,13 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
         }
         break;
     }
+    case S_EXPR_TYPE_LOOP_WHILE: {
+        // Check if the condition is calculable.
+        if (!fCondition->isCalculable()) {
+            *errorList << "Only calculable expressions can be used as conditions.";
+        }
+        break;
+    }
     case S_EXPR_TYPE_PROGN: {
         // Nothing to do, child nodes are checked after this switch-case.
         break;
@@ -1585,7 +1601,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         stream << CMD_INVOKEINTERFACE << constMethodNext->fNumber << (quint8)1 << (quint8)0;
         stream << CMD_ASTORE << value->fNumber;
 
-        // Write the body.
+        // Write code of the body.
         foreach (quint8 byte, codeBody) {
             stream << byte;
         }
@@ -1642,7 +1658,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
             stream << CMD_ICMPLT << (qint16)(LENGTH_IF + LENGTH_BODY + LENGTH_IINC + LENGTH_GOTO);
         }
 
-        // Write the body.
+        // Write code of the body.
         foreach (quint8 byte, codeBody) {
             stream << byte;
         }
@@ -1661,6 +1677,43 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
 
         // Add the goto.
         stream << CMD_GOTO << (qint16)(-LENGTH_NEW_ITER - LENGTH_IF - LENGTH_BODY - LENGTH_IINC);
+
+        // Add a fictive returning value.
+        stream << CMD_ACONST_NULL;
+        break;
+    }
+    case S_EXPR_TYPE_LOOP_WHILE: {
+        SemanticConstant * constFieldValueBoolean = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
+
+        QByteArray codeCondition = fCondition->generateCode(curClass, curMethod);
+        QByteArray codeBody;
+        QDataStream streamBody(&codeBody, QIODevice::WriteOnly);
+        foreach (SExpressionNode * expr, fArguments) {
+            // Generate code for current expression.
+            foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
+                streamBody << byte;
+            }
+            streamBody << CMD_POP;
+        }
+
+        const qint16 LENGTH_COND = codeCondition.size() + 3; // Including CMD_GETFIELD.
+        const qint16 LENGTH_IF = 3;
+        const qint16 LENGTH_BODY = codeBody.size();
+        const qint16 LENGTH_GOTO = 3;
+
+        // Write code for condition.
+        foreach (quint8 byte, fCondition->generateCode(curClass, curMethod)) {
+            stream << byte;
+        }
+
+        stream << CMD_GETFIELD << constFieldValueBoolean->fNumber;
+        stream << CMD_IFEQ << (qint16)(LENGTH_IF + LENGTH_BODY + LENGTH_GOTO);
+
+        // Write code of the body.
+        foreach (quint8 byte, codeBody) {
+            stream << byte;
+        }
+        stream << CMD_GOTO << (qint16)(-LENGTH_BODY - LENGTH_IF - LENGTH_COND);
 
         // Add a fictive returning value.
         stream << CMD_ACONST_NULL;
@@ -1710,7 +1763,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         const qint16 LENGTH_IF = 3;
         const qint16 LENGTH_GOTO = 3;
 
-        // Generate code for condition.
+        // Write code of the condition.
         foreach (quint8 byte, fCondition->generateCode(curClass, curMethod)) {
             stream << byte;
         }
@@ -1718,13 +1771,13 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         stream << CMD_GETFIELD << constFieldValueBoolean->fNumber;
         stream << CMD_IFNE << (qint16)(LENGTH_IF + LENGTH_BODY2 + LENGTH_GOTO);
 
-        // Generate code for body2.
+        // Write code of the body2.
         foreach (quint8 byte, codeBody2) {
             stream << byte;
         }
         stream << CMD_GOTO << (qint16)(LENGTH_GOTO + LENGTH_BODY1);
 
-        // Generate code for body1.
+        // Write code of the body1.
         foreach (quint8 byte, codeBody1) {
             stream << byte;
         }
