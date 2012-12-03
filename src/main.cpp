@@ -44,7 +44,7 @@ void run_don_on_program(SemanticProgram & program, QString fileName, bool showRe
     }
 }
 
-void compile(QString sourceFileName, QString destFolder, QString imageFileName)
+void compile(QString sourceFileName, QString destFolder, QString imageFileName, QString tablesFileName)
 {
     QTextStream stream(stdout);
 
@@ -84,6 +84,18 @@ void compile(QString sourceFileName, QString destFolder, QString imageFileName)
         run_don_on_program(sem, imageFileName, false);
     }
 
+    // Write tables if requested.
+    if (!tablesFileName.isEmpty()) {
+        QFile file(tablesFileName);
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream tablesStream(&file);
+            tablesStream << sem.tablesToString();
+            file.close();
+        } else {
+            stream << "Could not open file " + tablesFileName + "\n";
+        }
+    }
+
     // Delete the syntax tree.
     free_program(root);
 }
@@ -97,8 +109,9 @@ void help()
     stream << "-i file    Specifies the input file.\n";
     stream << "\n";
     stream << "Additional options:\n";
-    stream << "-o folder  Specifies the output folder where MainClass.class will be stored.\n";
-    stream << "-d file    Specifies the image file with syntax tree (graphviz required).\n";
+    stream << "-o folder  Specifies the output folder to store the MainClass.class.\n";
+    stream << "-s file    Specifies the image file name to store the syntax tree (graphviz required).\n";
+    stream << "-t file    Specifies the html file name to store generated tables.\n";
     stream << "-h         Prints this message.\n";
 }
 
@@ -121,6 +134,7 @@ int main(int argc, char *argv[])
     QString src;
     QString dst;
     QString img;
+    QString tab;
     QStringList unknown;
 
     int index = 1;
@@ -145,13 +159,20 @@ int main(int argc, char *argv[])
                 return 0;
             }
             dst = argv[++index];
-        } else if (cur == "-d") {
+        } else if (cur == "-s") {
             if (index == argc - 1) {
-                stream << "Too few arguments for -d.\n";
+                stream << "Too few arguments for -s.\n";
                 help();
                 return 0;
             }
             img = argv[++index];
+        } else if (cur == "-t") {
+            if (index == argc - 1) {
+                stream << "Too few arguments for -t.\n";
+                help();
+                return 0;
+            }
+            tab = argv[++index];
         } else {
             unknown << argv[index];
         }
@@ -178,7 +199,7 @@ int main(int argc, char *argv[])
         dst = srcInfo.dir().absolutePath() + "/bin-" + srcInfo.fileName();
     }
 
-    compile(src, dst, img);
+    compile(src, dst, img, tab);
 
     return 0;
 #endif

@@ -76,70 +76,59 @@ void SemanticConstant::generateCode(BinaryWriter * writer) const
     }
 }
 
-QString SemanticConstant::dotCode(QString previous) const
+QString SemanticConstant::toString() const
 {
-    QString tmp = "\"const №" + QString::number(fNumber) + "\\n";
-    QString result;
+    QString result = "<tr>";
     switch (fType) {
     case CONSTANT_Utf8: {
-        tmp += "Utf8 " + fUtf8 + "\"";
+        result += "<td>" + QString::number(fNumber) + " Utf8</td><td>" + fUtf8 + "</td>";
         break;
     }
     case CONSTANT_Integer: {
-        tmp += "Integer " + QString::number(fInteger) + "\"";
+        result += "<td>" + QString::number(fNumber) + " Integer</td><td>" + QString::number(fInteger) + "</td>";
         break;
     }
     case CONSTANT_Float: {
-        tmp += "Float\"";
+        result += "<td>" + QString::number(fNumber) + " Float</td><td>" + "" + "</td>";
         break;
     }
     case CONSTANT_Long: {
-        tmp += "Long\"";
+        result += "<td>" + QString::number(fNumber) + " Long</td><td>" + "" + "</td>";
         break;
     }
     case CONSTANT_Double: {
-        tmp += "Double\"";
+        result += "<td>" + QString::number(fNumber) + " Double</td><td>" + "" + "</td>";
         break;
     }
     case CONSTANT_Class: {
-        tmp += "Class " + fRef1->fUtf8 + "\"";
-        result += fRef1->dotCode(tmp);
+        result += "<td>" + QString::number(fNumber) + " Class</td><td>refers to #" + QString::number(fRef1->fNumber) + "</td>";
         break;
     }
     case CONSTANT_String: {
-        tmp += "String\"";
-        result += fRef1->dotCode(tmp);
+        result += "<td>" + QString::number(fNumber) + " String</td><td>refers to #" + QString::number(fRef1->fNumber) + "</td>";
         break;
     }
     case CONSTANT_Fieldref: {
-        tmp += "Fieldref\"";
-        result += fRef1->dotCode(tmp);
-        result += fRef2->dotCode(tmp);
+        result += "<td>" + QString::number(fNumber) + " Fieldref</td><td>refers to #" + QString::number(fRef1->fNumber) + ", #" + QString::number(fRef2->fNumber) + "</td>";
         break;
     }
     case CONSTANT_Methodref: {
-        tmp += "Methodref\"";
-        result += fRef1->dotCode(tmp);
-        result += fRef2->dotCode(tmp);
+        result += "<td>" + QString::number(fNumber) + " Methodref</td><td>refers to #" + QString::number(fRef1->fNumber) + ", #" + QString::number(fRef2->fNumber) + "</td>";
         break;
     }
     case CONSTANT_InterfaceMethodref: {
-        tmp += "InterfaceMethodref\"";
+        result += "<td>" + QString::number(fNumber) + " InterfaceMethodref</td><td>refers to #" + QString::number(fRef1->fNumber) + ", #" + QString::number(fRef2->fNumber) + "</td>";
         break;
     }
     case CONSTANT_NameAndType: {
-        tmp += "NameAndType\"";
-        result += fRef1->dotCode(tmp);
-        result += fRef2->dotCode(tmp);
+        result += "<td>" + QString::number(fNumber) + " NameAndType</td><td>refers to #" + QString::number(fRef1->fNumber) + ", #" + QString::number(fRef2->fNumber) + "</td>";
         break;
     }
     default: {
-        return "";
         break;
     }
     }
-
-    result += previous + "->" + tmp + ";\n";
+    result += "</tr>\n";
     return result;
 }
 
@@ -223,10 +212,19 @@ bool SemanticProgram::doGenerateCode(QString dir) const
 QString SemanticProgram::dotCode() const
 {
     QString result;
-    foreach (SemanticClass * semClass, fClassTable) {
-        //result += semClass->dotForTables("program");  // ARE YOU SURE YOU WANT THIS?
-    }
     result += fRoot->dotCode("", "");
+    return result;
+}
+
+QString SemanticProgram::tablesToString() const
+{
+    QString result = "<html><body>";
+    foreach (SemanticClass * curClass, fClassTable) {
+        result += "Class " + curClass->fNode->fId + "</br>\n";
+        result += curClass->tablesToString();
+        result += "</br>\n";
+    }
+    result += "</body></html>\n";
     return result;
 }
 
@@ -284,6 +282,36 @@ SemanticClass::~SemanticClass()
     }
 }
 
+QString SemanticClass::tablesToString() const
+{
+    QString result;
+    result += "Constants\n";
+    result += "<table border=1>";
+    foreach (SemanticConstant * constant, fConstantsTable) {
+        result += constant->toString() + "\n";
+    }
+    result += "</table>\n";
+    result += "</br>\nMethods</br>\n";
+    result += "<table border=1>";
+    foreach (SemanticMethod * method, fMethodsTable) {
+        QString name = method->fConstMethodref->fRef2->fRef1->fUtf8;
+
+        if (name != NAME_JAVA_METHOD_INIT) {
+            result += "<tr><td>" + name + "</td>";
+            result += "<td>number of arguments: " + QString::number(method->fNode->fArguments.size()) + "</td>";
+            result += "<td>number of local vars: " + QString::number(method->numberOfLocalVars()) + "</td>";
+        } else {
+            result += "<tr><td>init</td>";
+            result += "<td>number of arguments: 1</td>";
+            result += "<td>number of local vars: 1</td>";
+        }
+        result += "</tr>";
+    }
+    result += "</table>";
+    result += "\n";
+    return result;
+}
+
 bool SemanticClass::generateCode(QString dir) const
 {
     BinaryWriter writer(dir + "/" + fNode->fId + ".class");
@@ -335,16 +363,6 @@ bool SemanticClass::generateCode(QString dir) const
     writer.writeU2(0);
 
     return true;
-}
-
-QString SemanticClass::dotForTables(QString previous) const
-{
-    QString tmp = "\"class " + fConstClass->fRef1->fUtf8 + "\\nparent " + fConstParent->fRef1->fUtf8 + "\"";
-    QString result = previous + "->" + tmp + ";\n";
-    foreach (SemanticConstant * constant, fConstantsTable) {
-        result += constant->dotCode(tmp);
-    }
-    return result;
 }
 
 SemanticConstant * SemanticClass::addUtf8Constant(QString value)
@@ -697,6 +715,11 @@ SemanticLocalVar * SemanticMethod::addLocalVar(QString name)
     SemanticLocalVar * result = new SemanticLocalVar(fLocalVarsTable.size(), name); // Numbers start from 0.
     fLocalVarsTable.insert(name, result);
     return result;
+}
+
+quint16 SemanticMethod::numberOfLocalVars() const
+{
+    return fLocalVarsTable.size();
 }
 
 QStringList SemanticMethod::getBaseClassMethods() {

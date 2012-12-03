@@ -201,7 +201,7 @@ public:
                      qint32 integer = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
 
     void generateCode(BinaryWriter * writer) const;
-    QString dotCode(QString previous) const;
+    QString toString() const;
 };
 
 /**
@@ -219,6 +219,8 @@ public:
     bool doGenerateCode(QString dir) const;
 
     QString dotCode() const;
+    QString tablesToString() const;
+
     ProgramNode * root() const;
     QStringList errors() const;
 
@@ -249,9 +251,8 @@ public:
     SemanticClass(QString name, QString parent, const DefinitionNode * node = NULL);
     ~SemanticClass();
 
+    QString tablesToString() const;
     bool generateCode(QString dir) const;
-
-    QString dotForTables(QString previous) const;
 
     SemanticConstant * addUtf8Constant(QString value);
     SemanticConstant * addIntegerConstant(qint32 value);
@@ -316,6 +317,7 @@ public:
     bool hasLocalVar(QString name) const;
     SemanticLocalVar * getLocalVar(QString name) const;
     SemanticLocalVar * addLocalVar(QString name);
+    quint16 numberOfLocalVars() const;
 
     static QStringList getBaseClassMethods();
     static QStringList getRTLMethods();
