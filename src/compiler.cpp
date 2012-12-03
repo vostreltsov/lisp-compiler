@@ -128,7 +128,7 @@ QString SemanticConstant::toString() const
         break;
     }
     }
-    result += "</tr>\n";
+    result += "</tr>";
     return result;
 }
 
@@ -220,11 +220,11 @@ QString SemanticProgram::tablesToString() const
 {
     QString result = "<html><body>";
     foreach (SemanticClass * curClass, fClassTable) {
-        result += "Class " + curClass->fNode->fId + "</br>\n";
+        result += "Class " + curClass->fNode->fId + "</br>";
         result += curClass->tablesToString();
-        result += "</br>\n";
+        result += "</br>";
     }
-    result += "</body></html>\n";
+    result += "</body></html>";
     return result;
 }
 
@@ -263,7 +263,7 @@ SemanticClass::SemanticClass(QString name, QString parent, const DefinitionNode 
     fNode = node;
 
     addDefaultAndParentConstructor();
-    addRTLConstants();
+    addBaseClassConstants();
 }
 
 SemanticClass::~SemanticClass()
@@ -285,13 +285,13 @@ SemanticClass::~SemanticClass()
 QString SemanticClass::tablesToString() const
 {
     QString result;
-    result += "Constants\n";
+    result += "Constants</br>";
     result += "<table border=1>";
     foreach (SemanticConstant * constant, fConstantsTable) {
-        result += constant->toString() + "\n";
+        result += constant->toString();
     }
-    result += "</table>\n";
-    result += "</br>\nMethods</br>\n";
+    result += "</table></br>";
+    result += "Methods</br>";
     result += "<table border=1>";
     foreach (SemanticMethod * method, fMethodsTable) {
         QString name = method->fConstMethodref->fRef2->fRef1->fUtf8;
@@ -308,7 +308,6 @@ QString SemanticClass::tablesToString() const
         result += "</tr>";
     }
     result += "</table>";
-    result += "\n";
     return result;
 }
 
@@ -573,25 +572,25 @@ void SemanticClass::addDefaultAndParentConstructor()
     fMethodsTable.insert(NAME_JAVA_METHOD_INIT, fConstructorThis);
 }
 
-void SemanticClass::addRTLConstants()
+void SemanticClass::addBaseClassConstants()
 {
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE,         DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT,     DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUECHAR,    DESC_JAVA_CHARACTER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUESTRING,  DESC_JAVA_CLASS_STRING);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUELIST,    DESC_JAVA_CLASS_LINKEDLIST);
-    addFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEVECTOR,  DESC_JAVA_CLASS_VECTOR);
-
-    SemanticConstant * tmp = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_VOID_VOID);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_TYPE,         DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUEINT,     DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUECHAR,    DESC_JAVA_CHARACTER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUESTRING,  DESC_JAVA_CLASS_STRING);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUELIST,    DESC_JAVA_CLASS_LINKEDLIST);
+    addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUEVECTOR,  DESC_JAVA_CLASS_VECTOR);
+    addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT,             DESC_JAVA_METHOD_VOID_VOID);
 
     foreach (QString methodName, SemanticMethod::getBaseClassMethods()) {
         addMethodrefConstant(NAME_JAVA_CLASS_BASE, methodName, SemanticMethod::getDescForBaseClassMethod(methodName));
     }
+}
 
-    foreach (QString methodName, SemanticMethod::getRTLMethods()) {
-        addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, methodName, SemanticMethod::getDescForRTLMethod(methodName));
-    }
+void SemanticClass::addRTLMethod(QString methodName)
+{
+    addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, methodName, SemanticMethod::getDescForRTLMethod(methodName));
 }
 
 bool SemanticClass::hasField(QString name) const
@@ -1103,6 +1102,7 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
     }
     case S_EXPR_TYPE_STRING: {
         tmp += "string\\n" + fString + "\"";
+        tmp.replace('\n', ' ');
         return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
     }
     case S_EXPR_TYPE_BOOL: {
@@ -1313,47 +1313,53 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
     }
     case S_EXPR_TYPE_FCALL: {
         // Check if the function exists.
-        if (!curClass->hasMethod(fId)) {
+        bool isRTLMethod = SemanticMethod::isRTLMethod(fId);
+        bool hasMethod = curClass->hasMethod(fId);
+
+        if (!hasMethod && !isRTLMethod) {
+            // Error: calling unknow method.
             *errorList << "Calling undefined function: \"" + fId + "\".";
-        } else {
+        } else if (!hasMethod && isRTLMethod) {
+            // Add the RTL method to constants.
+            curClass->addRTLMethod(fId);
+        } else if (hasMethod && !isRTLMethod){
             // Check if number of arguments is the same as in the function definition.
             SemanticMethod * method = curClass->getMethod(fId);
-            if (method != NULL && !SemanticMethod::isRTLMethod(method->fConstMethodref->fRef2->fRef1->fUtf8)) {
-                int expectedNumberOfArgs = method->fNode->fArguments.size();
-                int realNumberOfArgs = fArguments.size();
-                if (expectedNumberOfArgs != realNumberOfArgs) {
-                    *errorList << "Method \"" + fId + "\" doesn't take " + QString::number(realNumberOfArgs) + " argument(s).";
-                }
+            // Check number of arguments.
+            int expectedNumberOfArgs = method->fNode->fArguments.size();
+            int realNumberOfArgs = fArguments.size();
+            if (expectedNumberOfArgs != realNumberOfArgs) {
+                *errorList << "Method \"" + fId + "\" doesn't take " + QString::number(realNumberOfArgs) + " argument(s).";
             }
+        }
 
-            // Check if arguments should be calculable. This also checks calculability of the assignment right side.
-            foreach (SExpressionNode * arg, fArguments) {
-                if (!arg->isCalculable()) {
-                    *errorList << "Only calculable expressions can be passed as arguments.";
-                    break;
-                }
+        // Check if arguments should be calculable. This also checks calculability of the assignment right side.
+        foreach (SExpressionNode * arg, fArguments) {
+            if (!arg->isCalculable()) {
+                *errorList << "Only calculable expressions can be passed as arguments.";
+                break;
             }
-            // Check if ID's are known.
-            foreach (SExpressionNode * arg, fArguments) {
-                // Function existance checked before this switch-case since it's a child node.
-                if (arg->fSubType == S_EXPR_TYPE_ID && !curMethod->hasLocalVar(arg->fId) && !(fId == NAME_FUNC_SETF && arg == fArguments.first())) {
-                    *errorList << "Passing undefined variable: \"" + arg->fId + "\".";
-                }
+        }
+        // Check if ID's are known.
+        foreach (SExpressionNode * arg, fArguments) {
+            // Function existance checked before this switch-case since it's a child node.
+            if (arg->fSubType == S_EXPR_TYPE_ID && !curMethod->hasLocalVar(arg->fId) && !(fId == NAME_FUNC_SETF && arg == fArguments.first())) {
+                *errorList << "Passing undefined variable: \"" + arg->fId + "\".";
             }
+        }
+        // Check if assigning to an identifier.
+        if (fId == NAME_FUNC_SETF) {
+            if (!fArguments.isEmpty() && fArguments.first()->fSubType == S_EXPR_TYPE_ID) {
+                curMethod->addLocalVar(fArguments.first()->fId);
+            } else {
+                *errorList << "Can't call \"setf\" with given arguments.";
+            }
+        }
 
-            // Check if assigning to an identifier.
-            if (fId == NAME_FUNC_SETF) {
-                if (!fArguments.isEmpty() && fArguments.first()->fSubType == S_EXPR_TYPE_ID) {
-                    curMethod->addLocalVar(fArguments.first()->fId);
-                } else {
-                    *errorList << "Can't call \"setf\" with given arguments.";
-                }
-            }
-
-            if (fId == NAME_FUNC_ELT) {
-                if (fArguments.isEmpty() || !fArguments.first()->isValidContainer(curClass, curMethod)) {
-                    *errorList << "Can't call \"elt\" with given arguments.";
-                }
+        // Check if ELT is called on a container.
+        if (fId == NAME_FUNC_ELT) {
+            if (fArguments.isEmpty() || !fArguments.first()->isValidContainer(curClass, curMethod)) {
+                *errorList << "Can't call \"elt\" with given arguments.";
             }
         }
         break;

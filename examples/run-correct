@@ -17,10 +17,6 @@ thisdir=$(pwd)
 ./qtproject -i correct/maths.cl          -o $thisdir"/correct/bin-maths"
 
 echo "----------------------------------------"
-echo "archey"
-cd $thisdir"/correct/bin-archey"          && java MainClass
-
-echo "----------------------------------------"
 echo "boolean"
 cd $thisdir"/correct/bin-boolean"         && java MainClass
 
@@ -59,3 +55,7 @@ cd $thisdir"/correct/bin-loops"           && java MainClass
 echo "----------------------------------------"
 echo "maths"
 cd $thisdir"/correct/bin-maths"           && java MainClass
+
+echo "----------------------------------------"
+echo "archey"
+cd $thisdir"/correct/bin-archey"          && java MainClass

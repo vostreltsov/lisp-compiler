@@ -271,7 +271,8 @@ public:
     SemanticConstant * findInterfaceMethodrefConstant(QString interfaceName, QString methodName) const;
 
     void addDefaultAndParentConstructor();
-    void addRTLConstants();
+    void addBaseClassConstants();
+    void addRTLMethod(QString methodName);
 
     bool hasField(QString name) const;
     bool hasMethod(QString name) const;
