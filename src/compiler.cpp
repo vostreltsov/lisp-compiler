@@ -1847,14 +1847,14 @@ QByteArray SExpressionNode::collectExpressionsToArray(const SemanticClass * curC
     SemanticConstant * constBaseClass = curClass->findClassConstant(NAME_JAVA_CLASS_BASE);
 
     // Create a new array.
-    stream << CMD_BIPUSH << (quint8)expressions.size();
+    stream << CMD_SIPUSH << (quint16)expressions.size();
     stream << CMD_ANEWARRAY << constBaseClass->fNumber;
 
     // Set the items.
-    quint8 index = 0;
+    quint16 index = 0;
     foreach (SExpressionNode * expr, expressions) {
         stream << CMD_DUP;
-        stream << CMD_BIPUSH << index++;
+        stream << CMD_SIPUSH << index++;
 
         // Generate code for current expression.
         foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
