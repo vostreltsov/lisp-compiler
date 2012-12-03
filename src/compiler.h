@@ -72,6 +72,10 @@ class DefinitionNode;
 #define DESC_JAVA_METHOD_VOID_OBJECT        "()"DESC_JAVA_CLASS_OBJECT
 #define DESC_JAVA_METHOD_VOID_BASE          "()"DESC_JAVA_CLASS_BASE
 #define DESC_JAVA_METHOD_VOID_ITERATOR      "()"DESC_JAVA_INTERFACE_ITERATOR
+#define DESC_JAVA_METHOD_INTEGER_VOID       "("DESC_JAVA_INTEGER")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_CHARACTER_VOID     "("DESC_JAVA_CHARACTER")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_STRING_VOID        "("DESC_JAVA_CLASS_STRING")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_INT_INT_VOID       "("DESC_JAVA_INTEGER DESC_JAVA_INTEGER")"DESC_JAVA_VOID
 
 #define DESC_JAVA_METHOD_INTEGER_VOID       "("DESC_JAVA_INTEGER")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_STRING_VOID        "("DESC_JAVA_CLASS_STRING")"DESC_JAVA_VOID
@@ -243,10 +247,16 @@ public:
     SemanticConstant               * fConstCode;      // Utf8 constant "Code".
     SemanticConstant               * fConstClass;     // Name of the class (CONSTANT_Class).
     SemanticConstant               * fConstParent;    // Name of the parent class (CONSTANT_Class).
+    DefinitionNode const           * fNode;           // Corresponding tree node.
 
+    SemanticMethod                 * fConstructorBaseV;
+    SemanticMethod                 * fConstructorBaseI;
+    SemanticMethod                 * fConstructorBaseC;
+    SemanticMethod                 * fConstructorBaseS;
+    SemanticMethod                 * fConstructorBaseB;
     SemanticMethod                 * fConstructorThis;
     SemanticMethod                 * fConstructorParent;
-    DefinitionNode const           * fNode;           // Corresponding tree node.
+
 
     SemanticClass(QString name, QString parent, const DefinitionNode * node = NULL);
     ~SemanticClass();
@@ -285,7 +295,6 @@ private:
     QLinkedList<SemanticConstant *>  fConstantsTable; // Constants table.
     QMap<QString, SemanticField *>   fFieldsTable;    // Fields table.
     QMap<QString, SemanticMethod *>  fMethodsTable;   // Methods table.
-    static QString createMethodDesc(int numberOfArguments);
 };
 
 /**
@@ -326,6 +335,7 @@ public:
     static bool isRTLMethod(QString name);
     static QString getDescForBaseClassMethod(QString name);
     static QString getDescForRTLMethod(QString name);
+    static QString getDescForRegularMethod(int numberOfArguments);
 
 private:
     QMap<QString, SemanticLocalVar *> fLocalVarsTable; // Local variables table.

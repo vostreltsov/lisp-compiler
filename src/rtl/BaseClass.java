@@ -32,6 +32,31 @@ public class BaseClass {
         valueVector = null;
     }
 
+    public BaseClass(int _int) {
+        this();
+        type = TYPE_INT;
+        valueInt = _int;
+    }
+
+    public BaseClass(char _char) {
+        this();
+        type = TYPE_CHAR;
+        valueChar = _char;
+    }
+
+    public BaseClass(String _str) {
+        this();
+        type = TYPE_STRING;
+        valueString = _str;
+    }
+
+    public BaseClass(int _bool, int _reserved) {
+        // _reserved is added to avoid conflicts with the int constructor.
+        this();
+        type = TYPE_BOOLEAN;
+        valueBoolean = _bool;
+    }
+
     public Iterator iterator() {
         if (type == TYPE_LIST) {
             return valueList.iterator();

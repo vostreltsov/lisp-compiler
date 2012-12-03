@@ -554,10 +554,6 @@ SemanticConstant * SemanticClass::findInterfaceMethodrefConstant(QString interfa
 
 void SemanticClass::addDefaultAndParentConstructor()
 {
-    // Add constructor name and descriptor.
-    addUtf8Constant(NAME_JAVA_METHOD_INIT);
-    addUtf8Constant(DESC_JAVA_METHOD_VOID_VOID);
-
     // Add constructor to the methods table.
     fConstructorThis = new SemanticMethod();
     fConstructorParent = new SemanticMethod();
@@ -581,7 +577,21 @@ void SemanticClass::addBaseClassConstants()
     addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUEBOOLEAN, DESC_JAVA_INTEGER);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUELIST,    DESC_JAVA_CLASS_LINKEDLIST);
     addFieldrefConstant(NAME_JAVA_CLASS_BASE,  NAME_JAVA_FIELD_BASE_VALUEVECTOR,  DESC_JAVA_CLASS_VECTOR);
-    addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT,             DESC_JAVA_METHOD_VOID_VOID);
+
+    fConstructorBaseV = new SemanticMethod();
+    fConstructorBaseV->fConstMethodref = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_VOID_VOID);
+
+    fConstructorBaseI = new SemanticMethod();
+    fConstructorBaseI->fConstMethodref = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_INTEGER_VOID);
+
+    fConstructorBaseC = new SemanticMethod();
+    fConstructorBaseC->fConstMethodref = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_CHARACTER_VOID);
+
+    fConstructorBaseS = new SemanticMethod();
+    fConstructorBaseS->fConstMethodref = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_STRING_VOID);
+
+    fConstructorBaseB = new SemanticMethod();
+    fConstructorBaseB->fConstMethodref = addMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT, DESC_JAVA_METHOD_INT_INT_VOID);
 
     foreach (QString methodName, SemanticMethod::getBaseClassMethods()) {
         addMethodrefConstant(NAME_JAVA_CLASS_BASE, methodName, SemanticMethod::getDescForBaseClassMethod(methodName));
@@ -635,9 +645,9 @@ SemanticMethod * SemanticClass::addMethod(const DefinitionNode * node)
     if (node->fId == NAME_JAVA_METHOD_MAIN) {
         desc = DESC_JAVA_METHOD_ARRAYSTRING_VOID;
     } else if (fConstClass->fRef1->fUtf8 == NAME_JAVA_CLASS_MAINCLASS) {
-        desc = createMethodDesc(node->fArguments.size()); // Main class has only static members.
+        desc = SemanticMethod::getDescForRegularMethod(node->fArguments.size()); // Main class has only static members.
     } else {
-        desc = createMethodDesc(node->fArguments.size() + 1);   // Local vars + "this".
+        desc = SemanticMethod::getDescForRegularMethod(node->fArguments.size() + 1);   // Local vars + "this".
     }
     // Add methodref constant.
     newMethod->fConstMethodref = addMethodrefConstant(fConstClass->fRef1->fUtf8, node->fId, desc);
@@ -645,16 +655,6 @@ SemanticMethod * SemanticClass::addMethod(const DefinitionNode * node)
     newMethod->fNode = node;
     fMethodsTable.insert(node->fId, newMethod);
     return newMethod;
-}
-
-QString SemanticClass::createMethodDesc(int numberOfArguments)
-{
-    QString result = "(";
-    for (int i = 0; i < numberOfArguments; i++) {
-        result += DESC_JAVA_CLASS_BASE;
-    }
-    result += QString(")") + DESC_JAVA_CLASS_BASE;
-    return result;
 }
 
 SemanticField::SemanticField()
@@ -785,6 +785,16 @@ QString SemanticMethod::getDescForRTLMethod(QString name)
     } else {
         return DESC_JAVA_METHOD_ARRAYBASE_BASE;
     }
+}
+
+QString SemanticMethod::getDescForRegularMethod(int numberOfArguments)
+{
+    QString result = "(";
+    for (int i = 0; i < numberOfArguments; i++) {
+        result += DESC_JAVA_CLASS_BASE;
+    }
+    result += QString(")") + DESC_JAVA_CLASS_BASE;
+    return result;
 }
 
 void SemanticMethod::generateCodeAttribute(BinaryWriter * writer, const SemanticClass * curClass) const
@@ -1437,84 +1447,50 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     QDataStream stream(&result, QIODevice::WriteOnly);
 
     SemanticConstant * constBaseClass = curClass->findClassConstant(NAME_JAVA_CLASS_BASE);
-    SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT);
-    SemanticConstant * constFieldType = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE);
 
     switch (fSubType) {
     case S_EXPR_TYPE_EMPTY: {
+        // Just store a null reference.
         stream << CMD_ACONST_NULL;
         break;
     }
     case S_EXPR_TYPE_INT: {
+        // Create an instance of the base class (constructor witn an int).
         SemanticConstant * constValue = curClass->findIntegerConstant(fInteger);
-        SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT);
-
-        // Create an instance of the base class.
         stream << CMD_NEW << constBaseClass->fNumber;
-        stream << CMD_DUP;
-        stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
-        // Set the type of the variable.
-        stream << CMD_DUP;
-        stream << CMD_BIPUSH << BASECLASS_TYPE_INT;
-        stream << CMD_PUTFIELD << constFieldType->fNumber;
-        // Set the value of the variable.
         stream << CMD_DUP;
         if (constValue != NULL) {
             stream << CMD_LDC_W << constValue->fNumber; // Store the constant number.
         } else {
             stream << CMD_SIPUSH << (qint16)fInteger;   // Store the operand itself.
         }
-        stream << CMD_PUTFIELD << constFieldValueInt->fNumber;
+        stream << CMD_INVOKESPECIAL << curClass->fConstructorBaseI->fConstMethodref->fNumber;
         break;
     }
     case S_EXPR_TYPE_CHAR: {
-        SemanticConstant * constFieldValueChar = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUECHAR);
-        // Create an instance of the base class.
+        // Create an instance of the base class (constructor witn a char).
         stream << CMD_NEW << constBaseClass->fNumber;
         stream << CMD_DUP;
-        stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
-        // Set the type of the variable.
-        stream << CMD_DUP;
-        stream << CMD_BIPUSH << BASECLASS_TYPE_CHAR;
-        stream << CMD_PUTFIELD << constFieldType->fNumber;
-        // Set the value of the variable.
-        stream << CMD_DUP;
         stream << CMD_BIPUSH << fCharacter;   // Store the operand itself.
-        stream << CMD_PUTFIELD << constFieldValueChar->fNumber;
+        stream << CMD_INVOKESPECIAL << curClass->fConstructorBaseC->fConstMethodref->fNumber;
         break;
     }
     case S_EXPR_TYPE_STRING: {
+        // Create an instance of the base class (constructor witn a string).
         SemanticConstant * constValue = curClass->findStringConstant(fString);
-        SemanticConstant * constFieldValueString = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUESTRING);
-
-        // Create an instance of the base class.
         stream << CMD_NEW << constBaseClass->fNumber;
         stream << CMD_DUP;
-        stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
-        // Set the type of the variable.
-        stream << CMD_DUP;
-        stream << CMD_BIPUSH << BASECLASS_TYPE_STRING;
-        stream << CMD_PUTFIELD << constFieldType->fNumber;
-        // Set the value of the variable.
-        stream << CMD_DUP;
         stream << CMD_LDC_W << constValue->fNumber;
-        stream << CMD_PUTFIELD << constFieldValueString->fNumber;
+        stream << CMD_INVOKESPECIAL << curClass->fConstructorBaseS->fConstMethodref->fNumber;
         break;
     }
     case S_EXPR_TYPE_BOOL: {
-        SemanticConstant * constFieldValueBool = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEBOOLEAN);
-        // Create an instance of the base class.
+        // Create an instance of the base class (constructor witn two ints).
         stream << CMD_NEW << constBaseClass->fNumber;
         stream << CMD_DUP;
-        stream << CMD_INVOKESPECIAL << constBaseConstructor->fNumber;
-        // Set the type of the variable.
-        stream << CMD_DUP;
-        stream << CMD_BIPUSH << BASECLASS_TYPE_BOOLEAN;
-        stream << CMD_PUTFIELD << constFieldType->fNumber;
-        // Set the value of the variable.
-        stream << CMD_DUP;
         stream << CMD_BIPUSH << (quint8)(fBoolean ? 1 : 0);   // Store the operand itself.
-        stream << CMD_PUTFIELD << constFieldValueBool->fNumber;
+        stream << CMD_BIPUSH << (quint8)0;                    // Reserved argument, see the RTL.
+        stream << CMD_INVOKESPECIAL << curClass->fConstructorBaseB->fConstMethodref->fNumber;
         break;
     }
     case S_EXPR_TYPE_ID: {
@@ -1812,7 +1788,6 @@ QByteArray SExpressionNode::collectExpressionsToArray(const SemanticClass * curC
     QDataStream stream(&result, QIODevice::WriteOnly);
 
     SemanticConstant * constBaseClass = curClass->findClassConstant(NAME_JAVA_CLASS_BASE);
-    SemanticConstant * constBaseConstructor = curClass->findMethodrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_METHOD_INIT);
 
     // Create a new array.
     stream << CMD_BIPUSH << (quint8)expressions.size();
