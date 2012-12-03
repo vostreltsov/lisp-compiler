@@ -1066,6 +1066,10 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
 {
     QString tmp = "\"id" + QString::number(fNodeId) + "\\ns_expr:";
     switch (fSubType) {
+    case S_EXPR_TYPE_EMPTY: {
+        tmp += "empty list\"";
+        return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+    }
     case S_EXPR_TYPE_INT: {
         tmp += "int\\n" + QString::number(fInteger) + "\"";
         return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
@@ -1256,6 +1260,10 @@ void SExpressionNode::semantics(SemanticProgram * program, QStringList * errorLi
 {
     // Analyse this node.
     switch (fSubType) {
+    case S_EXPR_TYPE_EMPTY: {
+        // Nothing to do.
+        break;
+    }
     case S_EXPR_TYPE_INT: {
         // Add an integer constant if 2 bytes not enough.
         if (fInteger > TWOBYTES_MAX || fInteger < TWOBYTES_MIN) {
@@ -1404,6 +1412,10 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
     SemanticConstant * constFieldType = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_TYPE);
 
     switch (fSubType) {
+    case S_EXPR_TYPE_EMPTY: {
+        stream << CMD_ACONST_NULL;
+        break;
+    }
     case S_EXPR_TYPE_INT: {
         SemanticConstant * constValue = curClass->findIntegerConstant(fInteger);
         SemanticConstant * constFieldValueInt = curClass->findFieldrefConstant(NAME_JAVA_CLASS_BASE, NAME_JAVA_FIELD_BASE_VALUEINT);
@@ -1571,8 +1583,9 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
 
         // Add the goto.
         stream << CMD_GOTO << (qint16)(-LENGTH_NEW_ITER - LENGTH_IF - LENGTH_NEW_VALUE - LENGTH_BODY);
-        break;
 
+        // Add a fictive returning value.
+        stream << CMD_ACONST_NULL;
         break;
     }
     case S_EXPR_TYPE_LOOP_FROM_TO:
@@ -1639,6 +1652,9 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
 
         // Add the goto.
         stream << CMD_GOTO << (qint16)(-LENGTH_NEW_ITER - LENGTH_IF - LENGTH_BODY - LENGTH_IINC);
+
+        // Add a fictive returning value.
+        stream << CMD_ACONST_NULL;
         break;
     }
     case S_EXPR_TYPE_PROGN: {
@@ -1647,7 +1663,9 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
             foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {
                 stream << byte;
             }
-            stream << CMD_POP;
+            if (expr != fArguments.last()) {
+                stream << CMD_POP;
+            }
         }
         break;
     }
@@ -1660,16 +1678,22 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         foreach (quint8 byte, fBody1->generateCode(curClass, curMethod)) {
             streamBody1 << byte;
         }
-        streamBody1 << CMD_POP;
+        if (codeBody1.isEmpty()) {
+            // So this branch has a returning value too.
+            streamBody1 << CMD_DUP;
+        }
 
         QByteArray codeBody2;
+        QDataStream streamBody2(&codeBody2, QIODevice::WriteOnly);
         if (fBody2 != NULL){
-            QDataStream streamBody2(&codeBody2, QIODevice::WriteOnly);
             // Generate code for body2.
             foreach (quint8 byte, fBody2->generateCode(curClass, curMethod)) {
                 streamBody2 << byte;
             }
-            streamBody2 << CMD_POP;
+        }
+        if (codeBody2.isEmpty()) {
+            // So this branch has a returning value too.
+            streamBody2 << CMD_DUP;
         }
 
         const qint16 LENGTH_BODY1 = codeBody1.size();
@@ -1715,12 +1739,6 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         break;
     }
     }
-
-    if (!isCalculable()) {
-        // Add the fictive result for non-calculable expressions.
-        stream << CMD_ACONST_NULL;
-    }
-
     return result;
 }
 
@@ -2112,6 +2130,8 @@ QByteArray DefinitionNode::generateCode(const SemanticClass * curClass, const Se
         break;
     }
     case DEF_TYPE_FUNC: {
+        // At least the function should return NULL.
+        stream << CMD_ACONST_NULL;
         foreach (SExpressionNode * expr, fBody) {
             // Generate code for current expression.
             foreach (quint8 byte, expr->generateCode(curClass, curMethod)) {

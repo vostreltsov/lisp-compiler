@@ -101,12 +101,12 @@ program_part_seq : program_part                   {$$ = create_program_part_seq(
                  | program_part_seq program_part  {$$ = add_to_program_part_seq($1, $2);}
                  ;
 
-s_expr : INT                                                         {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_INT,      $1, '\0',  NULL,  0,  NULL);}
-       | CHAR                                                        {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_CHAR,     0,  $1,    NULL,  0,  NULL);}
-       | STRING                                                      {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_STRING,   0,  '\0',  $1,    0,  NULL);}
-       | BOOL                                                        {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_BOOL,     0,  '\0',  NULL,  $1, NULL);}
-       | ID                                                          {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_ID,       0,  '\0',  NULL,  0,  $1);}
-       | '(' ')'                                                     {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_RESERVED, 0,  '\0',  NULL,  0,  NULL);}
+s_expr : INT                                                         {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_INT,     $1, '\0',  NULL,  0,  NULL);}
+       | CHAR                                                        {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_CHAR,    0,  $1,    NULL,  0,  NULL);}
+       | STRING                                                      {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_STRING,  0,  '\0',  $1,    0,  NULL);}
+       | BOOL                                                        {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_BOOL,    0,  '\0',  NULL,  $1, NULL);}
+       | ID                                                          {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_ID,      0,  '\0',  NULL,  0,  $1);}
+       | '(' ')'                                                     {$$ = create_s_expr_simple(++idCounter, S_EXPR_TYPE_EMPTY,   0,  '\0',  NULL,  0,  NULL);}
 
        | '(' ID ')'                                                  {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, NULL);}
        | '(' ID s_expr_seq ')'                                       {$$ = create_s_expr_funcall(++idCounter, S_EXPR_TYPE_FCALL, $2, $3);}

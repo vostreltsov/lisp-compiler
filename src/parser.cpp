@@ -1562,37 +1562,37 @@ yyreduce:
   case 11:
 /* Line 1778 of yacc.c  */
 #line 104 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_INT,      (yyvsp[(1) - (1)].semantic_int), '\0',  NULL,  0,  NULL);}
+    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_INT,     (yyvsp[(1) - (1)].semantic_int), '\0',  NULL,  0,  NULL);}
     break;
 
   case 12:
 /* Line 1778 of yacc.c  */
 #line 105 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_CHAR,     0,  (yyvsp[(1) - (1)].semantic_char),    NULL,  0,  NULL);}
+    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_CHAR,    0,  (yyvsp[(1) - (1)].semantic_char),    NULL,  0,  NULL);}
     break;
 
   case 13:
 /* Line 1778 of yacc.c  */
 #line 106 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_STRING,   0,  '\0',  (yyvsp[(1) - (1)].semantic_string),    0,  NULL);}
+    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_STRING,  0,  '\0',  (yyvsp[(1) - (1)].semantic_string),    0,  NULL);}
     break;
 
   case 14:
 /* Line 1778 of yacc.c  */
 #line 107 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_BOOL,     0,  '\0',  NULL,  (yyvsp[(1) - (1)].semantic_bool), NULL);}
+    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_BOOL,    0,  '\0',  NULL,  (yyvsp[(1) - (1)].semantic_bool), NULL);}
     break;
 
   case 15:
 /* Line 1778 of yacc.c  */
 #line 108 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_ID,       0,  '\0',  NULL,  0,  (yyvsp[(1) - (1)].semantic_id));}
+    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_ID,      0,  '\0',  NULL,  0,  (yyvsp[(1) - (1)].semantic_id));}
     break;
 
   case 16:
 /* Line 1778 of yacc.c  */
 #line 109 "parser.y"
-    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_RESERVED, 0,  '\0',  NULL,  0,  NULL);}
+    {(yyval.semantic_s_expr) = create_s_expr_simple(++idCounter, S_EXPR_TYPE_EMPTY,   0,  '\0',  NULL,  0,  NULL);}
     break;
 
   case 17:
