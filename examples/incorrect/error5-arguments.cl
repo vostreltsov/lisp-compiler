@@ -1,2 +1,2 @@
 (defun foo(bar bar)
-	())
+    ())
