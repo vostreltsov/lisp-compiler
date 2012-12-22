@@ -1578,7 +1578,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
 
         const qint16 LENGTH_NEW_ITER  = 2 + 5;           // ALOAD + CMD_INVOKEINTERFACE
         const qint16 LENGTH_IF        = 3;               // IFEQ
-        const qint16 LENGTH_NEW_VALUE = 2 + 5 + 2;       // ALOAD + CMD_INVOKEINTERFACE + ASTORE
+        const qint16 LENGTH_NEW_VALUE = 2 + 5 + 3 + 2;   // ALOAD + CMD_INVOKEINTERFACE + CHECKCAST + ASTORE
         const qint16 LENGTH_BODY      = codeBody.size(); // body expressions
         const qint16 LENGTH_GOTO      = 3;               // GOTO
 
@@ -1599,6 +1599,7 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
         // Get the current value.
         stream << CMD_ALOAD << fIterator->fNumber;
         stream << CMD_INVOKEINTERFACE << constMethodNext->fNumber << (quint8)1 << (quint8)0;
+        stream << CMD_CHECKCAST << curClass->findClassConstant(NAME_JAVA_CLASS_BASE)->fNumber;
         stream << CMD_ASTORE << value->fNumber;
 
         // Write code of the body.

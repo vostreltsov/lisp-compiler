@@ -154,6 +154,7 @@ const quint8  CMD_INVOKESTATIC    = 0xB8;
 const quint8  CMD_INVOKEINTERFACE = 0xB9;
 const quint8  CMD_NEW             = 0xBB;
 const quint8  CMD_ANEWARRAY       = 0xBD;
+const quint8  CMD_CHECKCAST       = 0xC0;
 
 const quint16 STACK_SIZE          = 1024;
 

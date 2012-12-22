@@ -1,6 +1,7 @@
 (defun print_shape(shape)
     (loop for row in shape do
-        (print row)
+        (loop for col in row do
+            (print col " "))
         (print "\n")))
 
 (defun fill (shape x y old_color new_color)
