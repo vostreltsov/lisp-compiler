@@ -16,6 +16,7 @@ thisdir=$(pwd)
 ./qtproject -i correct/loops.cl          -o $thisdir"/correct/bin-loops"
 ./qtproject -i correct/maths.cl          -o $thisdir"/correct/bin-maths"
 ./qtproject -i correct/quicksort.cl      -o $thisdir"/correct/bin-quicksort"
+./qtproject -i correct/shape-filling.cl  -o $thisdir"/correct/bin-shape-filling"
 
 echo "----------------------------------------"
 echo "boolean"
@@ -60,6 +61,10 @@ cd $thisdir"/correct/bin-maths"           && java MainClass
 echo "----------------------------------------"
 echo "quicksort"
 cd $thisdir"/correct/bin-quicksort"       && java MainClass
+
+echo "----------------------------------------"
+echo "shape-filling"
+cd $thisdir"/correct/bin-shape-filling"   && java MainClass
 
 echo "----------------------------------------"
 echo "archey"
