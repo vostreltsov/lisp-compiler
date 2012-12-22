@@ -66,7 +66,6 @@ int idCounter = 0;
 %token IF
 %token DEFCLASS
 %token DEFUN
-%token FUNCALL
 %token INITFORM
 %token READER
 %token WRITER

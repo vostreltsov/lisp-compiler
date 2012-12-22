@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 2.6.5.  */
+/* A Bison parser, made by GNU Bison 2.7.  */
 
 /* Bison interface for Yacc-like parsers in C
    
@@ -63,19 +63,18 @@ extern int yydebug;
      IF = 272,
      DEFCLASS = 273,
      DEFUN = 274,
-     FUNCALL = 275,
-     INITFORM = 276,
-     READER = 277,
-     WRITER = 278,
-     ACCESSOR = 279,
-     ALLOCATION = 280,
-     ALLOCINSTANCE = 281,
-     ALLOCCLASS = 282,
-     MAKEINSTANCE = 283,
-     SLOTVALUE = 284,
-     ERROR_UNCLOSED_COMMENT = 285,
-     ERROR_UNCLOSED_STRING = 286,
-     ERROR_UNEXPECTED_CHARACTER = 287
+     INITFORM = 275,
+     READER = 276,
+     WRITER = 277,
+     ACCESSOR = 278,
+     ALLOCATION = 279,
+     ALLOCINSTANCE = 280,
+     ALLOCCLASS = 281,
+     MAKEINSTANCE = 282,
+     SLOTVALUE = 283,
+     ERROR_UNCLOSED_COMMENT = 284,
+     ERROR_UNCLOSED_STRING = 285,
+     ERROR_UNEXPECTED_CHARACTER = 286
    };
 #endif
 
@@ -83,7 +82,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 {
-/* Line 2042 of yacc.c  */
+/* Line 2058 of yacc.c  */
 #line 19 "parser.y"
 
     int                              semantic_int;
@@ -103,8 +102,8 @@ typedef union YYSTYPE
     struct def_struct              * semantic_def;
 
 
-/* Line 2042 of yacc.c  */
-#line 108 "parser.hpp"
+/* Line 2058 of yacc.c  */
+#line 107 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

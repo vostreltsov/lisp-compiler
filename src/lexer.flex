@@ -272,9 +272,6 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
 "defun" {
     return DEFUN;
 }
-"funcall" {
-    return FUNCALL;
-}
 ":initform" {
     return INITFORM;
 }
