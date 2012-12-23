@@ -22,6 +22,7 @@ enum s_expr_type {
     S_EXPR_TYPE_RESERVED,         // Default invalid value.
     S_EXPR_TYPE_EMPTY,            // Emptiness, stands for NULL.
     S_EXPR_TYPE_INT,              // Integer value.
+    S_EXPR_TYPE_FLOAT,            // Floating point value.
     S_EXPR_TYPE_CHAR,             // Character value.
     S_EXPR_TYPE_STRING,           // String value.
     S_EXPR_TYPE_BOOL,             // Boolean value.

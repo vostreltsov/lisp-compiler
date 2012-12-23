@@ -8,14 +8,16 @@ import java.util.Iterator;
 public class BaseClass {
     final public static int TYPE_DAFUQ   = 0;
     final public static int TYPE_INT     = 1;
-    final public static int TYPE_CHAR    = 2;
-    final public static int TYPE_STRING  = 3;
-    final public static int TYPE_BOOLEAN = 4;
-    final public static int TYPE_LIST    = 5;
-    final public static int TYPE_VECTOR  = 6;
+    final public static int TYPE_FLOAT   = 2;
+    final public static int TYPE_CHAR    = 3;
+    final public static int TYPE_STRING  = 4;
+    final public static int TYPE_BOOLEAN = 5;
+    final public static int TYPE_LIST    = 6;
+    final public static int TYPE_VECTOR  = 7;
 
     public int type;
     public int valueInt;
+    public float valueFloat;
     public char valueChar;
     public String valueString;
     public int valueBoolean;
@@ -25,6 +27,7 @@ public class BaseClass {
     public BaseClass() {
         type = TYPE_DAFUQ;
         valueInt = 0;
+        valueFloat = 0;
         valueChar = '0';
         valueString = "";
         valueBoolean = 0;
@@ -36,6 +39,14 @@ public class BaseClass {
         this();
         type = TYPE_INT;
         valueInt = _int;
+        valueFloat = (float)valueInt;
+    }
+
+    public BaseClass(float _float) {
+        this();
+        type = TYPE_FLOAT;
+        valueInt = (int)_float;
+        valueFloat = _float;
     }
 
     public BaseClass(char _char) {

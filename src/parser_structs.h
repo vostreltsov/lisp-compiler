@@ -26,6 +26,7 @@ struct s_expr_struct {
     int                              nodeId;    // Identifier of the node in the syntax tree.
     enum s_expr_type                 type;      // Type of the s-expression.
     int                              integer;   // An integer constant.
+    float                            floating;  // A floating-point constant.
     char                             character; // A character constant.
     char                           * string;    // A string constant.
     int                              boolean;   // A boolean constant.

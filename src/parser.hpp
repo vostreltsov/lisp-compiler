@@ -47,34 +47,35 @@ extern int yydebug;
       know about them.  */
    enum yytokentype {
      INT = 258,
-     CHAR = 259,
-     STRING = 260,
-     BOOL = 261,
-     ID = 262,
-     LOOP = 263,
-     FOR = 264,
-     IN = 265,
-     DO = 266,
-     FROM = 267,
-     TO = 268,
-     DOWNTO = 269,
-     WHILE = 270,
-     PROGN = 271,
-     IF = 272,
-     DEFCLASS = 273,
-     DEFUN = 274,
-     INITFORM = 275,
-     READER = 276,
-     WRITER = 277,
-     ACCESSOR = 278,
-     ALLOCATION = 279,
-     ALLOCINSTANCE = 280,
-     ALLOCCLASS = 281,
-     MAKEINSTANCE = 282,
-     SLOTVALUE = 283,
-     ERROR_UNCLOSED_COMMENT = 284,
-     ERROR_UNCLOSED_STRING = 285,
-     ERROR_UNEXPECTED_CHARACTER = 286
+     FLOAT = 259,
+     CHAR = 260,
+     STRING = 261,
+     BOOL = 262,
+     ID = 263,
+     LOOP = 264,
+     FOR = 265,
+     IN = 266,
+     DO = 267,
+     FROM = 268,
+     TO = 269,
+     DOWNTO = 270,
+     WHILE = 271,
+     PROGN = 272,
+     IF = 273,
+     DEFCLASS = 274,
+     DEFUN = 275,
+     INITFORM = 276,
+     READER = 277,
+     WRITER = 278,
+     ACCESSOR = 279,
+     ALLOCATION = 280,
+     ALLOCINSTANCE = 281,
+     ALLOCCLASS = 282,
+     MAKEINSTANCE = 283,
+     SLOTVALUE = 284,
+     ERROR_UNCLOSED_COMMENT = 285,
+     ERROR_UNCLOSED_STRING = 286,
+     ERROR_UNEXPECTED_CHARACTER = 287
    };
 #endif
 
@@ -86,6 +87,7 @@ typedef union YYSTYPE
 #line 19 "parser.y"
 
     int                              semantic_int;
+    float                            semantic_float;
     char                             semantic_char;
     char                           * semantic_string;
     int                              semantic_bool;
@@ -103,7 +105,7 @@ typedef union YYSTYPE
 
 
 /* Line 2058 of yacc.c  */
-#line 107 "parser.hpp"
+#line 109 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

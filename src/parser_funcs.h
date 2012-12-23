@@ -33,6 +33,7 @@ struct program_part_seq_struct * add_to_program_part_seq(struct program_part_seq
 struct s_expr_struct * create_s_expr_simple(int nodeId,
                                             enum s_expr_type type,
                                             int integer,
+                                            float floating,
                                             char character,
                                             char * string,
                                             int boolean,

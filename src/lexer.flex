@@ -203,6 +203,12 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     yylval.semantic_int = sign * nondec2dec(yytext + 2 + shift, 16);
     return INT;
 }
+"-"?{DIGIT_DEC}+"."{DIGIT_DEC}* {
+    // Floating-point constant.
+    char * pEnd;
+    yylval.semantic_float = strtof(yytext, &pEnd);
+    return FLOAT;
+}
 "#\\"{NOTWHITESPACE} {
     // Character constant.
     yylval.semantic_char = yytext[2];

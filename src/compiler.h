@@ -48,6 +48,7 @@ class DefinitionNode;
 
 #define NAME_JAVA_FIELD_BASE_TYPE           "type"
 #define NAME_JAVA_FIELD_BASE_VALUEINT       "valueInt"
+#define NAME_JAVA_FIELD_BASE_VALUEFLOAT     "valueFloat"
 #define NAME_JAVA_FIELD_BASE_VALUECHAR      "valueChar"
 #define NAME_JAVA_FIELD_BASE_VALUESTRING    "valueString"
 #define NAME_JAVA_FIELD_BASE_VALUEBOOLEAN   "valueBoolean"
@@ -56,6 +57,7 @@ class DefinitionNode;
 
 #define DESC_JAVA_VOID                      "V"
 #define DESC_JAVA_INTEGER                   "I"
+#define DESC_JAVA_FLOAT                     "F"
 #define DESC_JAVA_CHARACTER                 "C"
 #define DESC_JAVA_BOOLEAN                   "Z"
 #define DESC_JAVA_CLASS_OBJECT              "L"NAME_JAVA_CLASS_OBJECT";"
@@ -73,24 +75,22 @@ class DefinitionNode;
 #define DESC_JAVA_METHOD_VOID_BASE          "()"DESC_JAVA_CLASS_BASE
 #define DESC_JAVA_METHOD_VOID_ITERATOR      "()"DESC_JAVA_INTERFACE_ITERATOR
 #define DESC_JAVA_METHOD_INTEGER_VOID       "("DESC_JAVA_INTEGER")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_FLOAT_VOID         "("DESC_JAVA_FLOAT")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_CHARACTER_VOID     "("DESC_JAVA_CHARACTER")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_STRING_VOID        "("DESC_JAVA_CLASS_STRING")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_INT_INT_VOID       "("DESC_JAVA_INTEGER DESC_JAVA_INTEGER")"DESC_JAVA_VOID
-
-#define DESC_JAVA_METHOD_INTEGER_VOID       "("DESC_JAVA_INTEGER")"DESC_JAVA_VOID
-#define DESC_JAVA_METHOD_STRING_VOID        "("DESC_JAVA_CLASS_STRING")"DESC_JAVA_VOID
-#define DESC_JAVA_METHOD_ARRAYSTRING_VOID   "("DESC_JAVA_ARRAY_STRING")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_BASE_VOID          "("DESC_JAVA_CLASS_BASE")"DESC_JAVA_VOID
+#define DESC_JAVA_METHOD_ARRAYSTRING_VOID   "("DESC_JAVA_ARRAY_STRING")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_ARRAYBASE_BASE     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_CLASS_BASE
-
 
 const quint8 BASECLASS_TYPE_DAFUQ   = 0;
 const quint8 BASECLASS_TYPE_INT     = 1;
-const quint8 BASECLASS_TYPE_CHAR    = 2;
-const quint8 BASECLASS_TYPE_STRING  = 3;
-const quint8 BASECLASS_TYPE_BOOLEAN = 4;
-const quint8 BASECLASS_TYPE_LIST    = 5;
-const quint8 BASECLASS_TYPE_VECTOR  = 6;
+const quint8 BASECLASS_TYPE_FLOAT   = 2;
+const quint8 BASECLASS_TYPE_CHAR    = 4;
+const quint8 BASECLASS_TYPE_STRING  = 4;
+const quint8 BASECLASS_TYPE_BOOLEAN = 5;
+const quint8 BASECLASS_TYPE_LIST    = 6;
+const quint8 BASECLASS_TYPE_VECTOR  = 7;
 
 const qint16 TWOBYTES_MAX         = 32767;
 const qint16 TWOBYTES_MIN         = -32768;
@@ -199,11 +199,12 @@ public:
     JavaConstantsTypes fType;     // Type of the constant.
     QString            fUtf8;     // UTF-8 string.
     qint32             fInteger;  // Integer value.
+    float              fFloat;    // Float value.
     SemanticConstant * fRef1;     // Pointer to another constant if required.
     SemanticConstant * fRef2;     // Pointer to another constant if required.
 
     SemanticConstant(quint16 number = 0, JavaConstantsTypes type = CONSTANT_Utf8, QString utf8 = "",
-                     qint32 integer = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
+                     qint32 integer = 0, float floating = 0, SemanticConstant * ref1 = NULL, SemanticConstant * ref2 = NULL);
 
     void generateCode(BinaryWriter * writer) const;
     QString toString() const;
@@ -252,12 +253,12 @@ public:
 
     SemanticMethod                 * fConstructorBaseV;
     SemanticMethod                 * fConstructorBaseI;
+    SemanticMethod                 * fConstructorBaseF;
     SemanticMethod                 * fConstructorBaseC;
     SemanticMethod                 * fConstructorBaseS;
     SemanticMethod                 * fConstructorBaseB;
     SemanticMethod                 * fConstructorThis;
     SemanticMethod                 * fConstructorParent;
-
 
     SemanticClass(QString name, QString parent, const DefinitionNode * node = NULL);
     ~SemanticClass();
@@ -267,6 +268,7 @@ public:
 
     SemanticConstant * addUtf8Constant(QString value);
     SemanticConstant * addIntegerConstant(qint32 value);
+    SemanticConstant * addFloatConstant(float value);
     SemanticConstant * addClassConstant(QString name);
     SemanticConstant * addStringConstant(QString value);
     SemanticConstant * addFieldrefConstant(QString className, QString fieldName, QString descriptor);
@@ -275,11 +277,13 @@ public:
     SemanticConstant * addNameAndTypeConstant(QString name, QString type);
 
     SemanticConstant * findIntegerConstant(qint32 value) const;
+    SemanticConstant * findFloatConstant(float value) const;
     SemanticConstant * findClassConstant(QString name) const;
     SemanticConstant * findStringConstant(QString name) const;
     SemanticConstant * findFieldrefConstant(QString className, QString fieldName, QString descriptor) const;
     SemanticConstant * findMethodrefConstant(QString className, QString methodName, QString descriptor) const;
     SemanticConstant * findInterfaceMethodrefConstant(QString interfaceName, QString methodName, QString descriptor) const;
+    SemanticConstant * findNameAndTypeConstant(QString name, QString type) const;
 
     void addDefaultAndParentConstructor();
     void addBaseClassConstants();
@@ -289,7 +293,7 @@ public:
     bool hasMethod(QString name) const;
     SemanticField * getField(QString name) const;
     SemanticMethod * getMethod(QString name) const;
-    SemanticField * addField(const DefinitionNode * node);
+    //SemanticField * addField(const DefinitionNode * node);
     SemanticMethod * addMethod(const DefinitionNode * node);
 
 private:
@@ -454,6 +458,7 @@ class SExpressionNode : public AttributedNode
 public:
     s_expr_type                       fSubType;
     qint32                            fInteger;
+    float                             fFloat;
     qint8                             fCharacter;
     QString                           fString;
     qint32                            fBoolean;

@@ -384,6 +384,9 @@ public class LispRTL {
             case BaseClass.TYPE_INT:
                 System.out.print(obj.valueInt);
                 break;
+            case BaseClass.TYPE_FLOAT:
+                System.out.print(obj.valueFloat);
+                break;
             case BaseClass.TYPE_CHAR:
                 System.out.print(obj.valueChar);
                 break;
