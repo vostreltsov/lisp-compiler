@@ -32,7 +32,7 @@ void SemanticConstant::generateCode(BinaryWriter * writer) const
         break;
     }
     case CONSTANT_Float: {
-        writer->writeU4(fFloat);
+        writer->writeF4(fFloat);
         break;
     }
     case CONSTANT_Long: {
@@ -1137,6 +1137,10 @@ QString SExpressionNode::dotCode(QString parent, QString label) const
     }
     case S_EXPR_TYPE_INT: {
         tmp += "int\\n" + QString::number(fInteger) + "\"";
+        return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
+    }
+    case S_EXPR_TYPE_FLOAT: {
+        tmp += "float\\n" + QString::number(fFloat) + "\"";
         return parent + "->" + tmp + "[label=\"" + label + "\"];\n";
     }
     case S_EXPR_TYPE_CHAR: {

@@ -47,6 +47,18 @@ void BinaryWriter::writeU1(quint8 value)
     }
 }
 
+void BinaryWriter::writeF4(float value)
+{
+    if (isAlive()) {
+        void * data = &value;
+        char * lol = (char*)data;
+        stream.writeRawData(&lol[3], 1);
+        stream.writeRawData(&lol[2], 1);
+        stream.writeRawData(&lol[1], 1);
+        stream.writeRawData(&lol[0], 1);
+    }
+}
+
 void BinaryWriter::writeByteArray(QByteArray bytes)
 {
     if (isAlive()) {
