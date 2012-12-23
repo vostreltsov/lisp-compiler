@@ -11,6 +11,7 @@ thisdir=$(pwd)
 ./qtproject -i correct/containers.cl     -o $thisdir"/correct/bin-containers"
 ./qtproject -i correct/defun.cl          -o $thisdir"/correct/bin-defun"
 ./qtproject -i correct/factorial.cl      -o $thisdir"/correct/bin-factorial"
+./qtproject -i correct/floats.cl         -o $thisdir"/correct/bin-floats"
 ./qtproject -i correct/helloworld.cl     -o $thisdir"/correct/bin-helloworld"
 ./qtproject -i correct/if-else-progn.cl  -o $thisdir"/correct/bin-if-else-progn"
 ./qtproject -i correct/loops.cl          -o $thisdir"/correct/bin-loops"
@@ -41,6 +42,10 @@ cd $thisdir"/correct/bin-defun"           && java MainClass
 echo "----------------------------------------"
 echo "factorial"
 cd $thisdir"/correct/bin-factorial"       && java MainClass
+
+echo "----------------------------------------"
+echo "floats"
+cd $thisdir"/correct/bin-floats"          && java MainClass
 
 echo "----------------------------------------"
 echo "helloworld"

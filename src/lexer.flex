@@ -5,7 +5,7 @@
 #include "parser.hpp"
 #include "errors.h"
 
-int my_powah(int base, int n)
+int mah_powah(int base, int n)
 {
     int result = 1;
     for (int i = 0; i < n; i++)
@@ -13,7 +13,7 @@ int my_powah(int base, int n)
     return result;
 }
 
-int nondec2dec(char * string, int base)
+int nondec2dec(const char * string, int base)
 {
     int result = 0;
     size_t length = strlen(string);
@@ -54,9 +54,29 @@ int nondec2dec(char * string, int base)
         default:
             tmp = 0;
         }
-        result += tmp * my_powah(base, i);
+        result += tmp * mah_powah(base, i);
     }
     return result;
+}
+
+float str2float(const char * string) {
+    char left[256];
+    char right[256];
+    const char * cur = string;
+    int i = 0;
+    while ('0' <= *cur && *cur <= '9' && *cur != '\0') {
+        left[i++] = *cur;
+        cur++;
+    }
+    left[i] = '\0';
+    cur++;  // skip '.'
+    i = 0;
+    while ('0' <= *cur && *cur <= '9' && *cur != '\0') {
+        right[i++] = *cur;
+        cur++;
+    }
+    right[i] = '\0';
+    return (float)nondec2dec(left, 10) + (float)nondec2dec(right, 10) / (float)mah_powah(10, strlen(right));
 }
 
 void store_function_id(const char * id) {
@@ -187,10 +207,8 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     yylval.semantic_int = sign * nondec2dec(yytext + 2 + shift, 8);
     return INT;
 }
-"-"?{DIGIT_DEC}+"."? {
+"-"?{DIGIT_DEC}+ {
     // Numeric constant.
-    if (yytext[yyleng - 1] == '.')
-        yytext[yyleng - 1] = '\0';
     int shift = (yytext[0] == '-') ? 1 : 0;
     int sign = shift ? -1 : 1;
     yylval.semantic_int = sign * nondec2dec(yytext + shift, 10);
@@ -203,10 +221,11 @@ unsigned int    buffer_length = 0;  // Length of the buffer.
     yylval.semantic_int = sign * nondec2dec(yytext + 2 + shift, 16);
     return INT;
 }
-"-"?{DIGIT_DEC}+"."{DIGIT_DEC}* {
+"-"?{DIGIT_DEC}*"."{DIGIT_DEC}* {
     // Floating-point constant.
-    char * pEnd;
-    yylval.semantic_float = strtof(yytext, &pEnd);
+    int shift = (yytext[0] == '-') ? 1 : 0;
+    int sign = shift ? -1 : 1;
+    yylval.semantic_float = sign * str2float(yytext + shift);
     return FLOAT;
 }
 "#\\"{NOTWHITESPACE} {

@@ -29,22 +29,49 @@ public class LispRTL {
         }
     }
 
+    private static boolean hasFloats(BaseClass [] args) {
+        for (BaseClass tmp : args) {
+            if (tmp.type == BaseClass.TYPE_FLOAT) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasStrings(BaseClass [] args) {
+        for (BaseClass tmp : args) {
+            if (tmp.type == BaseClass.TYPE_STRING) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static BaseClass plus(BaseClass [] args) throws Exception {
         checkNumberOfArgumentsNotLess(args, 1, "+");
 
         BaseClass result = new BaseClass();
 
         // If there is a string - concatenate everything and return a string.
-        boolean stringExists = false;
-        for (BaseClass tmp : args) {
-            stringExists |= !tmp.valueString.isEmpty();
+        boolean hasFloats = hasFloats(args);
+        boolean hasStrings = hasStrings(args);
+
+        if (hasStrings) {
+            result.type = BaseClass.TYPE_STRING;
+        } else if (hasFloats) {
+            result.type = BaseClass.TYPE_FLOAT;
+        } else {
+            result.type = BaseClass.TYPE_INT;
         }
-        result.type = stringExists ? BaseClass.TYPE_STRING : BaseClass.TYPE_INT;
+
         for (BaseClass tmp : args) {
-            if (stringExists) {
+            if (hasStrings) {
                 switch(tmp.type) {
                 case BaseClass.TYPE_INT:
                     result.valueString += tmp.valueInt;
+                    break;
+                case BaseClass.TYPE_FLOAT:
+                    result.valueString += tmp.valueFloat;
                     break;
                 case BaseClass.TYPE_CHAR:
                     result.valueString += tmp.valueChar;
@@ -59,11 +86,20 @@ public class LispRTL {
                     result.valueString += tmp.toString();
                     break;
                 }
-
+            } else if (hasFloats) {
+                result.valueFloat += tmp.valueFloat;
             } else {
                 result.valueInt += tmp.valueInt;
             }
         }
+
+        // Update float and int fields if it's a number.
+        if (hasFloats) {
+            result.valueInt = (int)result.valueFloat;
+        } else {
+            result.valueFloat = (float)result.valueInt;
+        }
+
         return result;
     }
 
@@ -71,13 +107,30 @@ public class LispRTL {
         checkNumberOfArgumentsNotLess(args, 1, "-");
 
         BaseClass result = new BaseClass();
-        result.type = BaseClass.TYPE_INT;
+        boolean hasFloats = hasFloats(args);
+        result.type = hasFloats ? BaseClass.TYPE_FLOAT : BaseClass.TYPE_INT;
+
         // Some minus-specific magic here.
         if (args.length > 1) {
-            result.valueInt = 2 * args[0].valueInt;
+            if (hasFloats) {
+                result.valueFloat = 2 * args[0].valueFloat;
+            } else {
+                result.valueInt = 2 * args[0].valueInt;
+            }
         }
+        // Calculate the result.
         for (BaseClass tmp : args) {
-            result.valueInt -= tmp.valueInt;
+            if (hasFloats) {
+                result.valueFloat -= tmp.valueFloat;
+            } else {
+                result.valueInt -= tmp.valueInt;
+            }
+        }
+        // Update float and int fields.
+        if (hasFloats) {
+            result.valueInt = (int)result.valueFloat;
+        } else {
+            result.valueFloat = (float)result.valueInt;
         }
         return result;
     }
@@ -86,10 +139,24 @@ public class LispRTL {
         checkNumberOfArgumentsNotLess(args, 1, "*");
 
         BaseClass result = new BaseClass();
-        result.type = BaseClass.TYPE_INT;
+        boolean hasFloats = hasFloats(args);
+        result.type = hasFloats ? BaseClass.TYPE_FLOAT : BaseClass.TYPE_INT;
         result.valueInt = 1;
+        result.valueFloat = 1;
+        // Calculate the result.
         for (BaseClass tmp : args) {
-            result.valueInt *= tmp.valueInt;
+            if (hasFloats) {
+                result.valueFloat *= tmp.valueFloat;
+            } else {
+                result.valueInt *= tmp.valueInt;
+            }
+
+        }
+        // Update float and int fields.
+        if (hasFloats) {
+            result.valueInt = (int)result.valueFloat;
+        } else {
+            result.valueFloat = (float)result.valueInt;
         }
         return result;
     }
@@ -99,21 +166,36 @@ public class LispRTL {
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_INT;
+        boolean hasFloats = hasFloats(args);
+        result.type = hasFloats ? BaseClass.TYPE_FLOAT : BaseClass.TYPE_INT;
         result.valueInt = 1;
+        result.valueFloat = 1;
         // Some div-specific magic here.
         if (args.length == 1) {
-            if (args[0].valueInt == 0) {
-                throw new Exception("Division by zero");
+            if (hasFloats) {
+                result.valueFloat /= args[0].valueFloat;
+            } else {
+                result.valueInt /= args[0].valueInt;
             }
-            result.valueInt /= args[0].valueInt;
         } else {
-            result.valueInt = args[0].valueInt;
-            for (int i = 1; i < args.length; i++) {
-                if (args[i].valueInt == 0) {
-                    throw new Exception("Division by zero");
+            if (hasFloats) {
+                result.valueFloat = args[0].valueFloat;
+                for (int i = 1; i < args.length; i++) {
+                    result.valueFloat /= args[i].valueFloat;
                 }
-                result.valueInt /= args[i].valueInt;
+            } else {
+                result.valueInt = args[0].valueInt;
+                for (int i = 1; i < args.length; i++) {
+                    result.valueInt /= args[i].valueInt;
+                }
             }
+
+        }
+        // Update float and int fields.
+        if (hasFloats) {
+            result.valueInt = (int)result.valueFloat;
+        } else {
+            result.valueFloat = (float)result.valueInt;
         }
         return result;
     }
@@ -123,12 +205,16 @@ public class LispRTL {
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
+        boolean hasFloats = hasFloats(args);
         boolean res = true;
         for (int i = 0; i < args.length - 1; i++) {
-            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT}, "an integer", ">");
-            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT}, "an integer", ">");
-            res &= args[i].valueInt > args[i + 1].valueInt;
-
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT, BaseClass.TYPE_FLOAT}, "a number", ">");
+            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT, BaseClass.TYPE_FLOAT}, "a number", ">");
+            if (hasFloats) {
+                res &= args[i].valueFloat > args[i + 1].valueFloat;
+            } else {
+                res &= args[i].valueInt > args[i + 1].valueInt;
+            }
         }
         result.valueBoolean = res ? 1 : 0;
         return result;
@@ -139,12 +225,16 @@ public class LispRTL {
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
+        boolean hasFloats = hasFloats(args);
         boolean res = true;
         for (int i = 0; i < args.length - 1; i++) {
-            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT}, "an integer", ">=");
-            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT}, "an integer", ">=");
-            res &= args[i].valueInt >= args[i + 1].valueInt;
-
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT, BaseClass.TYPE_FLOAT}, "a number", ">=");
+            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT, BaseClass.TYPE_FLOAT}, "a number", ">=");
+            if (hasFloats) {
+                res &= args[i].valueFloat >= args[i + 1].valueFloat;
+            } else {
+                res &= args[i].valueInt >= args[i + 1].valueInt;
+            }
         }
         result.valueBoolean = res ? 1 : 0;
         return result;
@@ -155,12 +245,16 @@ public class LispRTL {
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
+        boolean hasFloats = hasFloats(args);
         boolean res = true;
         for (int i = 0; i < args.length - 1; i++) {
-            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT}, "an integer", "<");
-            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT}, "an integer", "<");
-            res &= args[i].valueInt < args[i + 1].valueInt;
-
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT, BaseClass.TYPE_FLOAT}, "a number", "<");
+            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT, BaseClass.TYPE_FLOAT}, "a number", "<");
+            if (hasFloats) {
+                res &= args[i].valueFloat < args[i + 1].valueFloat;
+            } else {
+                res &= args[i].valueInt < args[i + 1].valueInt;
+            }
         }
         result.valueBoolean = res ? 1 : 0;
         return result;
@@ -171,12 +265,16 @@ public class LispRTL {
 
         BaseClass result = new BaseClass();
         result.type = BaseClass.TYPE_BOOLEAN;
+        boolean hasFloats = hasFloats(args);
         boolean res = true;
         for (int i = 0; i < args.length - 1; i++) {
-            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT}, "an integer", "<=");
-            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT}, "an integer", "<=");
-            res &= args[i].valueInt <= args[i + 1].valueInt;
-
+            checkArgumentType(args, i, new int[]{BaseClass.TYPE_INT, BaseClass.TYPE_FLOAT}, "a number", "<=");
+            checkArgumentType(args, i + 1, new int[]{BaseClass.TYPE_INT, BaseClass.TYPE_FLOAT}, "a number", "<=");
+            if (hasFloats) {
+                res &= args[i].valueFloat <= args[i + 1].valueFloat;
+            } else {
+                res &= args[i].valueInt <= args[i + 1].valueInt;
+            }
         }
         result.valueBoolean = res ? 1 : 0;
         return result;
@@ -193,6 +291,9 @@ public class LispRTL {
             switch(args[i].type) {
             case BaseClass.TYPE_INT:
                 res &= args[i].valueInt == args[i + 1].valueInt;
+                break;
+            case BaseClass.TYPE_FLOAT:
+                res &= args[i].valueFloat == args[i + 1].valueFloat;
                 break;
             case BaseClass.TYPE_CHAR:
                 res &= args[i].valueChar == args[i + 1].valueChar;
@@ -211,6 +312,9 @@ public class LispRTL {
                 break;
             default:
                 res = false;
+                break;
+            }
+            if (!res) {
                 break;
             }
 

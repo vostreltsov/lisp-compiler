@@ -1,0 +1,8 @@
+(print "evaluating (+ 1.4)          :  " (+ 1.4)          "\n")
+(print "evaluating (- 1.4)          :  " (- 1.4)          "\n")
+(print "evaluating (- 1.4 1.4)      :  " (- 1.4 1.4)      "\n")
+(print "evaluating (* 2 1.5 5)      :  " (* 2 1.5 5)      "\n")
+(print "evaluating (/ 2.4 2)        :  " (/ 2.4 2)        "\n")
+(print "evaluating (/ 2.4 2 0.5)    :  " (/ 2.4 2 0.5)    "\n")
+(print "evaluating (+ 10 1.4)       :  " (+ 10 1.4)       "\n")
+(print "evaluating (+ 10 1.4 \"1\")   :  " (+ 10 1.4 "1") "\n")
