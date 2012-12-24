@@ -8,6 +8,7 @@ thisdir=$(pwd)
 ./qtproject -i correct/boolean.cl        -o $thisdir"/correct/bin-boolean"
 ./qtproject -i correct/bubblesort.cl     -o $thisdir"/correct/bin-bubblesort"
 ./qtproject -i correct/concatenation.cl  -o $thisdir"/correct/bin-concatenation"
+./qtproject -i correct/conio.cl          -o $thisdir"/correct/bin-conio"
 ./qtproject -i correct/containers.cl     -o $thisdir"/correct/bin-containers"
 ./qtproject -i correct/defun.cl          -o $thisdir"/correct/bin-defun"
 ./qtproject -i correct/factorial.cl      -o $thisdir"/correct/bin-factorial"
@@ -30,6 +31,10 @@ cd $thisdir"/correct/bin-bubblesort"      && java MainClass
 echo "----------------------------------------"
 echo "concatenation"
 cd $thisdir"/correct/bin-concatenation"   && java MainClass
+
+echo "----------------------------------------"
+echo "conio"
+#cd $thisdir"/correct/bin-conio"           && java MainClass
 
 echo "----------------------------------------"
 echo "containers"

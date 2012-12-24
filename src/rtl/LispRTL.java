@@ -536,6 +536,36 @@ public class LispRTL {
         return null;
     }
 
+    public static BaseClass read_int() {
+        int n = Integer.parseInt(System.console().readLine());
+        return new BaseClass(n);
+    }
+
+    public static BaseClass read_float() {
+        float f = Float.parseFloat(System.console().readLine());
+        return new BaseClass(f);
+    }
+
+    public static BaseClass read_char() {
+        char f = System.console().readLine().charAt(0);
+        return new BaseClass(f);
+    }
+
+    public static BaseClass read_string() {
+        String s = System.console().readLine();
+        return new BaseClass(s);
+    }
+
+    public static BaseClass read_boolean() throws Exception  {
+        String s = System.console().readLine().toLowerCase();
+        if (s.equals("t")) {
+            return new BaseClass(1, 0);
+        } else if (s.equals("nil")) {
+            return new BaseClass(0, 0);
+        }
+        throw new Exception("Could not parse a boolean: \"t\" or \"nil\" expected, \"" + s + "\" found");
+    }
+
     public static BaseClass archey() {
         System.out.println("               +               ");
         System.out.println("               #               ");

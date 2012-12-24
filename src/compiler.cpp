@@ -787,6 +787,11 @@ QStringList SemanticMethod::getRTLMethods()
     result << "push";
     result << "pop";
     result << "print";
+    result << "read_int";
+    result << "read_float";
+    result << "read_char";
+    result << "read_string";
+    result << "read_boolean";
     result << "archey";
 
     return result;
@@ -813,7 +818,7 @@ QString SemanticMethod::getDescForBaseClassMethod(QString name)
 
 QString SemanticMethod::getDescForRTLMethod(QString name)
 {
-    if (name == "archey") {
+    if (name == "archey" || name.startsWith("read_")) {
         return DESC_JAVA_METHOD_VOID_BASE;
     } else {
         return DESC_JAVA_METHOD_ARRAYBASE_BASE;
