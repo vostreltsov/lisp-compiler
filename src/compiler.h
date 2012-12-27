@@ -83,15 +83,6 @@ class DefinitionNode;
 #define DESC_JAVA_METHOD_ARRAYSTRING_VOID   "("DESC_JAVA_ARRAY_STRING")"DESC_JAVA_VOID
 #define DESC_JAVA_METHOD_ARRAYBASE_BASE     "("DESC_JAVA_ARRAY_BASE")"DESC_JAVA_CLASS_BASE
 
-const quint8 BASECLASS_TYPE_DAFUQ   = 0;
-const quint8 BASECLASS_TYPE_INT     = 1;
-const quint8 BASECLASS_TYPE_FLOAT   = 2;
-const quint8 BASECLASS_TYPE_CHAR    = 4;
-const quint8 BASECLASS_TYPE_STRING  = 4;
-const quint8 BASECLASS_TYPE_BOOLEAN = 5;
-const quint8 BASECLASS_TYPE_LIST    = 6;
-const quint8 BASECLASS_TYPE_VECTOR  = 7;
-
 const qint16 TWOBYTES_MAX         = 32767;
 const qint16 TWOBYTES_MIN         = -32768;
 
@@ -119,20 +110,16 @@ const quint8  CMD_BIPUSH          = 0x10;
 const quint8  CMD_SIPUSH          = 0x11;
 const quint8  CMD_LDC             = 0x12;
 const quint8  CMD_LDC_W           = 0x13;
-
 const quint8  CMD_ILOAD           = 0x15;
 const quint8  CMD_ALOAD           = 0x19;
 const quint8  CMD_ALOAD_0         = 0x2A;
-
 const quint8  CMD_ISTORE          = 0x36;
 const quint8  CMD_ASTORE          = 0x3A;
 const quint8  CMD_AASTORE         = 0x53;
 const quint8  CMD_POP             = 0x57;
 const quint8  CMD_DUP             = 0x59;
-
 const quint8  CMD_IADD            = 0x60;
 const quint8  CMD_ISUB            = 0x64;
-
 const quint8  CMD_IFEQ            = 0x99;
 const quint8  CMD_IFNE            = 0x9A;
 const quint8  CMD_ICMPEQ          = 0x9F;
@@ -143,7 +130,6 @@ const quint8  CMD_ICMPGT          = 0xA3;
 const quint8  CMD_ICMPGE          = 0xA2;
 const quint8  CMD_GOTO            = 0xA7;
 const quint8  CMD_IINC            = 0x84;
-
 const quint8  CMD_ARETURN         = 0xB0;
 const quint8  CMD_RETURN          = 0xB1;
 const quint8  CMD_GETFIELD        = 0xB4;
@@ -289,9 +275,9 @@ public:
     void addBaseClassConstants();
     void addRTLMethod(QString methodName);
 
-    bool hasField(QString name) const;
+    //bool hasField(QString name) const;
     bool hasMethod(QString name) const;
-    SemanticField * getField(QString name) const;
+    //SemanticField * getField(QString name) const;
     SemanticMethod * getMethod(QString name) const;
     //SemanticField * addField(const DefinitionNode * node);
     SemanticMethod * addMethod(const DefinitionNode * node);

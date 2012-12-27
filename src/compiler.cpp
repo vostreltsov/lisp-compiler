@@ -638,10 +638,10 @@ void SemanticClass::addRTLMethod(QString methodName)
     addMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, methodName, SemanticMethod::getDescForRTLMethod(methodName));
 }
 
-bool SemanticClass::hasField(QString name) const
+/*bool SemanticClass::hasField(QString name) const
 {
     return fFieldsTable.contains(name);
-}
+}*/
 
 bool SemanticClass::hasMethod(QString name) const
 {
@@ -653,10 +653,10 @@ bool SemanticClass::hasMethod(QString name) const
     return false;   //fMethodsTable.contains(name);
 }
 
-SemanticField * SemanticClass::getField(QString name) const
+/*SemanticField * SemanticClass::getField(QString name) const
 {
     return fFieldsTable[name];
-}
+}*/
 
 SemanticMethod * SemanticClass::getMethod(QString name) const
 {
