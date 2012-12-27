@@ -816,6 +816,11 @@ bool SemanticMethod::isRTLMethod(QString name)
     return getRTLMethods().contains(name);
 }
 
+bool SemanticMethod::rtlMethodHasArguments(QString name)
+{
+    return (name != "archey" && !name.startsWith("read_"));
+}
+
 QString SemanticMethod::getDescForBaseClassMethod(QString name)
 {
     if (name == "iterator") {
@@ -827,10 +832,10 @@ QString SemanticMethod::getDescForBaseClassMethod(QString name)
 
 QString SemanticMethod::getDescForRTLMethod(QString name)
 {
-    if (name == "archey" || name.startsWith("read_")) {
-        return DESC_JAVA_METHOD_VOID_BASE;
-    } else {
+    if (rtlMethodHasArguments(name)) {
         return DESC_JAVA_METHOD_ARRAYBASE_BASE;
+    } else {
+        return DESC_JAVA_METHOD_VOID_BASE;
     }
 }
 
@@ -1600,8 +1605,10 @@ QByteArray SExpressionNode::generateCode(const SemanticClass * curClass, const S
             if (isRTL) {
                 constMethod = curClass->findMethodrefConstant(NAME_JAVA_CLASS_LISPRTL, fId, SemanticMethod::getDescForRTLMethod(fId));
                 // Put arguments onto the stack AS AN ARRAY.
-                foreach (quint8 byte, collectExpressionsToArray(curClass, curMethod, fArguments)) {
-                    stream << byte;
+                if (SemanticMethod::rtlMethodHasArguments(fId)) {
+                    foreach (quint8 byte, collectExpressionsToArray(curClass, curMethod, fArguments)) {
+                        stream << byte;
+                    }
                 }
                 // Call the method.
                 stream << CMD_INVOKESTATIC << constMethod->fNumber;

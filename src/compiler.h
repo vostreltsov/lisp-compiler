@@ -325,6 +325,7 @@ public:
     static QStringList getRTLMethods();
     static bool isBaseClassMethod(QString name);
     static bool isRTLMethod(QString name);
+    static bool rtlMethodHasArguments(QString name);
     static QString getDescForBaseClassMethod(QString name);
     static QString getDescForRTLMethod(QString name);
     static QString getDescForRegularMethod(int numberOfArguments);
