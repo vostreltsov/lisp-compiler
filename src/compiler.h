@@ -262,6 +262,7 @@ public:
     SemanticConstant * addInterfaceMethodrefConstant(QString interfaceName, QString methodName, QString descriptor);
     SemanticConstant * addNameAndTypeConstant(QString name, QString type);
 
+    SemanticConstant * findUtf8Constant(QString value) const;
     SemanticConstant * findIntegerConstant(qint32 value) const;
     SemanticConstant * findFloatConstant(float value) const;
     SemanticConstant * findClassConstant(QString name) const;

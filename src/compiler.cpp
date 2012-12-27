@@ -368,10 +368,9 @@ bool SemanticClass::generateCode(QString dir) const
 SemanticConstant * SemanticClass::addUtf8Constant(QString value)
 {
     // Does it already exist?
-    foreach (SemanticConstant * existed, fConstantsTable) {
-        if (existed->fType == CONSTANT_Utf8 && existed->fUtf8 == value) {
-            return existed;
-        }
+    SemanticConstant * existed = findUtf8Constant(value);
+    if (existed != NULL) {
+        return existed;
     }
     // Create the new constant.
     SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_Utf8, value);
@@ -491,6 +490,16 @@ SemanticConstant * SemanticClass::addNameAndTypeConstant(QString name, QString t
     SemanticConstant * result = new SemanticConstant(fConstantsTable.size() + 1, CONSTANT_NameAndType, "", 0, 0, nameConst, typeConst);
     fConstantsTable << result;
     return result;
+}
+
+SemanticConstant * SemanticClass::findUtf8Constant(QString value) const
+{
+    foreach (SemanticConstant * result, fConstantsTable) {
+        if (result->fType == CONSTANT_Utf8 && result->fUtf8 == value) {
+            return result;
+        }
+    }
+    return NULL;
 }
 
 SemanticConstant * SemanticClass::findIntegerConstant(qint32 value) const
