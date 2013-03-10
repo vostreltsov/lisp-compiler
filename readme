@@ -1,3 +1,1 @@
-check this out
-http://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node1.html
-http://www.apl.jhu.edu/~hall/Lisp-Notes/Defclass.html
+A simple common lisp to java byte code compiler. It's a course work in theory of programming languages and thus supports not all of the common lisp capabilities.
